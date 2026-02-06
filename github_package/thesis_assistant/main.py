@@ -7,7 +7,7 @@ Usage:
     quick_ask("Your question here")
 """
 
-from .config import get_api_key
+from .config import get_api_key, DRIVE_ROOT, PAPERS_DIR
 from .claude_client import ClaudeClient
 from .pdf_handler import PDFHandler
 from .prompts import (
