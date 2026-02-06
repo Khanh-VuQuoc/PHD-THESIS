@@ -7,17 +7,17 @@ Usage:
     quick_ask("Your question here")
 """
 
-from config import get_api_key
-from claude_client import ClaudeClient
-from pdf_handler import PDFHandler
-from prompts import (
+from .config import get_api_key
+from .claude_client import ClaudeClient
+from .pdf_handler import PDFHandler
+from .prompts import (
     get_latex_review_prompt,
     get_compare_papers_prompt,
     get_extract_equations_prompt,
     get_gap_analysis_prompt
 )
-from utils import display_response, print_header
-from cost_tracker import CostTracker
+from .utils import display_response, print_header
+from .cost_tracker import CostTracker
 
 
 # ============================================
