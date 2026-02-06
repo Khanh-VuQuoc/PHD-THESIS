@@ -4,8 +4,8 @@ Claude API client wrapper
 
 import anthropic
 from typing import Optional, List, Dict, Any
-from config import MODELS, PRICING, DEFAULT_MAX_TOKENS, DEFAULT_TEMPERATURE
-from pdf_handler import PDFHandler
+from .config import MODELS, PRICING, DEFAULT_MAX_TOKENS, DEFAULT_TEMPERATURE
+from .pdf_handler import PDFHandler
 
 
 class ClaudeClient:
