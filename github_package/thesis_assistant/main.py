@@ -202,7 +202,7 @@ def verify_setup():
     """Verify all setup is correct"""
     import os
     from pathlib import Path
-    from config import DRIVE_ROOT, PAPERS_DIR
+    from .config import DRIVE_ROOT, PAPERS_DIR
     
     print("🔍 Checking setup...\n")
     
