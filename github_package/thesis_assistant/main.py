@@ -18,7 +18,7 @@ from .prompts import (
 )
 from .utils import display_response, print_header
 from .cost_tracker import CostTracker
-
+from .config import get_api_key, DRIVE_ROOT, PAPERS_DIR  # Add DRIVE_ROOT, PAPERS_DIR here
 
 # ============================================
 # GLOBAL INSTANCES
@@ -202,7 +202,6 @@ def verify_setup():
     """Verify all setup is correct"""
     import os
     from pathlib import Path
-    from .config import DRIVE_ROOT, PAPERS_DIR
     
     print("🔍 Checking setup...\n")
     
