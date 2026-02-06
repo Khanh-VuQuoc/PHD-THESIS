@@ -6,7 +6,7 @@ import base64
 import os
 from pathlib import Path
 from typing import List, Optional
-from config import PAPERS_DIR
+from .config import PAPERS_DIR
 
 
 class PDFHandler:
