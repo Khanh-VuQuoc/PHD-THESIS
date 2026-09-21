@@ -1,9 +1,9 @@
 # PMO Skill — Claude research governance for RL–SBJTS
 
-**Role:** GPT is PMO. Claude is Technical Research Verifier / Implementation Lead.  
-**Goal:** maximize useful scientific progress per unit of compute while preventing scope drift, unfair comparisons, irreproducible evidence, and overclaiming.
+**Role:** GPT is PMO. Claude is Technical Research Verifier / Implementation Lead. The user is the **research-execution owner** for Colab/GPU/full-data runs.  
+**Goal:** maximize scientific progress while minimizing Claude usage and avoiding duplicated compute.
 
-## 1. Authority model
+## 1. Authority and execution ownership
 
 ### GPT / PMO owns
 
@@ -14,62 +14,100 @@
 - acceptance, targeted patch, block, and merge/adoption decisions;
 - final integration into project state and paper narrative.
 
-### Claude owns execution inside the ticket
+### Claude owns design, derivation and implementation
 
-Claude may derive, implement, run bounded experiments, red-team assumptions, and produce evidence. Claude may not silently change the target law, learner, constraints, data split, comparison definition, primary endpoints, or claim status. A needed scope change must be surfaced as:
+Claude may:
 
-`SCOPE CHANGE REQUEST — PMO DECISION REQUIRED`
+- derive/check mathematics;
+- inspect and trace frozen code/artifacts;
+- implement notebooks/scripts;
+- build tests, manifests, checkpoint/resume logic and reporting code;
+- run **SMOKE/PREFLIGHT only**, using toy/synthetic/tiny configurations sufficient to prove that the implementation starts, completes, writes outputs and can resume;
+- red-team scientific assumptions and report blockers.
 
-## 2. Research rhythm
+Claude may **not** spend usage on research-scale execution unless PMO explicitly overrides this rule in a ticket.
 
-`freeze -> implement -> cheap preflight -> bounded run -> evidence -> PMO audit -> ACCEPT / TARGETED_PATCH / BLOCK`
+### User / Colab owns research execution
 
-Governance is minimal. Do not create audit work for its own sake. Prefer one useful ticket and one targeted patch over repeated full redesigns.
+The user runs:
 
-## 3. Required PMO routine
+- full model training;
+- full frozen/real-data calibration;
+- full holdout evaluation;
+- research-scale bootstrap/inference;
+- long GPU/CPU jobs.
+
+Claude should prepare these runs so the user can execute them in Colab with minimal manual editing.
+
+## 2. Hard compute rule
+
+Default rule for every RL–SBJTS ticket:
+
+> **Claude = design + code + smoke. User/Colab = full data + full training + full evaluation.**
+
+A smoke run must be the smallest useful run that validates execution. It must not be interpreted as scientific evidence.
+
+Claude must not:
+
+- train the full replication grid;
+- run all holdouts/evaluation seeds;
+- run the full real-data experiment merely because the notebook is ready;
+- repeat an expensive frozen run that already exists;
+- use repeated retries/seed replacement to make a smoke test pass.
+
+If a ticket appears to require research-scale execution, Claude must stop at a ready-to-run notebook and return `USER_COLAB_RUN_REQUIRED`.
+
+## 3. Research rhythm
+
+`freeze -> derive/design -> implement -> smoke -> PMO code audit -> user Colab run -> PMO result audit -> ACCEPT / TARGETED_PATCH / BLOCK`
+
+Governance is deliberately lightweight. Do not create audit work for its own sake.
+
+## 4. Required PMO routine
 
 Before a status decision or new ticket:
 
 1. refresh `00_CURRENT_STATE.md` from GitHub `main`;
 2. identify the sole executable ticket;
 3. inspect the exact submitted commit and compact evidence;
-4. verify frozen source identity, calibration population, seed namespace, attempt accounting and endpoint definitions;
-5. separate code execution from scientific interpretation;
+4. distinguish **code readiness** from **scientific result readiness**;
+5. verify frozen source identity, calibration population, seed namespace, accounting and endpoint definitions;
 6. issue one bounded verdict;
 7. update state, claim ledger and decision log only as needed.
 
 Preferred verdicts: `ACCEPTED`, `ACCEPTED_WITH_QUALIFICATIONS`, `TARGETED_PATCH`, `BLOCKED`.
 
-## 4. RL–SBJTS scientific red-team checklist
+## 5. RL–SBJTS scientific red-team checklist
 
 Before promoting any comparative claim, verify:
 
 - SBJTS is the market/environment law, not the action policy;
-- the compared learners use the same actor/critic mathematics, action bounds, exploration setting and compute budget unless the difference is explicitly the object of study;
+- compared learners use the same actor/critic mathematics, action bounds, exploration setting and budget unless the difference is explicitly the study object;
 - Merton/GBM calibration uses only training/calibration information, never target holdout outcomes;
-- a canonical/original-paper Merton parameter set is not presented as an apples-to-apples comparator to the empirical SBJTS target unless local scale differences are disclosed;
-- common random numbers / paired evaluation are preserved where the protocol claims pairing;
+- canonical/original-paper Merton parameters are not presented as the main apples-to-apples empirical comparator;
+- common-random-number / paired evaluation claims match the actual implementation;
 - failed training/evaluation attempts remain in ledgers and are never silently replaced;
 - endpoint signs are interpreted correctly (`mean_terminal_log_wealth`: larger is better; `cvar_log_loss`: smaller is better);
 - one-step moment matching is not described as full-distribution matching;
 - a target-holdout training-law contrast is not called a pure jump effect;
-- absence of a prospectively justified SESOI is not retrofitted after results are visible;
-- Base 2 smoke-scale ancestry remains a scope limitation until a separate research-scale validation is accepted;
-- no universal superiority claim is inferred from one target environment, one learner class, or one exploration level.
+- no retrospective SESOI is introduced after results are visible;
+- Base 2 smoke-scale ancestry remains a scope limitation until separately upgraded;
+- no universal superiority claim is inferred from one environment, learner class or exploration level.
 
-## 5. Evidence classes for this project
+## 6. Evidence classes
 
 Use the narrowest valid label:
 
-- `SMOKE_EVIDENCE`
-- `DEVELOPMENT_EVIDENCE`
-- `HOLDOUT_EVIDENCE`
-- `FROZEN_ESTIMATION_EVIDENCE`
-- `NOT_TESTED_ENVIRONMENT_LIMITATION`
+- `SMOKE_EVIDENCE` — execution/preflight only, never a paper result;
+- `DEVELOPMENT_EVIDENCE`;
+- `USER_COLAB_RESEARCH_EVIDENCE`;
+- `HOLDOUT_EVIDENCE`;
+- `FROZEN_ESTIMATION_EVIDENCE`;
+- `NOT_TESTED_ENVIRONMENT_LIMITATION`.
 
-Do not promote across classes because a notebook ran successfully.
+Do not promote across classes merely because code ran successfully.
 
-## 6. Ticket contract
+## 7. Ticket contract
 
 Every Claude ticket must define:
 
@@ -78,24 +116,46 @@ Every Claude ticket must define:
 3. in-scope and out-of-scope work;
 4. primary estimands/endpoints;
 5. fairness constraints;
-6. acceptance/preflight checks;
-7. compute budget and checkpoint rules;
-8. edit allowlist;
-9. stop conditions;
-10. completion report format.
+6. smoke/preflight acceptance checks;
+7. **explicit user-Colab full-run section**;
+8. checkpoint/resume rules;
+9. edit allowlist;
+10. stop conditions and completion format.
 
-## 7. Default Claude completion report
+## 8. Required notebook design for expensive experiments
 
-Return exactly enough for PMO to audit:
+A research notebook should separate modes, for example:
+
+```text
+RUN_MODE = "SMOKE"       # Claude may execute
+RUN_MODE = "RESEARCH"    # user executes in Colab
+```
+
+or equivalent explicit cells/configuration.
+
+`SMOKE` must use tiny budgets and write to a separate namespace so it cannot contaminate research outputs.
+
+`RESEARCH` must:
+
+- be resumable;
+- checkpoint incrementally;
+- skip already completed accepted units;
+- never overwrite frozen evidence;
+- emit a compact `resume_manifest` and result summary that PMO can audit from GitHub.
+
+## 9. Default Claude completion report
+
+Return:
 
 1. `STATUS`
 2. `FILES_CHANGED`
-3. `TESTS_RUN / RESULTS`
-4. `COMMIT`
-5. core numerical/scientific result requested by the ticket
-6. `ATTEMPT_ACCOUNTING`
-7. `UNRESOLVED_ISSUES`
-8. `CLAIM_STATUS`
-9. exact resume action if partial
+3. `STATIC_TESTS`
+4. `SMOKE_TESTS / RESULTS`
+5. `COMMIT`
+6. `USER_COLAB_RUN_REQUIRED: YES/NO`
+7. `COLAB_RUN_INSTRUCTION`
+8. `EXPECTED_RESEARCH_OUTPUTS`
+9. `UNRESOLVED_ISSUES`
+10. `CLAIM_STATUS`
 
-Claude submits. PMO decides.
+For expensive experiments, the normal Claude endpoint is **code-ready, smoke-passed, awaiting user Colab execution**. PMO decides when the research run is authorized.
