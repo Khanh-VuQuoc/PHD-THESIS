@@ -9,9 +9,11 @@ Updated: 2026-09-21.
 | `BASE4_FINAL_RELEASE_AUDIT.json` | numerical verdict/integrity authority | protocol `c9ef65485a49d40356f3bbb02d491c4b73fcc9ebf0a22f02f64ab87e04a590d4`; backend `TORCH_CUDA_FLOAT32_BATCHED` |
 | `BASE4_FINAL_RESULTS_HANDOVER_PMO.md` | PMO-readable final Base 4 handover | estimation-first; confirmatory superiority not claimed |
 | `RL_SBJTS_TECHNICAL_IMPLEMENTATION_RECORD_FINAL.md` | implemented data flow, learner and source trace | code-governed implementation record |
-| `05B_BASE4_SCIENTIFIC_EXPERIMENT_GPU_RESEARCH_v2_0.ipynb` | Base 4 executed implementation | Drive source ID `1dBsDSYNc6YPW8pxBo_xhwcmMX9ZLVoiF`; copied into this repo as frozen baseline under `notebooks/frozen/` |
+| `05B_BASE4_SCIENTIFIC_EXPERIMENT_GPU_RESEARCH_v2_0.ipynb` | Base 4 executed implementation | Drive source ID `1dBsDSYNc6YPW8pxBo_xhwcmMX9ZLVoiF`; GitHub carries a small immutable pointer under `notebooks/frozen/`, while the large executed notebook stays in the frozen Drive research store |
 | Base 3 frozen research source | frozen engine + learner definitions loaded by Base 4 | source identity remains pinned by Base 4 ancestry/hashes; do not substitute an older MVP notebook |
 | frozen market snapshot | single empirical input consumed by the frozen pipeline | `frozen_market_snapshot_U1_BASELINE_4.npz`, sha256 `7e817762849118fc3abf8d4cf98ad8d65d921fa49cb0d1b3bb34d884b73c5b4a` |
+
+The observed SHA-256 of the downloaded Base 4 notebook bytes on 2026-09-21 is `7bb73be0ddb5ad52534e6d2bdf8829fc2603394188d39f0c337b618fedf97657`. This is a PMO retrieval fingerprint, not a replacement for the protocol's internal ancestry hashes.
 
 ## B. Merton / original-paper benchmark facts
 
