@@ -1,6 +1,6 @@
 # C-RLSBJTS-MERTON-COMP-01 — Direct RL–Merton comparator on frozen SBJTS holdout
 
-**Status:** `OPEN_FOR_CLAUDE`  
+**Status:** `READY_FOR_PMO`  
 **Owner:** Claude — Technical Research Verifier / Implementation Lead  
 **PMO:** GPT  
 **Evidence target:** development -> holdout estimation evidence; no confirmatory-superiority promotion.
@@ -286,3 +286,50 @@ Then set this ticket to `READY_FOR_PMO` and stop. PMO decides whether any claim 
 ## Progress
 
 - 2026-09-21 — PMO opened ticket. No comparator result exists yet.
+- 2026-09-21 — Claude executed W0–W7 on branch `claude/eager-ride-091ooh`. Status
+  `READY_FOR_PMO`. Full detail in `../reports/claude/RL_SBJTS_VS_MERTON_COMPARATOR_v1.md`
+  and `../evidence/merton_comparator_v1/`.
+
+  - **W0** protocol id `c9ef6548…` recomputed from the 27 component registries in
+    `BASE4_05A_FINAL_BUNDLE.zip`; 0 internal checksum failures, 0 component mismatches.
+    Base 3 embedded notebook, code-cell concat, all 17 native AST engine components,
+    the market snapshot and the training slice all verify against their pinned digests.
+    All 160 frozen Base 4 training `attempt_id`s reproduce exactly from the protocol id,
+    calibration id and frozen seed plan.
+  - **W1** `BASE4_TARGET_REPRODUCTION_PASS` — 800 frozen TT rows regenerated, 800/800
+    evaluation `attempt_id`s match, every endpoint inside the frozen Base 3
+    `GPU_EQ_ATOL`/`GPU_EQ_RTOL`; worst absolute deviation 7.8e-07.
+  - **W2** `MERTON_GBM_CALIBRATION_PASS` — training slice only, `sigma_M` 0.207773,
+    `mu_M - r_f` 0.091442, `dt` 1/250, `ddof` 0; Monte Carlo moment test z_mean −0.23,
+    z_var +0.92 against a predeclared 4-sigma band on a disjoint seed namespace.
+  - **W3** learner gates PC1–PC5 pass as predeclared (objective ascent z = 638 and
+    1116). One auxiliary **market** check, PC6, was underpowered at its predeclared
+    512-path 4-sigma band; the original outcome is preserved verbatim and adjudicated in
+    a disclosed addendum. Amended status
+    `LEARNER_POSITIVE_CONTROL_PASS_WITH_UNDERPOWERED_AUXILIARY_CHECK`.
+  - **W4** 80/80 Merton policies trained at the frozen budget, 0 failures, 0 seed
+    replacements, 0 frozen SBJTS policies retrained.
+  - **W5/W6** 48,000/48,000 learned evaluation attempts completed on the frozen target
+    holdout (24,000 per arm) plus 600 analytic attempts. No imputation.
+  - **W7** primary estimands, `Delta = SBJTS − MERTON_GBM`, crossed cluster bootstrap
+    executed verbatim from the frozen Base 4 notebook:
+
+    | Stratum | `Delta_W` (95% CI) | `Delta_CVaR` (95% CI) |
+    |---|---|---|
+    | LONG_ONLY_FULL | +0.0022063 [+0.0021715, +0.0022427] | −0.0031809 [−0.0033589, −0.0030012] |
+    | LONG_ONLY_CAP50 | +0.0005541 [+0.0005442, +0.0005637] | −0.0007611 [−0.0008115, −0.0007122] |
+
+    Both signs favour SBJTS training on both co-primary endpoints in both strata. The
+    arms hold nearly identical average exposure; the difference is state feedback the
+    GBM training law cannot teach. **No superiority claim is made and `CL-RL-006`
+    remains `NOT_TESTED`.**
+
+  - **PMO decision required** on two disclosed deviations: (D1) W1 covers one holdout
+    stream rather than two, because only the first 1 MiB of the 31 MB frozen
+    `evaluation_results_partial.csv` is retrievable in this session; (D2) consequently
+    the SBJTS arm of the comparator was regenerated for all 300 blocks from the
+    immutable frozen policies rather than read from the frozen ledger. Also recorded:
+    (D3) no CUDA in this environment, so the frozen fallback selected
+    `TORCH_CPU_FLOAT32_BATCHED`; (D4) the PC6 adjudication; (D5) the 21.5 MB Base 3
+    frozen zip could not be pulled, though both members Base 4 consumes from it verify
+    byte-identically; (D6) four evidence files beyond the named allowlist.
