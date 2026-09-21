@@ -1,7 +1,7 @@
 # PMO Skill — Claude research governance for RL–SBJTS
 
 **Role:** GPT is PMO. Claude is Technical Research Verifier / Implementation Lead. The user is the **research-execution owner** for Colab/GPU/full-data runs.  
-**Goal:** maximize scientific progress while minimizing Claude usage and avoiding duplicated compute.
+**Goal:** maximize scientific progress while minimizing Claude usage, duplicated compute and wasted paid Colab GPU time.
 
 ## 1. Authority and execution ownership
 
@@ -57,13 +57,39 @@ Claude must not:
 
 If a ticket appears to require research-scale execution, Claude must stop at a ready-to-run notebook and return `USER_COLAB_RUN_REQUIRED`.
 
-## 3. Research rhythm
+## 3. Colab T4 GPU research-execution contract
 
-`freeze -> derive/design -> implement -> smoke -> PMO code audit -> user Colab run -> PMO result audit -> ACCEPT / TARGETED_PATCH / BLOCK`
+Research training is designed for the user's **paid Google Colab NVIDIA T4 GPU**. Notebook implementation must therefore actively exploit CUDA rather than merely being GPU-compatible.
+
+For `RUN_MODE="RESEARCH"`:
+
+- require `torch.cuda.is_available()` before model training/evaluation begins;
+- record `torch.cuda.get_device_name(0)`, CUDA version, PyTorch version and selected device in the run manifest;
+- expected research device is **NVIDIA T4**; if a T4 is not allocated, stop with a clear hardware message unless PMO explicitly authorizes another GPU;
+- **no silent CPU fallback** for model training or large simulation/evaluation loops;
+- keep learner/simulation tensors on CUDA and vectorize/batch work to exploit the T4;
+- avoid Python per-path/per-sample loops where a batched tensor operation is feasible;
+- avoid repeated GPU→CPU→GPU transfers inside hot loops; aggregate on GPU and transfer only compact outputs/checkpoints when practical;
+- use `torch.no_grad()` / `torch.inference_mode()` for evaluation paths that do not require gradients;
+- choose batch/chunk sizes from available T4 VRAM and expose them as configuration rather than hard-coding a fragile maximum;
+- checkpoint frequently enough that a Colab disconnect does not destroy a long paid-GPU run;
+- log GPU utilization-oriented runtime summaries per major stage so obvious CPU bottlenecks can be detected.
+
+### Numerical compatibility
+
+The frozen Base 4 research backend is `TORCH_CUDA_FLOAT32_BATCHED`. Therefore the default comparator research backend is also CUDA **float32 batched**.
+
+Do **not** introduce AMP/float16/bfloat16, TF32-dependent changes, altered tolerances, or a new numerical backend merely to gain speed unless PMO explicitly opens a numerical-equivalence validation. Speedups must preserve the frozen mathematical and numerical contract first.
+
+CPU remains appropriate for lightweight file I/O, pandas bookkeeping, hashing and small summary/statistical operations when moving them to GPU would add overhead. The rule is to use the T4 aggressively where the workload is tensor-heavy, not to force every line of code onto CUDA.
+
+## 4. Research rhythm
+
+`freeze -> derive/design -> implement -> smoke -> PMO code audit -> user Colab T4 run -> PMO result audit -> ACCEPT / TARGETED_PATCH / BLOCK`
 
 Governance is deliberately lightweight. Do not create audit work for its own sake.
 
-## 4. Required PMO routine
+## 5. Required PMO routine
 
 Before a status decision or new ticket:
 
@@ -72,12 +98,13 @@ Before a status decision or new ticket:
 3. inspect the exact submitted commit and compact evidence;
 4. distinguish **code readiness** from **scientific result readiness**;
 5. verify frozen source identity, calibration population, seed namespace, accounting and endpoint definitions;
-6. issue one bounded verdict;
-7. update state, claim ledger and decision log only as needed.
+6. for expensive model jobs, verify that RESEARCH mode is truly CUDA-batched and T4-ready rather than a CPU implementation wrapped in a GPU notebook;
+7. issue one bounded verdict;
+8. update state, claim ledger and decision log only as needed.
 
 Preferred verdicts: `ACCEPTED`, `ACCEPTED_WITH_QUALIFICATIONS`, `TARGETED_PATCH`, `BLOCKED`.
 
-## 5. RL–SBJTS scientific red-team checklist
+## 6. RL–SBJTS scientific red-team checklist
 
 Before promoting any comparative claim, verify:
 
@@ -94,7 +121,7 @@ Before promoting any comparative claim, verify:
 - Base 2 smoke-scale ancestry remains a scope limitation until separately upgraded;
 - no universal superiority claim is inferred from one environment, learner class or exploration level.
 
-## 6. Evidence classes
+## 7. Evidence classes
 
 Use the narrowest valid label:
 
@@ -107,7 +134,7 @@ Use the narrowest valid label:
 
 Do not promote across classes merely because code ran successfully.
 
-## 7. Ticket contract
+## 8. Ticket contract
 
 Every Claude ticket must define:
 
@@ -117,18 +144,18 @@ Every Claude ticket must define:
 4. primary estimands/endpoints;
 5. fairness constraints;
 6. smoke/preflight acceptance checks;
-7. **explicit user-Colab full-run section**;
+7. **explicit user-Colab T4 full-run section**;
 8. checkpoint/resume rules;
 9. edit allowlist;
 10. stop conditions and completion format.
 
-## 8. Required notebook design for expensive experiments
+## 9. Required notebook design for expensive experiments
 
 A research notebook should separate modes, for example:
 
 ```text
 RUN_MODE = "SMOKE"       # Claude may execute
-RUN_MODE = "RESEARCH"    # user executes in Colab
+RUN_MODE = "RESEARCH"    # user executes on paid Colab T4
 ```
 
 or equivalent explicit cells/configuration.
@@ -137,13 +164,15 @@ or equivalent explicit cells/configuration.
 
 `RESEARCH` must:
 
+- assert CUDA/T4 availability before expensive execution;
+- use the frozen CUDA float32 batched numerical path unless PMO authorizes otherwise;
 - be resumable;
 - checkpoint incrementally;
 - skip already completed accepted units;
 - never overwrite frozen evidence;
-- emit a compact `resume_manifest` and result summary that PMO can audit from GitHub.
+- emit a compact `resume_manifest`, hardware manifest and result summary that PMO can audit from GitHub.
 
-## 9. Default Claude completion report
+## 10. Default Claude completion report
 
 Return:
 
@@ -151,11 +180,12 @@ Return:
 2. `FILES_CHANGED`
 3. `STATIC_TESTS`
 4. `SMOKE_TESTS / RESULTS`
-5. `COMMIT`
-6. `USER_COLAB_RUN_REQUIRED: YES/NO`
-7. `COLAB_RUN_INSTRUCTION`
-8. `EXPECTED_RESEARCH_OUTPUTS`
-9. `UNRESOLVED_ISSUES`
-10. `CLAIM_STATUS`
+5. `GPU_RESEARCH_PATH_CHECK` — confirm RESEARCH mode sends model/simulation tensor-heavy work to CUDA and preserves float32 batched semantics
+6. `COMMIT`
+7. `USER_COLAB_RUN_REQUIRED: YES/NO`
+8. `COLAB_T4_RUN_INSTRUCTION`
+9. `EXPECTED_RESEARCH_OUTPUTS`
+10. `UNRESOLVED_ISSUES`
+11. `CLAIM_STATUS`
 
-For expensive experiments, the normal Claude endpoint is **code-ready, smoke-passed, awaiting user Colab execution**. PMO decides when the research run is authorized.
+For expensive experiments, the normal Claude endpoint is **code-ready, smoke-passed, T4-ready, awaiting user Colab execution**. PMO decides when the research run is authorized.
