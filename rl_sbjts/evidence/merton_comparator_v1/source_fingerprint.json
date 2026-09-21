@@ -1,0 +1,268 @@
+{
+  "fingerprint_id": "C-RLSBJTS-MERTON-COMP-01/source_fingerprint",
+  "ticket": "C-RLSBJTS-MERTON-COMP-01",
+  "generated_at_utc": "2026-09-21T06:21:22.008120+00:00",
+  "SOURCE_CONSUMPTION_MODE": "VERIFIED_ARTIFACT_BYTES",
+  "artifacts": {
+    "base4_notebook_05B_v2_0": {
+      "local_path_basename": "05B_BASE4_v2_0.ipynb",
+      "drive_file_id": "1dBsDSYNc6YPW8pxBo_xhwcmMX9ZLVoiF",
+      "bytes": 250857,
+      "sha256": "7bb73be0ddb5ad52534e6d2bdf8829fc2603394188d39f0c337b618fedf97657",
+      "expected_sha256": "7bb73be0ddb5ad52534e6d2bdf8829fc2603394188d39f0c337b618fedf97657",
+      "match": true
+    },
+    "base4_05a_final_bundle_zip": {
+      "local_path_basename": "BASE4_05A_FINAL_BUNDLE.zip",
+      "drive_file_id": "17AqOQJHBjO8b1QnmBuUQYPnd3eRk4JpZ",
+      "bytes": 509912,
+      "sha256": "77aaf6b2ccdd98d446120b72adaddf01b8819ada12b406a3bc39e073d129ca43",
+      "expected_sha256": "77aaf6b2ccdd98d446120b72adaddf01b8819ada12b406a3bc39e073d129ca43",
+      "match": true
+    },
+    "base3_frozen_embedded_notebook": {
+      "local_path_basename": "03_RL_SBJTS_RESEARCH_GPU_HYBRID_v1_8__driveA.ipynb",
+      "drive_file_id": "1jwh6QQG99_wuTJ1HR1t9VUSPAxCqTY_w",
+      "bytes": 408616,
+      "sha256": "344956031d9e89763370a020d92ec54a669a7cc400e3d2b674de613897c02129",
+      "expected_sha256": "344956031d9e89763370a020d92ec54a669a7cc400e3d2b674de613897c02129",
+      "match": true
+    },
+    "frozen_market_snapshot": {
+      "local_path_basename": "frozen_market_snapshot_U1_BASELINE_4.npz",
+      "drive_file_id": "1Bx-850TWLSCZG6uJ5-THcEe2FdV8gGSk",
+      "bytes": 115621,
+      "sha256": "7e817762849118fc3abf8d4cf98ad8d65d921fa49cb0d1b3bb34d884b73c5b4a",
+      "expected_sha256": "7e817762849118fc3abf8d4cf98ad8d65d921fa49cb0d1b3bb34d884b73c5b4a",
+      "match": true
+    },
+    "base4_policies_npz": {
+      "local_path_basename": "base4_policies.npz",
+      "drive_file_id": "17TpwN8CrAZhi7Gv4rPBmsX161nRsnfT-",
+      "bytes": 67862,
+      "sha256": "34c39a30feb29391684bab03e4cbb0a3ebedd448af645253265413d8406fa294",
+      "expected_sha256": null,
+      "match": null
+    },
+    "base4_training_attempts_csv": {
+      "local_path_basename": "base4_training_attempts.csv",
+      "drive_file_id": "1QOlV7fBSZGYzxdWPJoF6eB61PfpM_C4e",
+      "bytes": 40994,
+      "sha256": "b56505a2d8d0973e821f0a81c60cfaaf96613c1e72bc3c11e44828f9332729c2",
+      "expected_sha256": null,
+      "match": null
+    }
+  },
+  "protocol_identity": {
+    "recomputed_protocol_id": "c9ef65485a49d40356f3bbb02d491c4b73fcc9ebf0a22f02f64ab87e04a590d4",
+    "declared_protocol_id": "c9ef65485a49d40356f3bbb02d491c4b73fcc9ebf0a22f02f64ab87e04a590d4",
+    "expected_protocol_id": "c9ef65485a49d40356f3bbb02d491c4b73fcc9ebf0a22f02f64ab87e04a590d4",
+    "n_components": 27,
+    "component_hash_mismatches": [],
+    "internal_checksum_failures": [],
+    "study_mode": "PRESPECIFIED_ESTIMATION_FIRST_COMPARATIVE_STUDY",
+    "ancestry_frozen_zip_sha256": "d3e77de4ae40fdbde31b607105c31f95d07033d00abd2bd71f93d9f3cdad0f63",
+    "ancestry_frozen_notebook_sha256": "344956031d9e89763370a020d92ec54a669a7cc400e3d2b674de613897c02129",
+    "ancestry_analysis_zip_sha256": "8c3546cd5d7660cc241924eb98792568ab2a70446ea550f66535c7405c970075",
+    "base4_seed_root": 20260901,
+    "base4_seed_root_status": "FINAL_LOCKED",
+    "N_joint_training_replications": 40,
+    "confirmatory_superiority_status": "NOT_CLAIMED",
+    "seed_root_status": "FINAL_LOCKED"
+  },
+  "base3_native_ast_components": {
+    "n_components": 17,
+    "mismatches": [],
+    "method": "BASE3_AST_COMPONENT_HASH (notebook_code_text -> ast.parse -> canonical_ast_dump -> per-component sha256)"
+  },
+  "base3_code_cell_concat_sha256": "db500333b57ae9029bde99018877580978f3c0344567fa8f86b9c74ac788b26e",
+  "base3_code_cell_concat_expected": "db500333b57ae9029bde99018877580978f3c0344567fa8f86b9c74ac788b26e",
+  "base3_code_cell_concat_match": true,
+  "base3_definitions_loaded": 287,
+  "base3_definitions_skipped": [
+    {
+      "name": "LOGLINES",
+      "reason": "SKIPPED_BY_NAME_IO_OR_RUN_SIDE_EFFECT"
+    },
+    {
+      "name": "DRIVE_AVAILABLE",
+      "reason": "SKIPPED_BY_NAME_IO_OR_RUN_SIDE_EFFECT"
+    },
+    {
+      "name": "STATUS",
+      "reason": "SKIPPED_BY_NAME_IO_OR_RUN_SIDE_EFFECT"
+    },
+    {
+      "name": "GATES",
+      "reason": "SKIPPED_BY_NAME_IO_OR_RUN_SIDE_EFFECT"
+    },
+    {
+      "name": "ART_ROOT",
+      "reason": "SKIPPED_BY_NAME_IO_OR_RUN_SIDE_EFFECT"
+    },
+    {
+      "name": "SNAPSHOT",
+      "reason": "SKIPPED_BY_NAME_IO_OR_RUN_SIDE_EFFECT"
+    },
+    {
+      "name": "HOLDOUT_DECLARATION",
+      "reason": "SKIPPED_BY_NAME_IO_OR_RUN_SIDE_EFFECT"
+    },
+    {
+      "name": "ENGINE_BACKEND",
+      "reason": "SKIPPED_BY_NAME_IO_OR_RUN_SIDE_EFFECT"
+    },
+    {
+      "name": "BASE",
+      "reason": "SKIPPED_BY_NAME_IO_OR_RUN_SIDE_EFFECT"
+    },
+    {
+      "name": "FROZEN_CAL",
+      "reason": "SKIPPED_BY_NAME_IO_OR_RUN_SIDE_EFFECT"
+    },
+    {
+      "name": "D_ASSETS",
+      "reason": "SKIPPED_BY_NAME_IO_OR_RUN_SIDE_EFFECT"
+    },
+    {
+      "name": "FROZEN_ENV_FINGERPRINT",
+      "reason": "SKIPPED_BY_NAME_IO_OR_RUN_SIDE_EFFECT"
+    },
+    {
+      "name": "SOURCE_CONTENT_ID",
+      "reason": "NameError: name 'SOURCE_TEXT' is not defined"
+    },
+    {
+      "name": "CONTENT_ID",
+      "reason": "NameError: name 'SOURCE_CONTENT_ID' is not defined"
+    }
+  ],
+  "frozen_environment": {
+    "snapshot_sha256": "7e817762849118fc3abf8d4cf98ad8d65d921fa49cb0d1b3bb34d884b73c5b4a",
+    "train_shape": [
+      2110,
+      4
+    ],
+    "train_sha256": "09811db465da1443b092f6b5e18a78b2fe1dda1fbf1709061395b0ed0e72bf01",
+    "train_end": "2020-05-22",
+    "validation_start": "2020-05-26",
+    "holdout_start": "2023-03-13",
+    "return_type": "simple",
+    "input_transform": "log1p",
+    "assets": [
+      "ITA",
+      "XLE",
+      "SMH",
+      "EUFN"
+    ],
+    "d": 4,
+    "n_reference_paths": 256,
+    "environment_fingerprint": "63ba37cc4a26b48b497e424cdeef4981684c1aef1176f2db571efa6e8e48a060",
+    "first_date": "2012-01-04",
+    "last_train_date": "2020-05-22",
+    "n_full_observations": 3518
+  },
+  "base4_protocol_constants": {
+    "BASE4_SEED_ROOT": 20260901,
+    "BASE4_CALIBRATION_ID": "a38cb5e8ba68806b86319ca0aff7806598646ea53a372384882cc3961d419f7c",
+    "affine_a": -0.00020892999064388252,
+    "affine_b": 1.254153979659183,
+    "N_STEPS": 60,
+    "N_PI": 5,
+    "N_STATE_FEATURES": 4,
+    "CONSTRAINT_REGIMES": {
+      "LONG_ONLY_FULL": [
+        0.0,
+        1.0
+      ],
+      "LONG_ONLY_CAP50": [
+        0.0,
+        0.5
+      ]
+    },
+    "RISK_FREE_PRIMARY_GROSS": 1.0,
+    "TAIL_ALPHA": 0.95,
+    "SEVERE_LOSS_THRESHOLD": 0.2,
+    "LEARNER_CONFIG": {
+      "optimizer": "adam_numpy_deterministic",
+      "learning_rate": 0.01,
+      "adam_beta1": 0.9,
+      "adam_beta2": 0.999,
+      "adam_eps": 1e-08,
+      "grad_clip_global_norm": 10.0,
+      "actor_init_scale": 0.0,
+      "actor_init_phi1_intercept": 0.5,
+      "actor_init_phi2_intercept": 0.0,
+      "scale_floor": 0.001,
+      "scale_ceiling": 10.0,
+      "max_standardized_offset": 12.0,
+      "critic_ridge_relative": 1e-06,
+      "critic_condition_max": 100000000.0,
+      "checkpoint_rule": "final_iterate",
+      "advantage_standardization": "none",
+      "entropy_gradient": "central_finite_difference",
+      "entropy_gradient_step": 1e-05,
+      "transmission_denominator_floor": 1e-08,
+      "parameter_movement_min": 1e-10,
+      "objective_response_min": 1e-08,
+      "actor_bound_fraction_max": 0.5,
+      "minimum_applied_jump_steps": 50,
+      "minimum_episodes_with_jump": 10
+    },
+    "RESEARCH_PROFILE": {
+      "train_paths": 512,
+      "eval_paths": 600,
+      "updates": 400,
+      "n_replications": 40,
+      "holdout_env_streams": 20,
+      "eval_seeds": 15
+    },
+    "AUTHORIZED_STRATA": [
+      {
+        "stratum_id": "S1_PRIMARY",
+        "constraint": "LONG_ONLY_FULL",
+        "exploration_m": 0.01
+      },
+      {
+        "stratum_id": "S2_CONFIRMATORY_CONSTRAINT",
+        "constraint": "LONG_ONLY_CAP50",
+        "exploration_m": 0.01
+      }
+    ]
+  },
+  "base4_policy_store_identity": {
+    "n_policies_in_frozen_store": 160,
+    "n_attempt_ids_recomputed": 160,
+    "exact_set_equality": true,
+    "note": "the 160 frozen Base 4 training attempt_ids are reproduced exactly from PROTOCOL_ID + BASE4_CALIBRATION_ID + the frozen seed/plan construction, with no value taken from the frozen ledgers"
+  },
+  "execution_environment": {
+    "python": "3.11.15",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "torch": "2.14.0+cu130",
+    "cuda_available": false,
+    "BASE4_BACKEND_FROZEN": "TORCH_CUDA_FLOAT32_BATCHED",
+    "BASE4_BACKEND_EFFECTIVE_HERE": "TORCH_CPU_FLOAT32_BATCHED",
+    "backend_deviation_note": "no CUDA device is available in this execution environment; the frozen notebook's own fallback ladder selects TORCH_CPU_FLOAT32_BATCHED. All random draws are numpy-generated CRN objects that are backend independent; only float32 reduction order differs."
+  },
+  "unretrievable_sources": {
+    "BASE3_FROZEN_zip": {
+      "drive_file_id": "13_rStM-xLtvEDN7btI-0snY1yP_bw-_O",
+      "bytes": 21554787,
+      "expected_sha256": "d3e77de4ae40fdbde31b607105c31f95d07033d00abd2bd71f93d9f3cdad0f63",
+      "reason": "exceeds the 10 MB Drive tool download limit and drive.google.com is blocked by this session's egress policy",
+      "mitigation": "the two members Base 4 consumes from that zip are verified byte-identical by their own pinned SHA-256 digests: the embedded Base 3 notebook and the frozen market snapshot"
+    },
+    "BASE3_MODEL_QUALITY_ANALYSIS_zip": {
+      "expected_sha256": "8c3546cd5d7660cc241924eb98792568ab2a70446ea550f66535c7405c970075",
+      "reason": "not retrieved; consumed by Base 4 only for run/content/result linkage, not by the engine"
+    },
+    "base4_evaluation_results_partial_csv": {
+      "drive_file_id": "1fNK1Xuj1U29j46xPO7CiVZ8uW2ZQ6Ic5",
+      "bytes": 31275147,
+      "reason": "exceeds the 10 MB download limit; only the first 1 MiB prefix is retrievable, which covers holdout_env_stream 0, eval_seed 0-9, all 160 policies, all four cells",
+      "impact": "W1 reproduction reference rows exist for one holdout stream only; see reproduction_check.json"
+    }
+  }
+}
