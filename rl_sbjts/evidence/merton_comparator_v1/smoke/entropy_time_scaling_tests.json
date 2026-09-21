@@ -1,0 +1,275 @@
+{
+  "ticket": "C-RLSBJTS-MERTON-COMP-01",
+  "stage": "ENTROPY_TIME_SCALING",
+  "run_mode": "SMOKE",
+  "evidence_class": "SMOKE_EVIDENCE",
+  "is_scientific_evidence": false,
+  "generated_at_utc": "2026-09-21T07:55:09.886215+00:00",
+  "claim_status": "SMOKE_EVIDENCE \u2014 execution proof only. This artifact is not a scientific result and must never be reported as comparator evidence.",
+  "check_id": "C-RLSBJTS-MERTON-COMP-01/ENTROPY_TIME_SCALING_UNIT_TESTS",
+  "status": "ENTROPY_TIME_SCALING_TESTS_PASS",
+  "scaling": {
+    "frozen_discrete_objective": "E[log(W_T/W_0)] + m * sum_{t=0}^{N-1} H(pi_t)",
+    "continuous_time_objective_chau_nguyen_nguyen": "E[log W_T] + lambda * integral_0^T H(pi_t) dt",
+    "entropy_object": "differential entropy of the truncated-Gaussian action density on the hard interval; identical in both objectives",
+    "grid": {
+      "dt": 0.004,
+      "n_steps": 60,
+      "T_years": 0.24
+    },
+    "identity": "integral_0^T H dt ~= dt * sum_t H_t  =>  m = lambda * dt",
+    "frozen_m_discrete": 0.01,
+    "lambda_equivalent_of_frozen_m": 2.5,
+    "paper_nominal_lambda": 0.01,
+    "m_discrete_equivalent_of_paper_lambda": 4e-05,
+    "ratio_learner_over_continuous_at_equal_nominal_value": 250.0,
+    "frozen_objective_modified_by_this_module": false,
+    "affects_primary_contrast": false,
+    "why_not": "both comparator arms optimise the same frozen discrete objective at the same m, so the time-scaling factor is common to the arms and cancels from Delta",
+    "affects_analytic_benchmark": true,
+    "how": "the analytic exploratory Merton policy is reported at the paper's nominal lambda and, separately, at lambda = m/dt, which is the exploration weight the frozen learner actually applies"
+  },
+  "test_problem": {
+    "mu": 1.0,
+    "sigma": 5.0,
+    "r_f": 0.0,
+    "T_years": 0.24,
+    "grid_refinements": [
+      2,
+      4
+    ],
+    "comparison_unit": "executed (location, scale) of the frozen truncated-Gaussian policy",
+    "domain": "the frozen policy box: scale in [scale_floor, scale_ceiling], which phi2_box(m) reproduces for every m",
+    "synthetic": true,
+    "note": "synthetic curvature only, chosen so every optimum the test visits is strictly interior; not calibrated, not the empirical (mu_M, sigma_M), and entering no estimand"
+  },
+  "results": [
+    {
+      "constraint": "LONG_ONLY_CAP50",
+      "bounds": [
+        0.0,
+        0.5
+      ],
+      "T1_SUM_IDENTITY": {
+        "max_abs_term_difference": 0.0,
+        "frozen_soft_return_to_go_max_abs_error": 1.1102230246251565e-16,
+        "tolerance": 1e-12,
+        "pass": true
+      },
+      "T2_GRID_INVARIANCE": {
+        "lambda_used": 2.5,
+        "base_executed_policy": {
+          "loc": 0.04000001496419968,
+          "scale": 0.3162277501690444
+        },
+        "continuous_executed_policy": {
+          "loc": 0.03999999153323709,
+          "scale": 0.316227775866649
+        },
+        "refined_with_m_rescaled": [
+          {
+            "refinement": 2,
+            "dt": 0.002,
+            "n_steps": 120,
+            "m_rescaled": 0.005,
+            "executed_loc": 0.03999999854295669,
+            "executed_scale": 0.31622776477193565,
+            "abs_loc_gap_vs_base": 1.642124299039427e-08,
+            "abs_scale_gap_vs_base": 1.4602891229564818e-08,
+            "at_box_edge": false
+          },
+          {
+            "refinement": 4,
+            "dt": 0.001,
+            "n_steps": 240,
+            "m_rescaled": 0.0025,
+            "executed_loc": 0.04000000524463408,
+            "executed_scale": 0.31622776248657675,
+            "abs_loc_gap_vs_base": 9.719565596810753e-09,
+            "abs_scale_gap_vs_base": 1.2317532327443814e-08,
+            "at_box_edge": false
+          }
+        ],
+        "refined_with_m_held_fixed": [
+          {
+            "refinement": 2,
+            "m_held_fixed": 0.01,
+            "executed_loc": 0.04000004286813366,
+            "executed_scale": 0.44721355014581904,
+            "abs_scale_gap_vs_base": 0.13098579997677462,
+            "at_box_edge": false
+          },
+          {
+            "refinement": 4,
+            "m_held_fixed": 0.01,
+            "executed_loc": 0.04000000269771855,
+            "executed_scale": 0.632455480732949,
+            "abs_scale_gap_vs_base": 0.3162277305639046,
+            "at_box_edge": false
+          }
+        ],
+        "max_gap_rescaled": 1.642124299039427e-08,
+        "max_gap_vs_continuous": 2.5697604599805857e-08,
+        "min_gap_when_m_not_rescaled": 0.13098579997677462,
+        "all_optima_strictly_inside_frozen_policy_box": true,
+        "tolerance": 1e-06,
+        "minimum_required_separation": 0.001,
+        "pass": true
+      },
+      "T3_SCALE_SEPARATION": {
+        "naive_lambda_equals_m_executed_policy": {
+          "loc": 0.04000000018019666,
+          "scale": 0.019999999886108528
+        },
+        "max_abs_gap_vs_frozen_discrete_optimum": 0.2962277502829359,
+        "minimum_required": 0.001,
+        "pass": true,
+        "meaning": "identifying the frozen m directly with the paper's lambda moves the optimal exploratory policy materially, so the distinction is not cosmetic"
+      },
+      "all_pass": true
+    },
+    {
+      "constraint": "LONG_ONLY_FULL",
+      "bounds": [
+        0.0,
+        1.0
+      ],
+      "T1_SUM_IDENTITY": {
+        "max_abs_term_difference": 0.0,
+        "frozen_soft_return_to_go_max_abs_error": 4.440892098500626e-16,
+        "tolerance": 1e-12,
+        "pass": true
+      },
+      "T2_GRID_INVARIANCE": {
+        "lambda_used": 2.5,
+        "base_executed_policy": {
+          "loc": 0.04000001505899657,
+          "scale": 0.31622776109551465
+        },
+        "continuous_executed_policy": {
+          "loc": 0.03999998869868952,
+          "scale": 0.31622777105258576
+        },
+        "refined_with_m_rescaled": [
+          {
+            "refinement": 2,
+            "dt": 0.002,
+            "n_steps": 120,
+            "m_rescaled": 0.005,
+            "executed_loc": 0.03999999466914254,
+            "executed_scale": 0.31622777117557876,
+            "abs_loc_gap_vs_base": 2.0389854034352783e-08,
+            "abs_scale_gap_vs_base": 1.0080064116735343e-08,
+            "at_box_edge": false
+          },
+          {
+            "refinement": 4,
+            "dt": 0.001,
+            "n_steps": 240,
+            "m_rescaled": 0.0025,
+            "executed_loc": 0.03999999654756081,
+            "executed_scale": 0.31622776781996825,
+            "abs_loc_gap_vs_base": 1.851143575926084e-08,
+            "abs_scale_gap_vs_base": 6.724453605055913e-09,
+            "at_box_edge": false
+          }
+        ],
+        "refined_with_m_held_fixed": [
+          {
+            "refinement": 2,
+            "m_held_fixed": 0.01,
+            "executed_loc": 0.04000002533863732,
+            "executed_scale": 0.44721358745126427,
+            "abs_scale_gap_vs_base": 0.13098582635574962,
+            "at_box_edge": false
+          },
+          {
+            "refinement": 4,
+            "m_held_fixed": 0.01,
+            "executed_loc": 0.040000059626797306,
+            "executed_scale": 0.6324554929422938,
+            "abs_scale_gap_vs_base": 0.3162277318467791,
+            "at_box_edge": false
+          }
+        ],
+        "max_gap_rescaled": 2.0389854034352783e-08,
+        "max_gap_vs_continuous": 2.636030704827874e-08,
+        "min_gap_when_m_not_rescaled": 0.13098582635574962,
+        "all_optima_strictly_inside_frozen_policy_box": true,
+        "tolerance": 1e-06,
+        "minimum_required_separation": 0.001,
+        "pass": true
+      },
+      "T3_SCALE_SEPARATION": {
+        "naive_lambda_equals_m_executed_policy": {
+          "loc": 0.0399999997427411,
+          "scale": 0.019999999822686843
+        },
+        "max_abs_gap_vs_frozen_discrete_optimum": 0.2962277612728278,
+        "minimum_required": 0.001,
+        "pass": true,
+        "meaning": "identifying the frozen m directly with the paper's lambda moves the optimal exploratory policy materially, so the distinction is not cosmetic"
+      },
+      "all_pass": true
+    }
+  ],
+  "empirical_curvature_diagnostic": {
+    "check_id": "C-RLSBJTS-MERTON-COMP-01/EMPIRICAL_CURVATURE_DIAGNOSTIC",
+    "evidence_class": "SMOKE_EVIDENCE",
+    "is_a_gate": false,
+    "mu_M": 0.0914416389554889,
+    "sigma_M": 0.2077734286932787,
+    "r_f": 0.0,
+    "interpretation": "at the empirical curvature the frozen per-step entropy weight dominates the per-step log-growth term, so the exploratory optimum saturates the frozen scale ceiling. This is a property of the frozen objective at m = 0.01 on a 1/250 grid, it is identical for both comparator arms, and it is the reason the analytic Merton benchmark is reported at two exploration conventions rather than one.",
+    "rows": [
+      {
+        "constraint": "LONG_ONLY_CAP50",
+        "bounds": [
+          0.0,
+          0.5
+        ],
+        "per_step_log_growth_term": 8.525863919205965e-05,
+        "per_step_entropy_term_frozen_m": -0.009405154743855818,
+        "entropy_over_growth_magnitude_ratio": 110.31321673653622,
+        "optima": {
+          "frozen_discrete_m": {
+            "effective_lambda": 2.5,
+            "executed_loc": 2.118139355956494,
+            "executed_scale": 7.609793666682988,
+            "at_box_edge": false
+          },
+          "paper_nominal_lambda": {
+            "effective_lambda": 0.01,
+            "executed_loc": 2.118185250130409,
+            "executed_scale": 0.4812934691223872,
+            "at_box_edge": false
+          }
+        }
+      },
+      {
+        "constraint": "LONG_ONLY_FULL",
+        "bounds": [
+          0.0,
+          1.0
+        ],
+        "per_step_log_growth_term": 0.0001604349959583616,
+        "per_step_entropy_term_frozen_m": -0.008836545666945163,
+        "entropy_over_growth_magnitude_ratio": 55.0786666846587,
+        "optima": {
+          "frozen_discrete_m": {
+            "effective_lambda": 2.5,
+            "executed_loc": 3.2935876019064096,
+            "executed_scale": 10.000000000000002,
+            "at_box_edge": true
+          },
+          "paper_nominal_lambda": {
+            "effective_lambda": 0.01,
+            "executed_loc": 2.1181854150467485,
+            "executed_scale": 0.48129347804803685,
+            "at_box_edge": false
+          }
+        }
+      }
+    ]
+  }
+}

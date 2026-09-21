@@ -1,0 +1,23 @@
+{
+  "_comment": "Template only. The live manifest is written by the notebook into evidence/merton_comparator_v1/<smoke|research>/resume_manifest.json after every training replication and every evaluation block. This file documents the schema PMO should expect and is never read by the code.",
+  "ticket": "C-RLSBJTS-MERTON-COMP-01",
+  "stage": "S5/U5_EVALUATION",
+  "run_mode": "RESEARCH",
+  "evidence_class": "USER_COLAB_RESEARCH_EVIDENCE",
+  "is_scientific_evidence": true,
+  "generated_at_utc": "<iso-8601>",
+  "blocks_total": 300,
+  "blocks_visited_this_run": 0,
+  "evaluation_attempts_recorded": 0,
+  "analytic_attempts_recorded": 0,
+  "required_merton_attempts": 24000,
+  "required_analytic_attempts": 1200,
+  "sbjts_arm": "NOT EVALUATED HERE \u2014 reused from the frozen Base 4 TT ledger",
+  "resume_unit": "attempt_id inside a partially completed block",
+  "_resume_contract": [
+    "re-running the notebook from the top with the same work directory resumes",
+    "a completed attempt_id is skipped, never recomputed",
+    "a failed attempt keeps its ledger row and stays in the denominator",
+    "no seed is ever replaced to make a unit succeed"
+  ]
+}

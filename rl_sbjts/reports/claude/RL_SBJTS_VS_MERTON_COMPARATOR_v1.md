@@ -1,219 +1,189 @@
-# RL–SBJTS vs RL–Merton/GBM comparator — Claude execution report v1
+# RL–SBJTS vs RL–Merton/GBM comparator — Claude code + smoke report v1
 
 **Ticket:** `C-RLSBJTS-MERTON-COMP-01`  
-**Role:** Claude, Technical Research Verifier / Implementation Lead. GPT/PMO decides promotion.  
-**Protocol ID:** `c9ef65485a49d40356f3bbb02d491c4b73fcc9ebf0a22f02f64ab87e04a590d4` (recomputed from the 27 component registries in the 05A bundle, not quoted)  
-**Study mode:** `PRESPECIFIED_ESTIMATION_FIRST_COMPARATIVE_STUDY` — confirmatory superiority `NOT_CLAIMED`  
-**Generated:** 2026-09-21T07:28:07.500111+00:00
+**Status:** `READY_FOR_PMO_CODE` — design, implementation and smoke only.  
+**Research execution owner:** user / Google Colab, paid NVIDIA T4.  
+**Evidence class of everything in this report:** `SMOKE_EVIDENCE`. No comparator result is claimed or reported here.  
+**Generated:** 2026-09-21T07:52:11.061005+00:00
 
 ---
 
-## 1. Question and scope
+## 0. What changed, and why
 
-If the same frozen RL learner is trained in an empirical Merton/GBM environment calibrated only from the frozen training slice, how does that policy perform relative to the frozen SBJTS-target-trained policy when both are deployed on the same unseen SBJTS target holdout?
+An earlier commit on this branch, `0bdd16b`, executed the full research-scale comparator before the current execution policy existed. Under DEC-RL-002 and the Colab T4 contract in `01_PMO_SKILL_RL_SBJTS.md` that run is **`DEVELOPMENT_EVIDENCE` only**. It is retained in git history, it is not carried forward as a research deliverable, and its output files have been removed from the working tree. Nothing in this report depends on its numbers.
 
-This is a **training-environment / model-misspecification contrast**. It is not a proof that Merton is wrong under its own assumptions, not a pure jump-effect decomposition, and carries no external-market-validity claim. Base 2 smoke-scale ancestry remains a standing limitation.
+The deliverable is now a standalone notebook with a hard `SMOKE` / `RESEARCH` split, plus the smoke evidence proving it runs, gates and resumes. Five things were changed on purpose relative to `0bdd16b`:
 
-## 2. W0 — source identity
+1. **RESEARCH hard-requires a CUDA NVIDIA T4**, with no CPU or NumPy fallback.
+2. **The Base 4 reproduction gate is the predeclared two-holdout subset**, adjudicated bitwise first and only then against the frozen backend tolerance.
+3. **The SBJTS arm is reused from the frozen Base 4 TT ledger**, not regenerated. `0bdd16b` regenerated it because the frozen ledger was not retrievable in that sandbox; in Colab it is, so regeneration is no longer justified.
+4. **The entropy time-scaling distinction is documented and unit-tested.**
+5. **Nothing research-scale was executed.** The smoke run is 19 seconds on CPU.
 
-| Artifact | SHA-256 | Matches pinned digest |
+## 1. Mode and hardware separation
+
+```python
+RUN_MODE = "SMOKE"      # Claude may execute
+RUN_MODE = "RESEARCH"   # user executes on the paid Colab T4
+```
+
+| | SMOKE | RESEARCH |
 |---|---|---|
-| `base4_notebook_05B_v2_0` | `7bb73be0ddb5ad52534e6d2b…` | yes |
-| `base4_05a_final_bundle_zip` | `77aaf6b2ccdd98d446120b72…` | yes |
-| `base3_frozen_embedded_notebook` | `344956031d9e89763370a020…` | yes |
-| `frozen_market_snapshot` | `7e817762849118fc3abf8d4c…` | yes |
-| `base4_policies_npz` | `34c39a30feb29391684bab03…` | pinned here by content |
-| `base4_training_attempts_csv` | `b56505a2d8d0973e821f0a81…` | pinned here by content |
+| Output namespace | `evidence/merton_comparator_v1/smoke/` | `evidence/merton_comparator_v1/research/` |
+| Backend | `TORCH_CPU_FLOAT32_BATCHED`, CPU forced even if a GPU is present | `TORCH_CUDA_FLOAT32_BATCHED` on `cuda:0` |
+| Hardware gate | none | `torch.cuda.is_available()` **and** the device name must contain `T4` |
+| Budgets | 3 updates, 32 train paths, 2 replications, 1 holdout × 2 eval seeds | 400 updates, 512 train paths, 40 replications, 20 holdout × 15 eval seeds |
+| Evidence class | `SMOKE_EVIDENCE`, `is_scientific_evidence: false` | `USER_COLAB_RESEARCH_EVIDENCE` |
 
-- Protocol id recomputed from 27 component registries: `c9ef65485a49d40356f3bbb0…` — equals the declared and the expected id.
-- Internal bundle checksum failures: 0; component hash mismatches: 0.
-- Base 3 native AST engine components verified: 17, mismatches: 0.
-- Base 3 code-cell-concat digest matches: True.
-- Frozen training slice `09811db465da1443b092f6b5…`, shape [2110, 4], 2012-01-04 to 2020-05-22, assets ITA, XLE, SMH, EUFN.
-- Environment fingerprint `63ba37cc4a26b48b497e424c…`.
-- All 160 frozen Base 4 training `attempt_id`s were recomputed from the protocol id, the calibration id and the frozen seed plan and match the frozen policy store exactly: True.
+The separation is enforced rather than documented. `assert_namespace_isolation` raises if a smoke stage tries to write under `research/`, `require_research_hardware` raises without a CUDA T4, and `Context.assert_backend_contract` re-checks the backend after construction. Two of the sixteen smoke checks exist purely to prove those two refusals actually fire; both do.
 
-## 3. W1 — reproduction gate
+`ALLOW_NON_T4` exists so PMO can authorise a different CUDA device in writing. It cannot enable CPU, and the override plus its written reason are recorded in `hardware_manifest.json` for audit.
 
-**Status: `BASE4_TARGET_REPRODUCTION_PASS`**
+Evaluation `eval_paths` is held at the frozen 600 even in SMOKE. That is deliberate: it is the only way the smoke join against the frozen Base 4 TT ledger is dimensionally faithful. Smoke rows remain scientifically meaningless because training is 3 updates on 2 replications, and every artifact says so.
 
-- 800 frozen TT rows regenerated: 40 replications x 2 constraints x 1 holdout stream x 10 evaluation seeds.
-- Evaluation `attempt_id`s matching the frozen ledger: 800/800.
-- Tolerance `abs <= 0.0002 + 2e-05 * abs(frozen)`, taken from the frozen Base 3 `GPU_EQ_ATOL` / `GPU_EQ_RTOL`. No tolerance was chosen by this ticket.
+## 2. GPU research path
 
-| Endpoint | max abs deviation | max rel deviation | within frozen tolerance |
+What RESEARCH sends to CUDA is the **market engine**: `simulate_three_channel_torch` runs float32 batched on `cuda:0`, which is exactly what frozen Base 4 did under `TORCH_CUDA_FLOAT32_BATCHED`. Market pairs are generated once per `(holdout, eval_seed)` block and held in memory while every policy is evaluated against them, so the 24,000 evaluations cost 300 engine runs rather than 24,000.
+
+What stays on CPU, and why that is not a defect: the Base 3 learner rollout, critic fit and actor gradient are **frozen NumPy float64**. Base 4 ran them on CPU too. Porting them to CUDA would change the numerical contract the PMO skill says must be preserved first, so it is raised rather than done:
+
+> `SCOPE CHANGE REQUEST — PMO DECISION REQUIRED`. A CUDA port of > `rollout_states_actions` would cut U5 wall-clock materially, since it is the > dominant cost at 24,000 rollouts. It is a numerical-equivalence question, not > a speed question: the rollout is float64 with a scipy truncated-normal inverse > CDF, and no float32 CUDA port can be assumed bit-identical. Claude has not > made that change. If PMO wants it, it needs its own equivalence protocol > against the frozen rows.
+
+Within the frozen contract the notebook already avoids per-path Python loops (the rollout is vectorised over paths; only the 60 engine steps are sequential, which the frozen recursion requires), avoids GPU→CPU transfers inside the block loop, releases each market pair before the next, and checkpoints after every training replication and every evaluation block.
+
+## 3. Entropy time scaling — the frozen discrete objective vs Chau–Nguyen–Nguyen
+
+The continuous-time exploratory objective carries entropy as a **rate**, integrated over calendar time:
+
+```text
+J_cont(pi; lambda) = E[log W_T] + lambda * integral_0^T H(pi_t) dt
+```
+
+The frozen Base 3 objective, implemented in `soft_return_to_go` and consumed unchanged by Base 4, carries it **per decision**, summed over engine steps:
+
+```text
+J_disc(pi; m)      = E[log(W_T/W_0)] + m * sum_{t=0}^{N-1} H(pi_t)
+```
+
+Both use the same `H`, the differential entropy of the truncated-Gaussian action density on the hard interval. Discretising the integral on the frozen grid gives `integral H dt ≈ dt * sum_t H_t`, so the two coincide exactly iff
+
+```text
+m = lambda * dt        equivalently        lambda = m / dt
+```
+
+With the frozen `dt = 1/250`, the Base 4 primary setting `m = 0.01` is therefore **not** `lambda = 0.01`: it is `lambda = 2.5`. Conversely the paper's nominal `lambda = 0.01` corresponds to `m = 4e-05`. At equal nominal value the frozen learner weights exploration 250× more heavily.
+
+### 3.1 What is and is not affected
+
+Nothing frozen is changed. Both comparator arms optimise the same frozen discrete objective at the same `m`, so the factor is common to the arms and **cancels from `Delta`**. It decides exactly one thing: which exploration weight the analytic Merton benchmark must be built at. The comparator therefore evaluates the analytic policy at **both** conventions and labels them, because presenting only the paper-nominal one as an apples-to-apples empirical comparator is what the PMO red-team checklist forbids.
+
+### 3.2 Unit tests
+
+`smoke/entropy_time_scaling_tests.json` — **`ENTROPY_TIME_SCALING_TESTS_PASS`**. Optima are compared as the *executed* policy (location, scale), not as raw `(phi1, phi2)`, because the frozen parameterisation `scale^2 = exp(phi2) * m` is itself indexed by `m`. The search domain is the frozen policy box, which `phi2_box(m)` maps onto `[scale_floor, scale_ceiling]` for every `m`.
+
+| Test | What it proves | LONG_ONLY_FULL | LONG_ONLY_CAP50 |
 |---|---|---|---|
-| `mean_terminal_log_wealth` | 4.655e-08 | 3.227e-06 | True |
-| `cvar_log_loss` | 7.266e-08 | 1.051e-06 | True |
-| `var_log_loss` | 7.808e-07 | 1.303e-05 | True |
-| `max_drawdown_q95` | 6.938e-08 | 1.254e-06 | True |
-| `q01_terminal_wealth` | 5.229e-08 | 5.763e-08 | True |
-| `severe_loss_probability` | 0.000e+00 | 0.000e+00 | True |
-| `executed_mean` | 7.892e-09 | 1.575e-08 | True |
-| `executed_variance` | 2.500e-09 | 3.021e-08 | True |
-| `latent_mean` | 7.892e-09 | 1.575e-08 | True |
-| `boundary_mass_lower` | 0.000e+00 | 0.000e+00 | True |
-| `boundary_mass_upper` | 0.000e+00 | 0.000e+00 | True |
+| T1 sum identity | `m·Σ H_t == (m/dt)·dt·Σ H_t` on the frozen entropy array, and `soft_return_to_go` reproduces the objective under its own `u > t` convention | 0.0e+00 / 4.4e-16 | 0.0e+00 / 1.1e-16 |
+| T2 grid invariance | refining the grid by k while holding T fixed leaves the optimum unchanged **iff** m is rescaled to m/k, and that optimum equals the continuous one at `lambda = m/dt` | rescaled gap 2.0e-08, vs continuous 2.6e-08, **unrescaled 0.131** | rescaled 1.6e-08, vs continuous 2.6e-08, **unrescaled 0.131** |
+| T3 scale separation | identifying `m` directly with `lambda` moves the optimum materially, so T2 is not passing vacuously | 0.296 | 0.296 |
 
-## 4. W2 — empirical Merton/GBM calibration (frozen)
+The seven-orders-of-magnitude gap between the rescaled and unrescaled columns of T2 is the whole content of the test: `lambda` is grid-free, `m` is not. All optima visited are strictly inside the frozen policy box, so no result is a boundary artefact.
 
-**Status: `MERTON_GBM_CALIBRATION_PASS`**
+### 3.3 Empirical-curvature diagnostic, descriptive only
 
-| Field | Value |
-|---|---|
-| `input_snapshot_sha256` | `7e817762849118fc3abf8d4cf98ad8d6…` |
-| `training_slice_sha256` | `09811db465da1443b092f6b5e18a78b2…` |
-| `n_observations` | `2110` |
-| `first_date` | `2012-01-04` |
-| `last_train_date` | `2020-05-22` |
-| `holdout_start` | `2023-03-13` |
-| `dt` | `0.004` |
-| `risk_free_gross_per_step` | `1.0` |
-| `r_f_annual` | `0.0` |
-| `variance_ddof` | `0` |
-| `m1_per_step_mean_log_increment` | `0.00027942696048003366` |
-| `v1_per_step_variance_log_increment` | `0.0001726791906838439` |
-| `sigma_M` | `0.2077734286932787` |
-| `mu_M_minus_r_f` | `0.0914416389554889` |
-| `mu_M` | `0.0914416389554889` |
-| `record_sha256` | `26c3ea298e9b69b4da788cc2530be428…` |
+At the empirical calibration the per-step entropy term exceeds the per-step log-growth term by a factor of 110 (LONG_ONLY_CAP50) and 55 (LONG_ONLY_FULL). Consequently:
 
-- Monte Carlo moment test on the disjoint namespace `MERTONCOMP_GBM_CALIBRATION_TEST` (20 seeds x 4096 paths x 60 steps = 4,915,200 increments), seed collisions with frozen namespaces: 0.
-- Predeclared 4-sigma band: mean z = -0.226, variance z = +0.917. Both inside.
-- Holdout or validation rows used: 0; parameter search: False.
-- Scope: This is a one-step mean/variance match of the GBM training law to the frozen training slice. It is NOT a full-distribution match: the empirical slice is neither Gaussian nor independent across days, and no such claim is made.
+| Constraint | Exploration convention | effective λ | optimal executed scale | optimal latent location |
+|---|---|---|---|---|
+| LONG_ONLY_CAP50 | `frozen_discrete_m` | 2.5 | 7.6098 | 2.1181 |
+| LONG_ONLY_CAP50 | `paper_nominal_lambda` | 0.01 | 0.4813 | 2.1182 |
+| LONG_ONLY_FULL | `frozen_discrete_m` | 2.5 | 10.0000 (box edge) | 3.2936 |
+| LONG_ONLY_FULL | `paper_nominal_lambda` | 0.01 | 0.4813 | 2.1182 |
 
-## 5. W3 — Merton-world learner positive control
+The `paper_nominal_lambda` row reproduces the classical exploratory Merton policy exactly — location `(mu−r)/sigma^2` and scale `sqrt(m)/sigma` — which is an independent check that the analytic formula belongs to the continuous-time objective. The `frozen_discrete_m` row is the policy the frozen learner is actually pointed at. This is a property of the frozen objective, identical for both arms, and is neither changed nor corrected here.
 
-- Predeclared outcome: `LEARNER_POSITIVE_CONTROL_FAIL`.
-- Learner gates PC1–PC5 all pass: True.
-  - LONG_ONLY_FULL rep 0: objective ascent z = 638 (-1.5057 -> +0.0078), parameter movement 1.0074, saturated fraction 0.000.
-  - LONG_ONLY_FULL rep 1: objective ascent z = 638 (-1.5057 -> +0.0078), parameter movement 0.9965, saturated fraction 0.000.
-  - LONG_ONLY_CAP50 rep 0: objective ascent z = 1116 (-1.6924 -> -0.4117), parameter movement 0.8576, saturated fraction 0.000.
-  - LONG_ONLY_CAP50 rep 1: objective ascent z = 1116 (-1.6924 -> -0.4117), parameter movement 0.8499, saturated fraction 0.000.
-- The one failing check, `PC6_MARKET_DIRECTION`, tests the market rather than the learner. Its predeclared 512-path 4-sigma form returned the correct sign but was underpowered:
-  - LONG_ONLY_FULL: predeclared z = 2.86; same rule at 16384 paths z = 20.0; mean log wealth strictly increasing across the predeclared 7-point grid: True; a* = 2.118 > upper bound 1.0.
-  - LONG_ONLY_CAP50: predeclared z = 3.44; same rule at 16384 paths z = 23.2; mean log wealth strictly increasing across the predeclared 7-point grid: True; a* = 2.118 > upper bound 0.5.
-- Amended status: `LEARNER_POSITIVE_CONTROL_PASS_WITH_UNDERPOWERED_AUXILIARY_CHECK`. The sample-size increase after an underpowered result is disclosed in the addendum; the decision rule, statistic and seed namespace were not changed, and no study parameter was altered.
+## 4. Predeclared two-holdout Base 4 reproduction gate
 
-**Exploration-weight convention (important for reading the analytic arm).** at m = 0.01 the per-step entropy term dominates the per-step log-growth term by roughly two orders of magnitude, so the learner's optimum sits near the entropy-maximising interior of the hard interval rather than at the analytic exploratory Merton location. This is a property of the FROZEN Base 3 learner objective and is neither changed nor corrected here. It is the reason the analytic Merton comparison is reported as descriptive and secondary, exactly as the ticket requires. none by construction: both primary arms use the identical frozen objective, m, bounds and budget, so the convention affects both arms equally and cancels from the training-law contrast.
+The subset is fixed in `comparator_config.REPRODUCTION_SUBSET` before any comparison runs: replications [0, 1] × both constraints × holdout streams [0, 1] × eval seeds [0, 1] = **16 TT rows**. Two distinct holdout market streams and two distinct evaluation action seeds are what make the gate sensitive to a seed-namespace or market-generator defect rather than only to arithmetic drift.
 
-## 6. W4/W5 — the two learned arms on the frozen SBJTS target holdout
+Adjudication order: **bitwise equality first**; the frozen Base 3 `GPU_EQ_ATOL = 0.0002` / `GPU_EQ_RTOL = 2e-05` is consulted only if bitwise equality fails, and any use of it is recorded. No tolerance is chosen by this ticket. Outcomes:
 
-Fairness: identical frozen learner code, optimiser, state `(1, t/N, log(W_t/W_0), r_{t-1})`, action bounds, `m = 0.01`, 400 updates and 512 paths/update. Replication index `k` is paired across arms, so both arms share the learner initialisation `rng_of("LEARNER", k)` and the per-update action-uniform stream `rng_of("LEARNER", k, stream=7000+it)`. On the evaluation side the pairing is exact: one frozen target market realisation and one common action-uniform block per `(holdout_env_stream, eval_seed)` block, applied to every policy in that block.
+- `BASE4_TARGET_REPRODUCTION_PASS_EXACT`
+- `BASE4_TARGET_REPRODUCTION_PASS_WITHIN_FROZEN_BACKEND_TOLERANCE`
+- `BLOCKED_REPRODUCTION_REFERENCE_ROWS_MISSING` / `…_ATTEMPT_ID_MISMATCH` / `BLOCKED_REPRODUCTION`
 
-What is **not** paired: the training market realisation. The SBJTS engine CRN carries per-substep multi-asset Brownian increments and five jump-channel uniform streams that a one-asset GBM does not consume, so common random numbers across training laws are structurally impossible and were not faked.
+Anything that is not a `PASS` stops the comparator: the Merton arm is not trained and the frozen TT ledger is not joined. `stage_inference` re-checks the gate status and raises `INFERENCE_BLOCKED_BY_REPRODUCTION_GATE` independently, so the guard cannot be bypassed by running a stage out of order.
 
-### 6.1 Primary estimands
+### What the smoke run shows
 
-`Delta = E[endpoint | train = SBJTS] - E[endpoint | train = MERTON_GBM]`, evaluated on the frozen SBJTS target holdout. `mean_terminal_log_wealth`: larger is better, so `Delta_W > 0` favours SBJTS training. `cvar_log_loss`: smaller is better, so `Delta_CVaR < 0` favours SBJTS training.
+- The predeclared gate returned **`BLOCKED_REPRODUCTION_REFERENCE_ROWS_MISSING`**: 8/16 rows compared, 8 reference rows unavailable. That is the correct behaviour here and is the point — only the first 1 MiB of the 31 MB frozen ledger is retrievable in Claude's sandbox, so holdout stream 1 has no reference rows. **Claude cannot pass this gate, and does not pretend to.** U1 on Colab, with the full ledger, is the real gate.
+- The gate *mechanism* was then exercised on the rows that do exist, via a SMOKE-only narrowing that is refused outright in RESEARCH mode and is stamped `is_predeclared_gate: false`. Result **`BASE4_TARGET_REPRODUCTION_PASS_WITHIN_FROZEN_BACKEND_TOLERANCE`** over 8 rows, all evaluation `attempt_id`s reproduced exactly, worst endpoint deviation 3.75e-08 against an `atol` of 0.0002.
+- Bitwise equality was *not* reached in smoke, as expected: smoke runs the CPU float32 engine while Base 4 ran the CUDA float32 engine. On the user's T4 the backend matches Base 4 exactly, so `…_PASS_EXACT` is the expected U1 outcome and `…_WITHIN_FROZEN_BACKEND_TOLERANCE` would itself be worth reporting.
 
-| Stratum | Endpoint | SBJTS mean | Merton mean | Delta | 95% CI | crossed SE | replication SD |
-|---|---|---|---|---|---|---|---|
-| LONG_ONLY_FULL | `mean_terminal_log_wealth` | 0.0148425 | 0.0126362 | **+0.00220626** | [+0.0021715, +0.00224269] | 1.83e-05 | 8.65e-05 |
-| LONG_ONLY_FULL | `cvar_log_loss` | 0.083862 | 0.0870429 | **-0.0031809** | [-0.00335885, -0.00300115] | 9.1e-05 | 0.00012 |
-| LONG_ONLY_CAP50 | `mean_terminal_log_wealth` | 0.00752256 | 0.00696848 | **+0.000554078** | [+0.000544161, +0.000563734] | 4.93e-06 | 2.24e-05 |
-| LONG_ONLY_CAP50 | `cvar_log_loss` | 0.0415482 | 0.0423093 | **-0.000761069** | [-0.000811537, -0.000712199] | 2.48e-05 | 2.74e-05 |
+## 5. Reuse of the frozen TT ledger instead of regenerating the SBJTS arm
 
-Crossed cluster bootstrap: CROSSED_CLUSTER_BOOTSTRAP_OVER JOINT_TRAINING_REPLICATION_X_HOLDOUT_ENVIRONMENT_X_EVALUATION_SEED, 5000 replications, seeds from sha256(protocol_id, calibration_id, stratum, contrast, endpoint, analysis_version); `hash()` never used. The bootstrap function was executed verbatim from the frozen Base 4 notebook source, not reimplemented.
+`stage_evaluate` evaluates **only** the new Merton policies. The SBJTS arm's 24,000 target-holdout rows are read from the frozen Base 4 `evaluation_results_partial.csv`, filtered to `cell_code == "TT"`, and joined in `stage_inference` on `(stratum, replication, holdout_env_stream, eval_seed)`. The frozen policies are never retrained and the frozen rows are never recomputed or overwritten.
 
-Tensor: 2 strata x 40 replications x 20 holdout streams x 15 evaluation seeds; 48,000 completed evaluation rows; collapsed before inference: False.
+Pairing survives the reuse by construction, not by assertion: both arms are evaluated at the same frozen market seed and the same frozen evaluation action-uniform stream, `rng_of("EVAL_ENV", action_seed % 2**31)`, drawn from the same frozen namespace. The reproduction gate is exactly what licenses treating a frozen row and a newly computed row as commensurable, which is why `stage_inference` refuses to run without it.
 
-No SESOI was used, no hypothesis test was performed, and no superiority claim is made.
+Smoke check: the evaluation ledger contains only the `MERTON_MT` arm, and inference reported `FROZEN_LEDGER_REUSE` with 8 frozen TT rows joined and 0 missing. Any row the frozen ledger cannot supply is listed in `rows_missing` rather than imputed.
 
-### 6.2 Secondary endpoints
+## 6. Other stages, as implemented
 
-| Stratum | Endpoint | SBJTS mean | Merton mean | Delta | 95% CI |
-|---|---|---|---|---|---|
-| LONG_ONLY_FULL | `var_log_loss` | 0.0588287 | 0.0617922 | -0.00296343 | [-0.00325233, -0.00267945] |
-| LONG_ONLY_FULL | `max_drawdown_q95` | 0.105872 | 0.106437 | -0.000564604 | [-0.000778102, -0.000344207] |
-| LONG_ONLY_FULL | `q01_terminal_wealth` | 0.906764 | 0.903818 | +0.00294553 | [+0.00236423, +0.00353278] |
-| LONG_ONLY_FULL | `severe_loss_probability` | 7.22222e-05 | 8.33333e-05 | -1.11111e-05 | [-5.55556e-05, +2.22222e-05] |
-| LONG_ONLY_FULL | `executed_mean` | 0.500677 | 0.49976 | +0.00091665 | [+0.000521208, +0.0013103] |
-| LONG_ONLY_FULL | `executed_variance` | 0.0827673 | 0.0827337 | +3.35778e-05 | [+2.75458e-05, +3.99815e-05] |
-| LONG_ONLY_FULL | `boundary_mass_lower` | 0 | 0 | +0 | [+0, +0] |
-| LONG_ONLY_FULL | `boundary_mass_upper` | 0 | 0 | +0 | [+0, +0] |
-| LONG_ONLY_CAP50 | `var_log_loss` | 0.0293318 | 0.0300267 | -0.000694887 | [-0.000790116, -0.000607868] |
-| LONG_ONLY_CAP50 | `max_drawdown_q95` | 0.0537509 | 0.0539108 | -0.000159967 | [-0.000232324, -8.87907e-05] |
-| LONG_ONLY_CAP50 | `q01_terminal_wealth` | 0.952676 | 0.951916 | +0.000759593 | [+0.000592072, +0.000920731] |
-| LONG_ONLY_CAP50 | `severe_loss_probability` | 0 | 0 | +0 | [+0, +0] |
-| LONG_ONLY_CAP50 | `executed_mean` | 0.249915 | 0.24967 | +0.000244876 | [+0.000150798, +0.000345046] |
-| LONG_ONLY_CAP50 | `executed_variance` | 0.0207303 | 0.0207265 | +3.7545e-06 | [+2.96422e-06, +4.56547e-06] |
-| LONG_ONLY_CAP50 | `boundary_mass_lower` | 0 | 0 | +0 | [+0, +0] |
-| LONG_ONLY_CAP50 | `boundary_mass_upper` | 0 | 0 | +0 | [+0, +0] |
+**S0/U0 source fingerprint.** Verifies every consumed artifact by SHA-256, recomputes the protocol id from the 27 component registries in the 05A bundle, re-derives the 17 Base 3 native AST engine component hashes (0 mismatches) and checks the frozen training slice digest. Smoke confirmed the training slice matches `09811db465da1443…`.
 
-### 6.3 How to read this
+**S2/U2 empirical GBM calibration.** Frozen training slice only (2110 daily rows, 2012-01-04 to 2020-05-22, EW log increment over the 4 snapshot assets), `dt = 1/250`, risk-free gross 1.0 per step, `ddof = 0`, all read from the frozen sources. Smoke result `MERTON_GBM_CALIBRATION_PASS`: `m1 = 0.000279427`, `v1 = 0.000172679`, `sigma_M = 0.207773`, `mu_M − r_f = 0.091442`. The predeclared 4-sigma Monte Carlo moment test on a disjoint seed namespace returned `z_mean = +0.413`, `z_var = -0.588`. No parameter search; zero validation or holdout rows read. This is a one-step mean/variance match, not a full-distribution match.
 
-Both learned arms hold almost the same *average* exposure: executed action mean 0.5007 (SBJTS) against 0.4998 (Merton) under LONG_ONLY_FULL, and 0.2499 against 0.2497 under LONG_ONLY_CAP50. Boundary mass is zero for both arms in both strata. The difference between the arms is therefore not a difference in how much risk they take on average; it is a difference in **state feedback**.
+**S3/U3 positive control.** PC1–PC5 against frozen `LEARNER_CONFIG` thresholds. Smoke result `LEARNER_POSITIVE_CONTROL_PASS` on 4 tiny policies, with objective-ascent z between 215 and 481. The analytic reference shown alongside each policy is the one at `lambda = m/dt`, because that is the objective the learner actually optimises.
 
-Inspecting the trained actors makes that concrete. The table below averages the location row of the trained linear actor over all 40 replications; the across-replication SD is given in `actor_weight_summary.json` and is two orders of magnitude smaller than the arm difference on the last two features.
+**S4/U4 training and S5/U5 evaluation.** Implemented at the frozen budgets, checkpointed after every replication and every block, resumable by immutable `attempt_id`. Failed attempts keep their ledger row and stay in the denominator; no seed is replaced. Smoke proved resume by training 2 of 4 policies, re-entering, and training only the remaining 2.
 
-| Constraint | Arm | intercept | `t/N` | `log(W_t/W_0)` | `r_{t-1}` |
-|---|---|---|---|---|---|
-| LONG_ONLY_CAP50 | SBJTS | +0.0331 | -0.0841 | -0.4249 | -1.1698 |
-| LONG_ONLY_CAP50 | Merton | +0.0330 | -0.0898 | -0.0650 | +0.0292 |
-| LONG_ONLY_FULL | SBJTS | +0.0324 | -0.0743 | -0.5534 | -1.5631 |
-| LONG_ONLY_FULL | Merton | +0.0328 | -0.0870 | -0.0171 | +0.0327 |
+**S6/U6 analytic Merton.** Both exploration conventions, in its own table, labelled `is_rl_trained: false`.
 
-The SBJTS-trained actor puts substantial negative weight on realised wealth and on the previous risky log return; the Merton-trained actor's weights on those two features are an order of magnitude smaller and, on the previous return, of the opposite sign and statistically indistinguishable from nothing. That is the expected outcome rather than a defect: under the empirical GBM law the previous return carries no information about the next one, so there is nothing for the Merton-world learner to condition on, whereas the SBJTS law has temporal structure that the frozen linear actor can exploit. The comparator is therefore measuring the value of state feedback that the misspecified training law cannot teach.
+**S7/U7 inference.** `crossed_bootstrap` and `stable_seed` are executed verbatim from the frozen Base 4 notebook rather than reimplemented. No SESOI, no hypothesis test, no superiority claim.
 
-Two cautions on magnitude. First, the crossed-bootstrap standard error is much smaller than the across-replication standard deviation (1.83e-05 against 8.65e-05 for `Delta_W` under LONG_ONLY_FULL) because the evaluation pairing is exact: both arms see the same market realisation and the same action uniforms in every block, so the market component of the variance cancels. The standardized effect in the table uses the replication SD, not the crossed SE. Second, the effect is small in absolute terms: 0.00221 of terminal log wealth over a 60-step horizon, against an SBJTS arm level of 0.01484. The intervals exclude zero on both co-primary endpoints in both strata and every one of the 40 replication-level contrasts has the same sign, but no significance threshold, SESOI or superiority verdict is attached to that here.
+## 7. Smoke suite
 
-## 7. W6 — analytic constrained exploratory Merton (secondary, not RL-trained)
+`smoke/smoke_report.json` — **16/16 checks pass in 19.0 s on CPU.**
 
-These two policies were **not** trained by the RL learner. They are the closed-form exploratory log-utility Merton policies implied by the same empirical `mu_M`, `sigma_M`, `r_f` and `m`, conditioned to the same hard interval, evaluated on the same frozen target holdout blocks with the same action uniforms. They are reported separately and must not be read as a third learned arm.
+| # | Check | Result |
+|---|---|---|
+| 1 | `RESEARCH_HARDWARE_GATE_REFUSES_WITHOUT_T4` | PASS — RESEARCH_MODE_REQUIRES_CUDA |
+| 2 | `SMOKE_CANNOT_WRITE_INTO_RESEARCH_NAMESPACE` | PASS — SMOKE_WRITE_INTO_RESEARCH_NAMESPACE_FORBIDDEN |
+| 3 | `SMOKE_CONTEXT_BUILT` | PASS — backend=TORCH_CPU_FLOAT32_BATCHED device=cpu blocks=2 reps=[0, 1] |
+| 4 | `S0_SOURCE_FINGERPRINT` | PASS — train_sha match, 17 AST components |
+| 5 | `ENTROPY_TIME_SCALING_TESTS` | PASS — ENTROPY_TIME_SCALING_TESTS_PASS; lambda_equiv=2.5 |
+| 6 | `S1_PREDECLARED_TWO_HOLDOUT_GATE_BLOCKS_ON_MISSING_REFERENCE` | PASS — BLOCKED_REPRODUCTION_REFERENCE_ROWS_MISSING; 8/16 rows, 8 reference rows unavailable locally |
+| 7 | `S1_GATE_MECHANISM_PASSES_ON_AVAILABLE_ROWS` | PASS — BASE4_TARGET_REPRODUCTION_PASS_WITHIN_FROZEN_BACKEND_TOLERANCE; 8 rows; worst abs 3.75e-08 |
+| 8 | `S2_MERTON_GBM_CALIBRATION` | PASS — MERTON_GBM_CALIBRATION_PASS; sigma_M=0.207773, z_mean=+0.41 |
+| 9 | `S3_POSITIVE_CONTROL_GATES_EVALUATE` | PASS — LEARNER_POSITIVE_CONTROL_PASS; 4 policies, all_pass=True |
+| 10 | `S4_TRAINING_PARTIAL` | PASS — 2 trained, 2/4 total |
+| 11 | `S4_RESUME_SKIPS_COMPLETED_UNITS` | PASS — resumed and trained 2 of 4, none repeated |
+| 12 | `S5_EVALUATION_AND_RESUME` | PASS — 8/8 Merton attempts over 2 blocks; resume visited 1 remaining block(s) |
+| 13 | `S5_SBJTS_ARM_NOT_RE_EVALUATED` | PASS — evaluation ledger contains only the MERTON_MT arm |
+| 14 | `OUTPUT_SCHEMAS` | PASS — training_attempts.csv:ok, evaluation_attempts.csv:ok, analytic_merton_results.csv:ok |
+| 15 | `S7_INFERENCE_REUSES_FROZEN_TT_LEDGER` | PASS — 8 frozen TT rows joined, 0 missing, 20 estimands |
+| 16 | `S7_REFUSES_WITHOUT_REPRODUCTION_GATE` | PASS — INFERENCE_BLOCKED_BY_REPRODUCTION_GATE |
 
-| Constraint | mean terminal log wealth | CVaR log loss | executed mean | executed variance | attempts |
-|---|---|---|---|---|---|
-| LONG_ONLY_CAP50 | 0.0104093 | 0.0453158 | 0.381858 | 0.010797 | 300 |
-| LONG_ONLY_FULL | 0.0198377 | 0.0957288 | 0.837297 | 0.0220019 | 300 |
+Two of these are negative tests that must fail-closed and do: the RESEARCH hardware gate refuses on a machine without CUDA, and inference refuses when the reproduction gate has not passed.
 
-Read with care. Under LONG_ONLY_FULL the analytic policy reaches a higher mean terminal log wealth (0.0198377) than either learned arm, and simultaneously a higher CVaR log loss (0.0957288 against 0.083862 for the SBJTS arm), because it holds a far larger average exposure (0.8373 against roughly 0.50 for both learned arms). The two are not on a common risk-adjusted footing and the difference is not evidence about either learned arm. The gap in exposure follows directly from the exploration-weight convention recorded in section 5: the analytic policy is the optimum of the continuous-time objective, while both learned arms optimise the frozen discrete objective, which weights entropy by a factor 1/dt = 250 more heavily. No conclusion about learner quality should be drawn from this row.
+## 8. Files
 
-## 8. Attempt accounting
+- `notebooks/06_RL_SBJTS_VS_MERTON_COMPARATOR_GPU_v1_0.ipynb` — the deliverable. Six modules are embedded as base64 and round-trip verified against the source that was actually smoke-executed, so the notebook cannot drift from the tested code.
+- `evidence/merton_comparator_v1/smoke/` — smoke artifacts, all stamped `SMOKE_EVIDENCE`.
+- `evidence/merton_comparator_v1/research/README_EXPECTED_OUTPUTS.md` — the file-by-file contract for the user's Colab run. The directory is otherwise empty by design.
+- `evidence/merton_comparator_v1/resume_manifest.template.json` — the resume schema PMO should expect.
 
-- Merton training: required 80, attempted 80, completed 80, failed 0. Frozen SBJTS target policies retrained: 0. Seed replacement: False. Failed attempts remain in the denominator: True.
-- Evaluation arm `MERTON_MT`: attempted 24,000, completed 24,000, failed 0 (required per arm 24,000).
-- Evaluation arm `SBJTS_TT`: attempted 24,000, completed 24,000, failed 0 (required per arm 24,000).
-- Analytic Merton evaluation attempts: 600.
-- Imputation: NONE.
+## 9. Unresolved issues for PMO
 
-## 9. Deviations from the ticket, stated plainly
-
-**D1 — W1 holdout coverage.** The ticket asks for at least two holdout streams in the reproduction subset. Only one was possible. The frozen Base 4 evaluation_results_partial.csv is 31 MB and only its first 1 MiB is retrievable through this session's Drive tooling (10 MB download cap; drive.google.com blocked by egress policy). That prefix contains every row for holdout_env_stream 0 and eval_seed 0-9 and no row for any other holdout stream, so no frozen reference value exists here against which a second holdout stream could be compared. This is a source-retrieval limit, not a reproduction failure. The reproduction that was possible is far wider than the ticket's minimum on every other axis (800 rows against a required 16), and all 800 evaluation `attempt_id`s reproduce exactly. **PMO decision required** on whether single-stream reproduction discharges AC2.
-
-**D2 — the SBJTS arm was regenerated rather than reused.** The ticket says to reuse frozen TT evidence after W1. The frozen TT rows are not retrievable in this environment beyond holdout stream 0 (same 1 MiB limit), so the SBJTS arm of the comparator was regenerated for all 300 blocks from the **immutable frozen policies**, which were never retrained. Regeneration is validated against the 800 frozen rows that are retrievable. No frozen artifact was overwritten.
-
-**D3 — backend.** Base 4 ran `TORCH_CUDA_FLOAT32_BATCHED`. No CUDA device is available in this execution environment, so the frozen notebook's own fallback ladder selected `TORCH_CPU_FLOAT32_BATCHED`. All randomness is numpy-generated CRN and is backend independent; only float32 reduction order differs, and W1 bounds the consequence.
-
-**D4 — PC6.** Disclosed in section 5 and in `learner_positive_control_addendum.json`.
-
-**D5 — unretrievable frozen sources.** The 21.5 MB `BASE3_FROZEN_*.zip` and the 8.6 MB analysis zip could not be pulled (10 MB tool limit; `drive.google.com` blocked by this session's egress policy). The two members Base 4 actually consumes from the frozen zip — the embedded Base 3 notebook and the market snapshot — were verified byte-identical against their own pinned digests, which is a stronger check than the container hash. The analysis zip feeds only run/content/result linkage, not the engine.
-
-**D6 — evidence files beyond the named allowlist.** Four files were written into `evidence/merton_comparator_v1/` that the ticket does not name: `reproduction_rows.csv` (the 800 row-level W1 comparisons behind `reproduction_check.json`), `learner_positive_control.json` and `learner_positive_control_addendum.json` (W3, which the allowlist has no slot for), and `actor_weight_summary.json` (the trained-actor diagnostic in section 6.3). Endpoint values and attempt status are carried in a single `evaluation_attempts.csv` rather than split across an attempts ledger and a results ledger, so failed attempts and their endpoints stay in one denominator. No file outside `evidence/merton_comparator_v1/`, `notebooks/06_...ipynb`, `reports/claude/...` and this ticket's `Status` / `Progress` section was created or modified.
+1. **CUDA port of the frozen learner rollout.** Raised in section 2 as a scope change. Not done. U5 wall-clock on the T4 depends on it.
+2. **Expected U1 outcome.** On a T4 the backend matches Base 4, so `…_PASS_EXACT` is expected. If U1 returns `…_WITHIN_FROZEN_BACKEND_TOLERANCE` instead, that is a finding about CUDA determinism across driver or PyTorch versions and should be audited before U4 proceeds, even though the gate technically passes.
+3. **Analytic benchmark convention.** The comparator reports both. If PMO wants only one in the paper, the `FROZEN_LEARNER_EQUIV` row is the like-for-like one; the `TICKET_NOMINAL_M` row is the paper's nominal setting and is not comparable to the learned arms without the disclosure in section 3.
+4. **`0bdd16b`.** Superseded as a deliverable, retained as `DEVELOPMENT_EVIDENCE`. PMO may want it explicitly labelled in the decision log so it is never mistaken for a research run.
 
 ## 10. Claim status
 
-- `CL-RL-006` (RL–SBJTS superior to RL–Merton/GBM) stays **`NOT_TESTED`** until PMO independently audits this evidence. Nothing here promotes it.
-- `CL-RL-009` (a fair comparator is constructible) now has executed evidence; PMO decides whether it moves off `PROSPECTIVE_DESIGN`.
-- `CL-RL-007`, `CL-RL-010`, `CL-RL-011`, `CL-RL-012` are untouched and remain `BLOCKED`. This comparator is one target environment, one learner class, one exploration level and one empirical calibration; it supports no universal claim, no pure-jump reading and no external-market validity.
-- The contrast is a **training-law / model-misspecification** contrast. The two training laws differ in far more than the presence of jumps: temporal dependence, higher moments and asset dimension all differ, and only the one-step mean and variance of the empirical training slice were matched by construction.
-- No SESOI exists and none was introduced. The intervals are estimation-first.
-
-## 11. Files
-
-- `evidence/merton_comparator_v1/actor_weight_summary.json`
-- `evidence/merton_comparator_v1/analytic_merton_results.csv`
-- `evidence/merton_comparator_v1/evaluation_attempts.csv`
-- `evidence/merton_comparator_v1/learner_positive_control.json`
-- `evidence/merton_comparator_v1/learner_positive_control_addendum.json`
-- `evidence/merton_comparator_v1/merton_calibration.json`
-- `evidence/merton_comparator_v1/policies_merton.npz`
-- `evidence/merton_comparator_v1/primary_estimands.json`
-- `evidence/merton_comparator_v1/reproduction_check.json`
-- `evidence/merton_comparator_v1/reproduction_rows.csv`
-- `evidence/merton_comparator_v1/resume_manifest.json`
-- `evidence/merton_comparator_v1/source_fingerprint.json`
-- `evidence/merton_comparator_v1/training_attempts.csv`
-- `notebooks/06_RL_SBJTS_VS_MERTON_COMPARATOR_GPU_v1_0.ipynb`
-- `reports/claude/RL_SBJTS_VS_MERTON_COMPARATOR_v1.md` (this file)
+- `CL-RL-006` (RL–SBJTS superior to RL–Merton/GBM) remains **`NOT_TESTED`**. Nothing in this report bears on it.
+- `CL-RL-009` (a fair comparator is constructible) has code and smoke evidence only; PMO decides whether that is enough to move it off `PROSPECTIVE_DESIGN`.
+- `CL-RL-007`, `CL-RL-010`, `CL-RL-011`, `CL-RL-012` are untouched and remain `BLOCKED`.
+- Smoke artifacts are execution proofs. They are not comparator evidence and must never be reported as such.

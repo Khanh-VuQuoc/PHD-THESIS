@@ -1,6 +1,6 @@
 # C-RLSBJTS-MERTON-COMP-01 — Direct RL–Merton comparator on frozen SBJTS holdout
 
-**Status:** `OPEN_FOR_CLAUDE`  
+**Status:** `READY_FOR_PMO_CODE`  
 **Owner:** Claude — Technical Research Verifier / Implementation Lead  
 **Research execution owner:** User / Google Colab  
 **PMO:** GPT  
@@ -309,3 +309,54 @@ Then set this ticket to `READY_FOR_PMO_CODE` and stop. PMO audits the implementa
 
 - 2026-09-21 — PMO opened ticket.
 - 2026-09-21 — PMO amended execution policy: Claude is restricted to design/code/smoke; all research-scale execution is reserved for user Colab.
+- 2026-09-21 — Claude delivered design + code + smoke on branch `claude/eager-ride-091ooh`.
+  Status `READY_FOR_PMO_CODE`. `USER_COLAB_RUN_REQUIRED: YES`. Detail in
+  `../reports/claude/RL_SBJTS_VS_MERTON_COMPARATOR_v1.md`.
+
+  - **Superseded run.** Commit `0bdd16b` on this branch executed the research-scale
+    comparator before this execution policy existed. It is retained in git history as
+    `DEVELOPMENT_EVIDENCE` only, its outputs have been removed from the working tree,
+    and no number from it is carried forward.
+  - **Mode separation.** `RUN_MODE` is `SMOKE` or `RESEARCH`, with separate output
+    namespaces, separate budgets and separate evidence classes. The isolation is
+    enforced at runtime: a smoke stage that tries to write under `research/` raises,
+    and SMOKE is forced onto CPU even when a GPU is present.
+  - **T4 hard requirement.** RESEARCH calls `require_research_hardware()` before any
+    expensive stage: it raises without `torch.cuda.is_available()`, and raises again if
+    the allocated device name does not contain `T4`. There is no CPU or NumPy fallback.
+    `ALLOW_NON_T4` permits another CUDA device only with a written PMO authorisation,
+    never CPU, and is recorded in `hardware_manifest.json`. `Context` re-asserts the
+    `TORCH_CUDA_FLOAT32_BATCHED` contract after construction.
+  - **Exact two-holdout reproduction gate.** The predeclared subset is fixed in code
+    before any comparison runs: replications (0, 1) x both constraints x holdout streams
+    (0, 1) x eval seeds (0, 1) = 16 TT rows. Bitwise equality is adjudicated first; the
+    frozen Base 3 `GPU_EQ_ATOL`/`GPU_EQ_RTOL` is consulted only on failure and any use of
+    it is recorded. A non-pass stops the comparator, and `stage_inference` independently
+    refuses to join the frozen ledger without a passing gate.
+  - **Frozen TT ledger reuse.** The SBJTS arm is no longer regenerated. `stage_evaluate`
+    evaluates only the 80 Merton policies; the 24,000 SBJTS rows are read from the frozen
+    Base 4 `evaluation_results_partial.csv` and joined on
+    (stratum, replication, holdout, eval seed). Pairing holds by construction: both arms
+    use the same frozen market seed and the same frozen evaluation action-uniform stream.
+  - **Entropy time scaling documented and unit-tested.** The frozen Base 3 objective
+    `E[log(W_T/W_0)] + m * sum_t H_t` and the Chau-Nguyen-Nguyen continuous-time objective
+    `E[log W_T] + lambda * integral H_t dt` coincide on the frozen grid iff
+    `m = lambda * dt`. With `dt = 1/250` the frozen `m = 0.01` is `lambda = 2.5`, and the
+    paper's nominal `lambda = 0.01` is `m = 4e-5`: a factor of 250. Three tests pass
+    non-vacuously (T1 sum identity exact to 4.4e-16; T2 grid invariance 2.0e-08 when `m`
+    is rescaled against 0.131 when it is not; T3 separation 0.296), with every optimum
+    strictly inside the frozen policy box. Nothing frozen is changed. The factor is
+    common to both arms and cancels from `Delta`; it decides only which exploration
+    weight the analytic benchmark is built at, so the comparator now reports the analytic
+    Merton policy at both conventions, labelled.
+  - **Smoke.** 16/16 checks pass in 19 s on CPU, including two negative tests that must
+    fail closed: the RESEARCH hardware gate refuses without a T4, and inference refuses
+    without a passing reproduction gate. Checkpoint/resume was proved by training 2 of 4
+    tiny policies, re-entering, and training only the remaining 2.
+  - **No research execution.** No frozen-data calibration at research scale, no 80-policy
+    grid, no 24,000-attempt evaluation, no research bootstrap was run.
+  - **Open for PMO.** (i) a CUDA port of the frozen NumPy float64 learner rollout is
+    raised as `SCOPE CHANGE REQUEST — PMO DECISION REQUIRED` and was not made, since it is
+    a numerical-equivalence question; (ii) `…_PASS_EXACT` is the expected U1 outcome on a
+    T4, and a tolerance-only pass should be audited before U4 proceeds; (iii) which
+    analytic exploration convention belongs in the paper.

@@ -1,0 +1,194 @@
+{
+  "ticket": "C-RLSBJTS-MERTON-COMP-01",
+  "stage": "S3/U3_MERTON_WORLD_POSITIVE_CONTROL",
+  "run_mode": "SMOKE",
+  "evidence_class": "SMOKE_EVIDENCE",
+  "is_scientific_evidence": false,
+  "generated_at_utc": "2026-09-21T07:55:18.884018+00:00",
+  "claim_status": "SMOKE_EVIDENCE \u2014 execution proof only. This artifact is not a scientific result and must never be reported as comparator evidence.",
+  "status": "LEARNER_POSITIVE_CONTROL_PASS",
+  "predeclared_thresholds": {
+    "actor_bound_fraction_max": 0.5,
+    "parameter_movement_min": 1e-10,
+    "objective_response_min": 1e-08,
+    "sigma_multiplier": 4.0
+  },
+  "threshold_provenance": "frozen Base 3 LEARNER_CONFIG; the 4-sigma paired band is the frozen TOLERANCES['estimator_z'] convention",
+  "design": {
+    "n_replications_per_stratum": 2,
+    "updates": 3,
+    "train_paths": 32,
+    "positive_control_seed_namespace": "MERTONCOMP_GBM_POSITIVE_CONTROL"
+  },
+  "analytic_reference_convention": "FROZEN_LEARNER_EQUIV (lambda = m/dt), because that is the exploration weight the frozen discrete objective actually applies; see entropy_time_scaling_tests.json",
+  "results": [
+    {
+      "stratum_id": "S1_PRIMARY",
+      "constraint": "LONG_ONLY_FULL",
+      "replication": 0,
+      "updates": 3,
+      "train_paths": 32,
+      "policy_sha256": "4fe0d8066dffe64645ebb1bc18f986d15f1a4c99de17cf2f54df8fd39806a71a",
+      "parameter_movement_frobenius": 0.07852975081585965,
+      "saturated_fraction": 0.0,
+      "critic_status": "IDENTIFIED",
+      "objective_grid_range": 0.41749738932263836,
+      "ascent_check": {
+        "mean_delta_objective": 0.1354171868062506,
+        "paired_se": 0.000506267641999282,
+        "n_paths": 32,
+        "z": 267.4814180726222
+      },
+      "learned_executed_mean": 0.963933928761085,
+      "analytic_reference_frozen_equivalent": {
+        "effective_lambda": 2.5,
+        "executed_mean": 0.5023271877162023,
+        "exploratory_scale": 7.609918361689616
+      },
+      "plumbing": {
+        "finite_wealth": true,
+        "finite_entropy": true,
+        "finite_latent": true,
+        "executed_in_support": true,
+        "gradient_finite": true,
+        "gradient_nonzero": true,
+        "critic_identified": true,
+        "no_ruin": true
+      },
+      "gates": {
+        "PC1_PLUMBING": true,
+        "PC2_SATURATION": true,
+        "PC3_MOVEMENT": true,
+        "PC4_NON_VACUITY": true,
+        "PC5_ASCENT": true
+      },
+      "all_gates_pass": true
+    },
+    {
+      "stratum_id": "S1_PRIMARY",
+      "constraint": "LONG_ONLY_FULL",
+      "replication": 1,
+      "updates": 3,
+      "train_paths": 32,
+      "policy_sha256": "ef21f879593b2014cfad98e0484453394db55b718c76a7ff954752dae4b3b7d3",
+      "parameter_movement_frobenius": 0.07031857823079446,
+      "saturated_fraction": 0.0,
+      "critic_status": "IDENTIFIED",
+      "objective_grid_range": 0.41749738932263836,
+      "ascent_check": {
+        "mean_delta_objective": 0.134199549233338,
+        "paired_se": 0.0006231047951890425,
+        "n_paths": 32,
+        "z": 215.37235834082043
+      },
+      "learned_executed_mean": 0.9640070053970561,
+      "analytic_reference_frozen_equivalent": {
+        "effective_lambda": 2.5,
+        "executed_mean": 0.5023271877162023,
+        "exploratory_scale": 7.609918361689616
+      },
+      "plumbing": {
+        "finite_wealth": true,
+        "finite_entropy": true,
+        "finite_latent": true,
+        "executed_in_support": true,
+        "gradient_finite": true,
+        "gradient_nonzero": true,
+        "critic_identified": true,
+        "no_ruin": true
+      },
+      "gates": {
+        "PC1_PLUMBING": true,
+        "PC2_SATURATION": true,
+        "PC3_MOVEMENT": true,
+        "PC4_NON_VACUITY": true,
+        "PC5_ASCENT": true
+      },
+      "all_gates_pass": true
+    },
+    {
+      "stratum_id": "S2_CONFIRMATORY_CONSTRAINT",
+      "constraint": "LONG_ONLY_CAP50",
+      "replication": 0,
+      "updates": 3,
+      "train_paths": 32,
+      "policy_sha256": "07f54196833135931933036bc8aee9c2b91afcd2c369a710aaa303c8da991736",
+      "parameter_movement_frobenius": 0.08047155487094754,
+      "saturated_fraction": 0.0,
+      "critic_status": "IDENTIFIED",
+      "objective_grid_range": 0.3830312752572118,
+      "ascent_check": {
+        "mean_delta_objective": 0.15490549081236735,
+        "paired_se": 0.0003218382491934129,
+        "n_paths": 32,
+        "z": 481.3147324800256
+      },
+      "learned_executed_mean": 0.47251243975449136,
+      "analytic_reference_frozen_equivalent": {
+        "effective_lambda": 2.5,
+        "executed_mean": 0.2506719769600321,
+        "exploratory_scale": 7.609918361689616
+      },
+      "plumbing": {
+        "finite_wealth": true,
+        "finite_entropy": true,
+        "finite_latent": true,
+        "executed_in_support": true,
+        "gradient_finite": true,
+        "gradient_nonzero": true,
+        "critic_identified": true,
+        "no_ruin": true
+      },
+      "gates": {
+        "PC1_PLUMBING": true,
+        "PC2_SATURATION": true,
+        "PC3_MOVEMENT": true,
+        "PC4_NON_VACUITY": true,
+        "PC5_ASCENT": true
+      },
+      "all_gates_pass": true
+    },
+    {
+      "stratum_id": "S2_CONFIRMATORY_CONSTRAINT",
+      "constraint": "LONG_ONLY_CAP50",
+      "replication": 1,
+      "updates": 3,
+      "train_paths": 32,
+      "policy_sha256": "7bfa5c448d72147a7784829c73cc8f726dea8bc013f6f455021899cce09df264",
+      "parameter_movement_frobenius": 0.07057701506236096,
+      "saturated_fraction": 0.0,
+      "critic_status": "IDENTIFIED",
+      "objective_grid_range": 0.3830312752572118,
+      "ascent_check": {
+        "mean_delta_objective": 0.15424780125484608,
+        "paired_se": 0.00033696409417349906,
+        "n_paths": 32,
+        "z": 457.75738104436016
+      },
+      "learned_executed_mean": 0.4725423934766895,
+      "analytic_reference_frozen_equivalent": {
+        "effective_lambda": 2.5,
+        "executed_mean": 0.2506719769600321,
+        "exploratory_scale": 7.609918361689616
+      },
+      "plumbing": {
+        "finite_wealth": true,
+        "finite_entropy": true,
+        "finite_latent": true,
+        "executed_in_support": true,
+        "gradient_finite": true,
+        "gradient_nonzero": true,
+        "critic_identified": true,
+        "no_ruin": true
+      },
+      "gates": {
+        "PC1_PLUMBING": true,
+        "PC2_SATURATION": true,
+        "PC3_MOVEMENT": true,
+        "PC4_NON_VACUITY": true,
+        "PC5_ASCENT": true
+      },
+      "all_gates_pass": true
+    }
+  ]
+}

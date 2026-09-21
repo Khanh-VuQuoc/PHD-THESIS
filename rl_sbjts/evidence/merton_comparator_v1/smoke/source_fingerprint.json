@@ -1,0 +1,107 @@
+{
+  "ticket": "C-RLSBJTS-MERTON-COMP-01",
+  "stage": "S0/U0_SOURCE_FINGERPRINT",
+  "run_mode": "SMOKE",
+  "evidence_class": "SMOKE_EVIDENCE",
+  "is_scientific_evidence": false,
+  "generated_at_utc": "2026-09-21T07:55:08.438962+00:00",
+  "claim_status": "SMOKE_EVIDENCE \u2014 execution proof only. This artifact is not a scientific result and must never be reported as comparator evidence.",
+  "SOURCE_CONSUMPTION_MODE": "VERIFIED_ARTIFACT_BYTES",
+  "artifacts": {
+    "05B_BASE4_v2_0.ipynb": {
+      "present": true,
+      "bytes": 250857,
+      "sha256": "7bb73be0ddb5ad52534e6d2bdf8829fc2603394188d39f0c337b618fedf97657"
+    },
+    "BASE4_05A_FINAL_BUNDLE.zip": {
+      "present": true,
+      "bytes": 509912,
+      "sha256": "77aaf6b2ccdd98d446120b72adaddf01b8819ada12b406a3bc39e073d129ca43"
+    },
+    "03_RL_SBJTS_RESEARCH_GPU_HYBRID_v1_8__driveA.ipynb": {
+      "present": true,
+      "bytes": 408616,
+      "sha256": "344956031d9e89763370a020d92ec54a669a7cc400e3d2b674de613897c02129"
+    },
+    "frozen_market_snapshot_U1_BASELINE_4.npz": {
+      "present": true,
+      "bytes": 115621,
+      "sha256": "7e817762849118fc3abf8d4cf98ad8d65d921fa49cb0d1b3bb34d884b73c5b4a"
+    },
+    "base4_policies.npz": {
+      "present": true,
+      "bytes": 67862,
+      "sha256": "34c39a30feb29391684bab03e4cbb0a3ebedd448af645253265413d8406fa294"
+    },
+    "base4_training_attempts.csv": {
+      "present": true,
+      "bytes": 40994,
+      "sha256": "b56505a2d8d0973e821f0a81c60cfaaf96613c1e72bc3c11e44828f9332729c2"
+    }
+  },
+  "protocol_id_expected": "c9ef65485a49d40356f3bbb02d491c4b73fcc9ebf0a22f02f64ab87e04a590d4",
+  "base3_code_cell_concat_sha256": "db500333b57ae9029bde99018877580978f3c0344567fa8f86b9c74ac788b26e",
+  "base3_code_cell_concat_match": true,
+  "base3_native_ast_components": {
+    "n": 17,
+    "mismatches": []
+  },
+  "frozen_environment": {
+    "snapshot_sha256": "7e817762849118fc3abf8d4cf98ad8d65d921fa49cb0d1b3bb34d884b73c5b4a",
+    "train_shape": [
+      2110,
+      4
+    ],
+    "train_sha256": "09811db465da1443b092f6b5e18a78b2fe1dda1fbf1709061395b0ed0e72bf01",
+    "train_end": "2020-05-22",
+    "validation_start": "2020-05-26",
+    "holdout_start": "2023-03-13",
+    "return_type": "simple",
+    "input_transform": "log1p",
+    "assets": [
+      "ITA",
+      "XLE",
+      "SMH",
+      "EUFN"
+    ],
+    "d": 4,
+    "n_reference_paths": 256,
+    "environment_fingerprint": "63ba37cc4a26b48b497e424cdeef4981684c1aef1176f2db571efa6e8e48a060",
+    "first_date": "2012-01-04",
+    "last_train_date": "2020-05-22",
+    "n_full_observations": 3518
+  },
+  "backend": "TORCH_CPU_FLOAT32_BATCHED",
+  "engine_device": "cpu",
+  "hardware": {
+    "recorded_at_utc": "2026-09-21T07:55:06.942036+00:00",
+    "torch_available": true,
+    "cuda_available": false,
+    "device_name": null,
+    "device_index": null,
+    "cuda_runtime_version": "13.0",
+    "cudnn_version": 92400,
+    "torch_version": "2.14.0+cu130",
+    "total_memory_mb": null,
+    "capability": null,
+    "is_t4": false,
+    "gate": "SMOKE_NO_HARDWARE_REQUIREMENT",
+    "smoke_forced_cpu": true
+  },
+  "profile": {
+    "run_mode": "SMOKE",
+    "evidence_class": "SMOKE_EVIDENCE",
+    "is_scientific_evidence": false,
+    "outputs_subdir": "smoke",
+    "train_paths": 32,
+    "eval_paths": 600,
+    "updates": 3,
+    "n_replications": 2,
+    "holdout_env_streams": 1,
+    "eval_seeds": 2,
+    "backend": "TORCH_CPU_FLOAT32_BATCHED",
+    "engine_device": "cpu",
+    "requires_cuda": false,
+    "requires_t4": false
+  }
+}
