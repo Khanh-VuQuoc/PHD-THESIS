@@ -1,0 +1,110 @@
+{
+  "ticket": "C-RLSBJTS-MERTON-COMP-01",
+  "stage": "S2/U2_MERTON_GBM_CALIBRATION",
+  "run_mode": "SMOKE",
+  "evidence_class": "SMOKE_EVIDENCE",
+  "is_scientific_evidence": false,
+  "generated_at_utc": "2026-09-21T07:55:18.282952+00:00",
+  "claim_status": "SMOKE_EVIDENCE \u2014 execution proof only. This artifact is not a scientific result and must never be reported as comparator evidence.",
+  "status": "MERTON_GBM_CALIBRATION_PASS",
+  "calibration": {
+    "calibration_id_source": "C-RLSBJTS-MERTON-COMP-01 Section 4.1",
+    "input_snapshot_sha256": "7e817762849118fc3abf8d4cf98ad8d65d921fa49cb0d1b3bb34d884b73c5b4a",
+    "training_slice_sha256": "09811db465da1443b092f6b5e18a78b2fe1dda1fbf1709061395b0ed0e72bf01",
+    "training_slice_shape": [
+      2110,
+      4
+    ],
+    "n_observations": 2110,
+    "assets": [
+      "ITA",
+      "XLE",
+      "SMH",
+      "EUFN"
+    ],
+    "snapshot_return_type": "simple",
+    "input_transform": "log1p",
+    "first_date": "2012-01-04",
+    "train_end_date": "2020-05-22",
+    "last_train_date": "2020-05-22",
+    "validation_start": "2020-05-26",
+    "holdout_start": "2023-03-13",
+    "holdout_used": false,
+    "risky_object": "equally weighted log increment, mean over the 4 snapshot assets: the same market object the learner consumes (project_ew of the engine increments)",
+    "dt": 0.004,
+    "dt_provenance": "frozen Base 3 GBMConfig.dt = 1/250 (one engine step = one trading day of the frozen daily snapshot)",
+    "risk_free_gross_per_step": 1.0,
+    "risk_free_provenance": "frozen Base 3 RISK_FREE_PRIMARY_GROSS = 1.0, the Base 4 primary convention",
+    "r_f_annual": 0.0,
+    "variance_ddof": 0,
+    "variance_ddof_provenance": "frozen MomentTargetSpec.variance_ddof = 0",
+    "m1_per_step_mean_log_increment": 0.00027942696048003366,
+    "v1_per_step_variance_log_increment": 0.0001726791906838439,
+    "sigma_M_squared": 0.04316979767096097,
+    "sigma_M": 0.2077734286932787,
+    "mu_M_minus_r_f": 0.0914416389554889,
+    "mu_M": 0.0914416389554889,
+    "per_step_law": "log increment ~ Normal(m1, v1); risky gross = exp(increment)",
+    "parameter_search_performed": false,
+    "n_free_parameters_fitted": 2,
+    "identity_note": "sigma_M^2 = v1/dt and mu_M - r_f = m1/dt + 0.5*sigma_M^2 is the GBM log-return identity, not an extra fitted degree of freedom",
+    "record_sha256": "26c3ea298e9b69b4da788cc2530be428c1b0a41039c8b437bd229b0b4a8fe253"
+  },
+  "leakage_control": {
+    "source_used": "frozen training slice only",
+    "training_slice_sha256": "09811db465da1443b092f6b5e18a78b2fe1dda1fbf1709061395b0ed0e72bf01",
+    "training_slice_sha256_expected": "09811db465da1443b092f6b5e18a78b2fe1dda1fbf1709061395b0ed0e72bf01",
+    "training_slice_sha256_match": true,
+    "validation_or_holdout_rows_used": 0,
+    "target_holdout_statistics_used": false,
+    "parameter_search_performed": false
+  },
+  "monte_carlo_moment_test": {
+    "predeclared_before_execution": true,
+    "n_test_seeds": 3,
+    "paths_per_seed": 256,
+    "steps_per_path": 60,
+    "n_pooled_increments": 46080,
+    "seed_namespace": "MERTONCOMP_GBM_CALIBRATION_TEST",
+    "seed_namespace_disjoint_from_frozen": true,
+    "seed_collisions": [],
+    "sigma_multiplier": 4.0,
+    "tolerance_mean": 0.0002448633339656616,
+    "tolerance_variance": 4.550496225628961e-06,
+    "target_mean_m1": 0.00027942696048003366,
+    "target_variance_v1": 0.0001726791906838439,
+    "simulated_mean": 0.0003047305849575663,
+    "simulated_variance": 0.00017201002373298143,
+    "abs_error_mean": 2.530362447753263e-05,
+    "abs_error_variance": 6.691669508624668e-07,
+    "z_mean": 0.4133509753008767,
+    "z_variance": -0.5882144871090192,
+    "mean_within_tolerance": true,
+    "variance_within_tolerance": true,
+    "pass": true,
+    "per_seed": [
+      {
+        "index": 0,
+        "seed": 768895512,
+        "n": 15360,
+        "mean": 0.0005033842429384095,
+        "var": 0.00017267983869449462
+      },
+      {
+        "index": 1,
+        "seed": 419053900,
+        "n": 15360,
+        "mean": 0.00015152512312729036,
+        "var": 0.00017221170954801704
+      },
+      {
+        "index": 2,
+        "seed": 1459048439,
+        "n": 15360,
+        "mean": 0.00025928238880699913,
+        "var": 0.0001710735222285355
+      }
+    ]
+  },
+  "scope_note": "one-step mean/variance match to the frozen training slice; NOT a full-distribution match"
+}

@@ -1,0 +1,125 @@
+{
+  "ticket": "C-RLSBJTS-MERTON-COMP-01",
+  "stage": "SMOKE_END_TO_END",
+  "run_mode": "SMOKE",
+  "evidence_class": "SMOKE_EVIDENCE",
+  "is_scientific_evidence": false,
+  "generated_at_utc": "2026-09-21T07:55:25.064819+00:00",
+  "claim_status": "NOT_TESTED \u2014 smoke only. No comparator claim is supported by any artifact in this directory.",
+  "checks": [
+    {
+      "check": "RESEARCH_HARDWARE_GATE_REFUSES_WITHOUT_T4",
+      "pass": true,
+      "detail": "RESEARCH_MODE_REQUIRES_CUDA"
+    },
+    {
+      "check": "SMOKE_CANNOT_WRITE_INTO_RESEARCH_NAMESPACE",
+      "pass": true,
+      "detail": "SMOKE_WRITE_INTO_RESEARCH_NAMESPACE_FORBIDDEN"
+    },
+    {
+      "check": "SMOKE_CONTEXT_BUILT",
+      "pass": true,
+      "detail": "backend=TORCH_CPU_FLOAT32_BATCHED device=cpu blocks=2 reps=[0, 1]"
+    },
+    {
+      "check": "S0_SOURCE_FINGERPRINT",
+      "pass": true,
+      "detail": "train_sha match, 17 AST components"
+    },
+    {
+      "check": "ENTROPY_TIME_SCALING_TESTS",
+      "pass": true,
+      "detail": "ENTROPY_TIME_SCALING_TESTS_PASS; lambda_equiv=2.5"
+    },
+    {
+      "check": "S1_PREDECLARED_TWO_HOLDOUT_GATE_BLOCKS_ON_MISSING_REFERENCE",
+      "pass": true,
+      "detail": "BLOCKED_REPRODUCTION_REFERENCE_ROWS_MISSING; 8/16 rows, 8 reference rows unavailable locally"
+    },
+    {
+      "check": "S1_GATE_MECHANISM_PASSES_ON_AVAILABLE_ROWS",
+      "pass": true,
+      "detail": "BASE4_TARGET_REPRODUCTION_PASS_WITHIN_FROZEN_BACKEND_TOLERANCE; 8 rows; worst abs 3.75e-08"
+    },
+    {
+      "check": "S2_MERTON_GBM_CALIBRATION",
+      "pass": true,
+      "detail": "MERTON_GBM_CALIBRATION_PASS; sigma_M=0.207773, z_mean=+0.41"
+    },
+    {
+      "check": "S3_POSITIVE_CONTROL_GATES_EVALUATE",
+      "pass": true,
+      "detail": "LEARNER_POSITIVE_CONTROL_PASS; 4 policies, all_pass=True"
+    },
+    {
+      "check": "S4_TRAINING_PARTIAL",
+      "pass": true,
+      "detail": "2 trained, 2/4 total"
+    },
+    {
+      "check": "S4_RESUME_SKIPS_COMPLETED_UNITS",
+      "pass": true,
+      "detail": "resumed and trained 2 of 4, none repeated"
+    },
+    {
+      "check": "S5_EVALUATION_AND_RESUME",
+      "pass": true,
+      "detail": "8/8 Merton attempts over 2 blocks; resume visited 1 remaining block(s)"
+    },
+    {
+      "check": "S5_SBJTS_ARM_NOT_RE_EVALUATED",
+      "pass": true,
+      "detail": "evaluation ledger contains only the MERTON_MT arm"
+    },
+    {
+      "check": "OUTPUT_SCHEMAS",
+      "pass": true,
+      "detail": "training_attempts.csv:ok, evaluation_attempts.csv:ok, analytic_merton_results.csv:ok"
+    },
+    {
+      "check": "S7_INFERENCE_REUSES_FROZEN_TT_LEDGER",
+      "pass": true,
+      "detail": "8 frozen TT rows joined, 0 missing, 20 estimands"
+    },
+    {
+      "check": "S7_REFUSES_WITHOUT_REPRODUCTION_GATE",
+      "pass": true,
+      "detail": "INFERENCE_BLOCKED_BY_REPRODUCTION_GATE"
+    }
+  ],
+  "all_pass": true,
+  "n_checks": 16,
+  "elapsed_s": 19.4,
+  "profile": {
+    "run_mode": "SMOKE",
+    "evidence_class": "SMOKE_EVIDENCE",
+    "is_scientific_evidence": false,
+    "outputs_subdir": "smoke",
+    "train_paths": 32,
+    "eval_paths": 600,
+    "updates": 3,
+    "n_replications": 2,
+    "holdout_env_streams": 1,
+    "eval_seeds": 2,
+    "backend": "TORCH_CPU_FLOAT32_BATCHED",
+    "engine_device": "cpu",
+    "requires_cuda": false,
+    "requires_t4": false
+  },
+  "hardware": {
+    "recorded_at_utc": "2026-09-21T07:55:06.942036+00:00",
+    "torch_available": true,
+    "cuda_available": false,
+    "device_name": null,
+    "device_index": null,
+    "cuda_runtime_version": "13.0",
+    "cudnn_version": 92400,
+    "torch_version": "2.14.0+cu130",
+    "total_memory_mb": null,
+    "capability": null,
+    "is_t4": false,
+    "gate": "SMOKE_NO_HARDWARE_REQUIREMENT",
+    "smoke_forced_cpu": true
+  }
+}

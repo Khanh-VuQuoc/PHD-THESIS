@@ -1,0 +1,17 @@
+{
+  "ticket": "C-RLSBJTS-MERTON-COMP-01",
+  "stage": "S5/U5_EVALUATION",
+  "run_mode": "SMOKE",
+  "evidence_class": "SMOKE_EVIDENCE",
+  "is_scientific_evidence": false,
+  "generated_at_utc": "2026-09-21T07:55:23.477211+00:00",
+  "claim_status": "SMOKE_EVIDENCE \u2014 execution proof only. This artifact is not a scientific result and must never be reported as comparator evidence.",
+  "blocks_total": 2,
+  "blocks_visited_this_run": 1,
+  "evaluation_attempts_recorded": 8,
+  "analytic_attempts_recorded": 8,
+  "required_merton_attempts": 8,
+  "required_analytic_attempts": 8,
+  "sbjts_arm": "NOT EVALUATED HERE \u2014 reused from the frozen Base 4 TT ledger",
+  "resume_unit": "attempt_id inside a partially completed block"
+}
