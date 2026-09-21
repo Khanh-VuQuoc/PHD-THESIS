@@ -6,55 +6,70 @@ Updated: 2026-09-21. Owner: GPT / PMO.
 
 | Field | Current value |
 |---|---|
-| Project research status | **COMPARATOR_IMPLEMENTATION_FOR_USER_COLAB** — Base 4 retained as complete estimation-first evidence with stated limitations. |
-| Sole executable ticket | `tickets/C-RLSBJTS-MERTON-COMP-01.md` — **OPEN_FOR_CLAUDE (DESIGN + CODE + SMOKE ONLY)**. |
-| Current objective | Claude prepares and smoke-validates a fair RL–Merton/GBM comparator notebook; the user runs all research-scale calibration, training, evaluation and inference in Colab. |
+| Project research status | **USER_COLAB_RESEARCH_AUTHORIZED** — comparator code/smoke package passed PMO code audit and is merged to `main`. |
+| Sole executable ticket | `tickets/C-RLSBJTS-MERTON-COMP-01.md` — Claude implementation phase complete; user research execution now authorized. |
+| Current objective | Run the direct RL–Merton/GBM comparator on the user's paid Google Colab NVIDIA T4, with U0–U3 acting as hard pre-training gates before U4–U7. |
+| PMO-reviewed implementation | PR #2 / merged commit `a3d42a57718f921e2f5add9c3eead1e419cc4bc7`; source implementation commit `204f13e3f33edade7613fd9f84b2672569101e95`. |
 | Existing accepted evidence | Base 4: 160/160 training attempts complete, 96,000/96,000 evaluation attempts complete; target-training effect estimated under matched canonical one-step mean/variance control. |
-| Existing claim status | **No RL–SBJTS > RL–Merton claim has been tested.** Base 4 compares SBJTS target training against an affine-calibrated no-jump bridge control, not Merton/GBM. |
-| Primary new comparison | SBJTS-trained policy vs Merton/GBM-trained policy, both evaluated on the frozen SBJTS target holdout. |
+| Existing claim status | **No RL–SBJTS > RL–Merton claim yet.** Research evidence from the user Colab run must be audited before any promotion. |
+| Primary new comparison | frozen SBJTS-trained policy vs new Merton/GBM-trained policy, both evaluated on the same frozen SBJTS target holdout. |
 | Primary endpoints | `mean_terminal_log_wealth` and `cvar_log_loss`, separately for LONG_ONLY_FULL and LONG_ONLY_CAP50. |
-| Secondary comparator | Analytic constrained Merton policy evaluated on the same target holdout, clearly separated from learned RL–Merton. |
-| Execution ownership | **Claude:** derivation, code, static checks, smoke only. **User/Colab:** frozen/real-data calibration, full model training, full holdout evaluation, research-scale inference. |
-| Research hardware | **Paid Google Colab NVIDIA T4 GPU.** Tensor-heavy training/simulation/evaluation must use CUDA; no silent CPU fallback. Default numerical path remains CUDA float32 batched, consistent with frozen Base 4. |
+| Research hardware | **Paid Google Colab NVIDIA T4.** RESEARCH mode fails closed without CUDA T4. The frozen market engine runs CUDA float32 batched. |
+| Learner numerical contract | The frozen Base 3 actor/critic rollout, critic fit and actor-gradient path remains vectorized NumPy float64 on CPU, exactly as in frozen Base 4. Porting this component to CUDA is a separate numerical-equivalence scope change and is **not** part of the authorized comparator run. |
 | Frozen ancestry | Base 2 environment/calibration; Base 3 learner mathematics; Base 4 target law, constraints, `m=0.01`, state, wealth accounting, training budget, holdout namespaces and endpoint definitions. |
 | Permanent current limitation | Base 2 ancestry is smoke-scale; no external-market-validation or universal superiority claim. |
-| Next PMO decision | First audit Claude's code/smoke/T4-readiness package. If accepted, authorize user Colab RESEARCH mode. After the user run, audit scientific results separately. |
+| Next PMO decision | After the user Colab run publishes research outputs, audit source fingerprint, U1 reproduction, calibration, attempt accounting, estimands and claim status. |
 
-## Claude start instruction
+## Authorized user execution
 
-Read this state, `01_PMO_SKILL_RL_SBJTS.md`, the sole ticket, `04_CANONICAL_SOURCE_MAP.md`, and the relevant entries in `02_CLAIM_LEDGER.md` from `main` before work.
+Use `rl_sbjts/notebooks/06_RL_SBJTS_VS_MERTON_COMPARATOR_GPU_v1_0.ipynb` from `main`.
 
-Claude must **not** execute the research-scale comparator. Prepare a standalone resumable notebook with a strict `SMOKE` versus `RESEARCH` split. Claude may run only the smallest smoke/preflight needed to prove the notebook, output writing and resume logic work.
+Set:
 
-The RESEARCH path must be designed for the user's paid **NVIDIA T4 Colab GPU**, assert CUDA/T4 availability, keep tensor-heavy learner/simulation/evaluation work on CUDA, and preserve the frozen Base 4 `TORCH_CUDA_FLOAT32_BATCHED` numerical contract. Do not introduce AMP/float16/bfloat16 or silent CPU fallback without a separate PMO numerical-equivalence decision.
-
-Research-scale source fingerprinting against actual frozen artifacts, Base 4 reproduction, empirical Merton calibration on the real frozen training slice, positive-control run, 80-policy Merton training, 24,000 target-holdout evaluations and final inference are reserved for the user's Colab execution after PMO code audit.
-
-Claude should mark the ticket `READY_FOR_PMO_CODE` when implementation and smoke are complete, provide exact Colab T4 run instructions, then stop.
-
-## Frozen boundaries
-
-- SBJTS target law and frozen environment ancestry.
-- Base 4 `m = 0.01` primary exploration setting.
-- State `(1, t/N, log(W_t/W_0), r_{t-1})`.
-- Linear actor, truncated-Gaussian action policy, linear ridge critic, Adam update mathematics.
-- LONG_ONLY_FULL and LONG_ONLY_CAP50 bounds.
-- 400 updates and 512 training paths/update for the eventual learned-policy comparator.
-- Existing Base 4 policies/results are immutable evidence; do not overwrite them.
-- Target holdout is evaluation-only.
-- Default research numerical backend is CUDA float32 batched on the rented Colab T4.
-
-## Execution policy
-
-```text
-Claude: derive -> implement -> static test -> SMOKE -> verify T4/CUDA research path -> READY_FOR_PMO_CODE -> STOP
-PMO: audit code/smoke/GPU path -> approve or patch
-User: run RESEARCH mode on paid Colab NVIDIA T4 -> commit/publish outputs
-PMO: audit research outputs -> scientific decision
+```python
+RUN_MODE = "RESEARCH"
+ALLOW_NON_T4 = False
 ```
 
-No expensive run should be duplicated merely for verification. Paid GPU time should be spent only on research-scale stages that actually require it.
+Use a paid Colab **NVIDIA T4** runtime. Run from the top with the frozen inputs under `MyDrive/sbjts_rst`.
+
+The notebook must pass, in order:
+
+```text
+U0 source fingerprint
+ -> U1 exact/tolerance-adjudicated two-holdout Base 4 reproduction
+ -> U2 empirical Merton calibration
+ -> U3 bounded learner positive control
+ -> U4 80-policy Merton training
+ -> U5 24,000 Merton target-holdout evaluations
+ -> U6 analytic secondary benchmark
+ -> U7 inference
+```
+
+### Hard stop rules
+
+- If U0 fails identity/hash checks: **STOP**.
+- If U1 is not `BASE4_TARGET_REPRODUCTION_PASS_EXACT` or `...PASS_WITHIN_FROZEN_BACKEND_TOLERANCE`: **STOP before U4**.
+- If U1 passes only within tolerance rather than exactly, preserve the evidence and report it to PMO; this is not an automatic defect, but the backend difference must be recorded.
+- If U3 reports a gross learner failure: **STOP before U4**.
+- Do not alter `m`, bounds, state, budgets, seeds, holdout namespace, endpoint definitions or entropy convention during the run.
+- Do not retrain frozen SBJTS policies and do not regenerate the TT arm; reuse the frozen Base 4 ledger.
+- On disconnect, rerun from the top with the same `MERTONCOMP_WORK`; accepted completed units must be skipped.
+
+## GPU interpretation
+
+The authorized run deliberately preserves the same learner implementation used by frozen Base 4. T4 accelerates the tensor-heavy SBJTS/market simulation and block generation; the small frozen actor/critic update path remains NumPy float64 on CPU for numerical comparability. Moving that learner path to CUDA would create a new implementation lineage and requires a separate equivalence ticket before it can be used for paper evidence.
+
+## Evidence handoff after Colab
+
+Copy/commit the generated `evidence/merton_comparator_v1/research/` outputs to GitHub. Then return here with:
+
+> `audit comparator Colab results`
+
+PMO will audit the research evidence; no claim is promoted automatically.
 
 ## Closed / historical work
 
-Base 4 remains frozen and is not reopened. Previous resolver/base3 engineering tickets are historical. The current work is an extension comparator, not a rewrite of Base 4.
+- Base 4 remains frozen and is not reopened.
+- Commit `0bdd16b` is retained only as **DEVELOPMENT_EVIDENCE** because it executed research-scale work before the current user-Colab/T4 policy and its result files are not part of the active research tree.
+- Claude's comparator implementation/smoke phase is complete; no further Claude research-scale execution is authorized for this ticket.
