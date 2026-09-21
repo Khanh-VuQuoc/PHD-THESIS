@@ -1,0 +1,729 @@
+{
+  "check_id": "C-RLSBJTS-MERTON-COMP-01/W3_MERTON_WORLD_LEARNER_POSITIVE_CONTROL",
+  "generated_at_utc": "2026-09-21T06:30:59.144974+00:00",
+  "status": "LEARNER_POSITIVE_CONTROL_FAIL",
+  "predeclared_thresholds": {
+    "actor_bound_fraction_max": 0.5,
+    "parameter_movement_min": 1e-10,
+    "objective_response_min": 1e-08,
+    "sigma_multiplier": 4.0
+  },
+  "threshold_provenance": "frozen Base 3 LEARNER_CONFIG smoke thresholds; the 4-sigma paired Monte Carlo band is the frozen TOLERANCES['estimator_z'] = 4.0 convention",
+  "design": {
+    "n_policies": 4,
+    "updates": 400,
+    "train_paths": 512,
+    "positive_control_seed_namespace": "MERTONCOMP_GBM_POSITIVE_CONTROL",
+    "note": "bounded: 2 replications x 2 constraints at the frozen budget, trained in the empirical-GBM world only"
+  },
+  "results": [
+    {
+      "stratum_id": "S1_PRIMARY",
+      "constraint": "LONG_ONLY_FULL",
+      "bounds": [
+        0.0,
+        1.0
+      ],
+      "exploration_m": 0.01,
+      "replication": 0,
+      "updates": 400,
+      "train_paths": 512,
+      "policy_sha256": "6e6a0a75e00f8d33e6385ca2e5dee591acae418bb271d088ecb787a573faad5f",
+      "w_init": [
+        [
+          0.5,
+          0.0,
+          0.0,
+          -0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          -0.0
+        ]
+      ],
+      "w_final": [
+        [
+          0.03272117190277022,
+          -0.08902466231225944,
+          -0.033724635266886537,
+          0.089990865334733
+        ],
+        [
+          0.5933697618437963,
+          0.5299267465264687,
+          0.3744945205422243,
+          0.07893952642896471
+        ]
+      ],
+      "parameter_movement_frobenius": 1.0074215732547036,
+      "plumbing": {
+        "finite_wealth": true,
+        "finite_entropy": true,
+        "finite_latent": true,
+        "executed_in_support": true,
+        "gradient_finite": true,
+        "gradient_nonzero": true,
+        "critic_status": "IDENTIFIED",
+        "critic_identified": true,
+        "ruin_count": 0,
+        "no_ruin": true
+      },
+      "saturated_fraction": 0.0,
+      "objective_grid": [
+        {
+          "phi1": 0.0,
+          "objective": -0.9444924334266905,
+          "mean_log_wealth": 0.0015838107829004764,
+          "mean_entropy_sum": -94.6076244209591,
+          "saturated_fraction": 0.0,
+          "executed_mean": 0.08016473066532712,
+          "executed_var": 0.0037156841471450218
+        },
+        {
+          "phi1": 0.16666666666666666,
+          "objective": -0.6084909617047355,
+          "mean_log_wealth": 0.0033138976600674114,
+          "mean_entropy_sum": -61.18048593648029,
+          "saturated_fraction": 0.0,
+          "executed_mean": 0.17751096533539937,
+          "executed_var": 0.00828648981250552
+        },
+        {
+          "phi1": 0.3333333333333333,
+          "objective": -0.5262472759131595,
+          "mean_log_wealth": 0.005741092601259536,
+          "mean_entropy_sum": -53.198836851441904,
+          "saturated_fraction": 0.0,
+          "executed_mean": 0.3338763817096667,
+          "executed_var": 0.010095750594961041
+        },
+        {
+          "phi1": 0.5,
+          "objective": -0.522180932383621,
+          "mean_log_wealth": 0.008011807633088683,
+          "mean_entropy_sum": -53.01927400167097,
+          "saturated_fraction": 0.0,
+          "executed_mean": 0.5003953966049741,
+          "executed_var": 0.010142254982969086
+        },
+        {
+          "phi1": 0.6666666666666666,
+          "objective": -0.5219875406273143,
+          "mean_log_wealth": 0.010000827887104623,
+          "mean_entropy_sum": -53.198836851441904,
+          "saturated_fraction": 0.0,
+          "executed_mean": 0.6668963396315912,
+          "executed_var": 0.010083616064795435
+        },
+        {
+          "phi1": 0.8333333333333333,
+          "objective": -0.6002234792068526,
+          "mean_log_wealth": 0.011581380157950311,
+          "mean_entropy_sum": -61.18048593648029,
+          "saturated_fraction": 0.0,
+          "executed_mean": 0.8231172597321054,
+          "executed_var": 0.008221021936502114
+        },
+        {
+          "phi1": 1.0,
+          "objective": -0.9337035124584901,
+          "mean_log_wealth": 0.012372731751100912,
+          "mean_entropy_sum": -94.6076244209591,
+          "saturated_fraction": 0.0,
+          "executed_mean": 0.9202604940331742,
+          "executed_var": 0.0036506874552004226
+        }
+      ],
+      "objective_grid_range": 0.4225048927993762,
+      "objective_grid_argmax_phi1": 0.6666666666666666,
+      "logwealth_grid_argmax_phi1": 1.0,
+      "ascent_check": {
+        "mean_delta_objective": 1.5135204904562496,
+        "paired_se": 0.002371507809166901,
+        "n_paths": 512,
+        "z": 638.2102072807181,
+        "objective_init": -1.505690635551181,
+        "objective_final": 0.007829854905068465
+      },
+      "market_direction_check": {
+        "mean_logwealth_hi_minus_lo": 0.010788920968200435,
+        "paired_se": 0.003766567616246052,
+        "z": 2.8643906249460107
+      },
+      "learned_executed_mean": 0.5000048067905476,
+      "learned_executed_variance": 0.08344786768714856,
+      "analytic_exploratory_merton": {
+        "constraint_bounds": [
+          0.0,
+          1.0
+        ],
+        "exploration_m": 0.01,
+        "mu_M": 0.0914416389554889,
+        "sigma_M": 0.2077734286932787,
+        "r_f": 0.0,
+        "unconstrained_merton_fraction": 2.1181854882076263,
+        "classical_constrained_fraction": 1.0,
+        "exploratory_latent_loc": 2.1181854882076263,
+        "exploratory_scale": 0.4812934966175245,
+        "phi": [
+          2.1181854882076263,
+          3.1426141562230243
+        ],
+        "executed_mean": 0.8372642248880666,
+        "executed_second_moment": 0.7230170975317773,
+        "executed_variance": 0.022005715254362346,
+        "entropy": -0.8208432470911182,
+        "policy_class": "TruncatedGaussian(loc=(mu-r)/sigma^2, scale=sqrt(m)/sigma) conditioned to [a, b]",
+        "is_rl_trained": false
+      },
+      "descriptive_gap_vs_analytic": {
+        "executed_mean_gap": -0.337259418097519,
+        "is_a_gate": false,
+        "reason": "the frozen discrete learner objective adds m * H once per engine step, while the continuous-time analytic exploratory Merton policy carries m as a per-unit-time rate; at dt = 1/250 the learner's effective exploration weight is 250x the analytic benchmark's, so the two optima are not expected to coincide",
+        "effective_exploration_weight_ratio_learner_over_analytic": 250.0
+      },
+      "gates": {
+        "PC1_PLUMBING": true,
+        "PC2_SATURATION": true,
+        "PC3_MOVEMENT": true,
+        "PC4_NON_VACUITY": true,
+        "PC5_ASCENT": true,
+        "PC6_MARKET_DIRECTION": false
+      },
+      "all_gates_pass": false
+    },
+    {
+      "stratum_id": "S1_PRIMARY",
+      "constraint": "LONG_ONLY_FULL",
+      "bounds": [
+        0.0,
+        1.0
+      ],
+      "exploration_m": 0.01,
+      "replication": 1,
+      "updates": 400,
+      "train_paths": 512,
+      "policy_sha256": "182727c95b11ba187768392c263b093d95c9acb417ea1a2c29e0335ba3e7a48f",
+      "w_init": [
+        [
+          0.5,
+          -0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          -0.0,
+          -0.0
+        ]
+      ],
+      "w_final": [
+        [
+          0.031264024487418385,
+          -0.08686217664039605,
+          -0.024225936224413047,
+          -0.041158943418791234
+        ],
+        [
+          0.5916598802623468,
+          0.5258783014951253,
+          0.34868488579638685,
+          0.12372397659814068
+        ]
+      ],
+      "parameter_movement_frobenius": 0.9965127098754378,
+      "plumbing": {
+        "finite_wealth": true,
+        "finite_entropy": true,
+        "finite_latent": true,
+        "executed_in_support": true,
+        "gradient_finite": true,
+        "gradient_nonzero": true,
+        "critic_status": "IDENTIFIED",
+        "critic_identified": true,
+        "ruin_count": 0,
+        "no_ruin": true
+      },
+      "saturated_fraction": 0.0,
+      "objective_grid": [
+        {
+          "phi1": 0.0,
+          "objective": -0.9444924334266905,
+          "mean_log_wealth": 0.0015838107829004764,
+          "mean_entropy_sum": -94.6076244209591,
+          "saturated_fraction": 0.0,
+          "executed_mean": 0.08016473066532712,
+          "executed_var": 0.0037156841471450218
+        },
+        {
+          "phi1": 0.16666666666666666,
+          "objective": -0.6084909617047355,
+          "mean_log_wealth": 0.0033138976600674114,
+          "mean_entropy_sum": -61.18048593648029,
+          "saturated_fraction": 0.0,
+          "executed_mean": 0.17751096533539937,
+          "executed_var": 0.00828648981250552
+        },
+        {
+          "phi1": 0.3333333333333333,
+          "objective": -0.5262472759131595,
+          "mean_log_wealth": 0.005741092601259536,
+          "mean_entropy_sum": -53.198836851441904,
+          "saturated_fraction": 0.0,
+          "executed_mean": 0.3338763817096667,
+          "executed_var": 0.010095750594961041
+        },
+        {
+          "phi1": 0.5,
+          "objective": -0.522180932383621,
+          "mean_log_wealth": 0.008011807633088683,
+          "mean_entropy_sum": -53.01927400167097,
+          "saturated_fraction": 0.0,
+          "executed_mean": 0.5003953966049741,
+          "executed_var": 0.010142254982969086
+        },
+        {
+          "phi1": 0.6666666666666666,
+          "objective": -0.5219875406273143,
+          "mean_log_wealth": 0.010000827887104623,
+          "mean_entropy_sum": -53.198836851441904,
+          "saturated_fraction": 0.0,
+          "executed_mean": 0.6668963396315912,
+          "executed_var": 0.010083616064795435
+        },
+        {
+          "phi1": 0.8333333333333333,
+          "objective": -0.6002234792068526,
+          "mean_log_wealth": 0.011581380157950311,
+          "mean_entropy_sum": -61.18048593648029,
+          "saturated_fraction": 0.0,
+          "executed_mean": 0.8231172597321054,
+          "executed_var": 0.008221021936502114
+        },
+        {
+          "phi1": 1.0,
+          "objective": -0.9337035124584901,
+          "mean_log_wealth": 0.012372731751100912,
+          "mean_entropy_sum": -94.6076244209591,
+          "saturated_fraction": 0.0,
+          "executed_mean": 0.9202604940331742,
+          "executed_var": 0.0036506874552004226
+        }
+      ],
+      "objective_grid_range": 0.4225048927993762,
+      "objective_grid_argmax_phi1": 0.6666666666666666,
+      "logwealth_grid_argmax_phi1": 1.0,
+      "ascent_check": {
+        "mean_delta_objective": 1.5135358803681234,
+        "paired_se": 0.0023726144281046254,
+        "n_paths": 512,
+        "z": 637.9190240266805,
+        "objective_init": -1.505690635551181,
+        "objective_final": 0.00784524481694204
+      },
+      "market_direction_check": {
+        "mean_logwealth_hi_minus_lo": 0.010788920968200435,
+        "paired_se": 0.003766567616246052,
+        "z": 2.8643906249460107
+      },
+      "learned_executed_mean": 0.4996959177397919,
+      "learned_executed_variance": 0.08343267287368065,
+      "analytic_exploratory_merton": {
+        "constraint_bounds": [
+          0.0,
+          1.0
+        ],
+        "exploration_m": 0.01,
+        "mu_M": 0.0914416389554889,
+        "sigma_M": 0.2077734286932787,
+        "r_f": 0.0,
+        "unconstrained_merton_fraction": 2.1181854882076263,
+        "classical_constrained_fraction": 1.0,
+        "exploratory_latent_loc": 2.1181854882076263,
+        "exploratory_scale": 0.4812934966175245,
+        "phi": [
+          2.1181854882076263,
+          3.1426141562230243
+        ],
+        "executed_mean": 0.8372642248880666,
+        "executed_second_moment": 0.7230170975317773,
+        "executed_variance": 0.022005715254362346,
+        "entropy": -0.8208432470911182,
+        "policy_class": "TruncatedGaussian(loc=(mu-r)/sigma^2, scale=sqrt(m)/sigma) conditioned to [a, b]",
+        "is_rl_trained": false
+      },
+      "descriptive_gap_vs_analytic": {
+        "executed_mean_gap": -0.33756830714827474,
+        "is_a_gate": false,
+        "reason": "the frozen discrete learner objective adds m * H once per engine step, while the continuous-time analytic exploratory Merton policy carries m as a per-unit-time rate; at dt = 1/250 the learner's effective exploration weight is 250x the analytic benchmark's, so the two optima are not expected to coincide",
+        "effective_exploration_weight_ratio_learner_over_analytic": 250.0
+      },
+      "gates": {
+        "PC1_PLUMBING": true,
+        "PC2_SATURATION": true,
+        "PC3_MOVEMENT": true,
+        "PC4_NON_VACUITY": true,
+        "PC5_ASCENT": true,
+        "PC6_MARKET_DIRECTION": false
+      },
+      "all_gates_pass": false
+    },
+    {
+      "stratum_id": "S2_CONFIRMATORY_CONSTRAINT",
+      "constraint": "LONG_ONLY_CAP50",
+      "bounds": [
+        0.0,
+        0.5
+      ],
+      "exploration_m": 0.01,
+      "replication": 0,
+      "updates": 400,
+      "train_paths": 512,
+      "policy_sha256": "b1cb0f0dd562f49419bd6d34fb55c649b813c2af0fe3df6d089310629eff717e",
+      "w_init": [
+        [
+          0.5,
+          0.0,
+          0.0,
+          -0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          -0.0
+        ]
+      ],
+      "w_final": [
+        [
+          0.03288305623458329,
+          -0.0906553790577446,
+          -0.07841585854884905,
+          0.06190105317990463
+        ],
+        [
+          0.4525643929169261,
+          0.4039686270875033,
+          0.34048998725044394,
+          0.12295155085248367
+        ]
+      ],
+      "parameter_movement_frobenius": 0.8575856346999102,
+      "plumbing": {
+        "finite_wealth": true,
+        "finite_entropy": true,
+        "finite_latent": true,
+        "executed_in_support": true,
+        "gradient_finite": true,
+        "gradient_nonzero": true,
+        "critic_status": "IDENTIFIED",
+        "critic_identified": true,
+        "ruin_count": 0,
+        "no_ruin": true
+      },
+      "saturated_fraction": 0.0,
+      "objective_grid": [
+        {
+          "phi1": 0.0,
+          "objective": -0.944497174328835,
+          "mean_log_wealth": 0.0015838740238423414,
+          "mean_entropy_sum": -94.60810483526772,
+          "saturated_fraction": 0.0,
+          "executed_mean": 0.08016436918742836,
+          "executed_var": 0.0037154948767468216
+        },
+        {
+          "phi1": 0.08333333333333333,
+          "objective": -0.7519973212185954,
+          "mean_log_wealth": 0.0022997197667454367,
+          "mean_entropy_sum": -75.42970409853409,
+          "saturated_fraction": 0.0,
+          "executed_mean": 0.11906948330008532,
+          "executed_var": 0.005912479181534512
+        },
+        {
+          "phi1": 0.16666666666666666,
+          "objective": -0.6104074767190626,
+          "mean_log_wealth": 0.003311762002409657,
+          "mean_entropy_sum": -61.37192387214722,
+          "saturated_fraction": 0.0,
+          "executed_mean": 0.17734177326376066,
+          "executed_var": 0.008227625037305217
+        },
+        {
+          "phi1": 0.25,
+          "objective": -0.559822378111592,
+          "mean_log_wealth": 0.004486906519757238,
+          "mean_entropy_sum": -56.430928463134926,
+          "saturated_fraction": 0.0,
+          "executed_mean": 0.2503233883800142,
+          "executed_var": 0.009232396537719461
+        },
+        {
+          "phi1": 0.3333333333333333,
+          "objective": -0.6081572108678173,
+          "mean_log_wealth": 0.005562027853655057,
+          "mean_entropy_sum": -61.37192387214722,
+          "saturated_fraction": 0.0,
+          "executed_mean": 0.3232676903670273,
+          "executed_var": 0.008174277954257066
+        },
+        {
+          "phi1": 0.41666666666666663,
+          "objective": -0.7479402732979382,
+          "mean_log_wealth": 0.006356767687402721,
+          "mean_entropy_sum": -75.42970409853409,
+          "saturated_fraction": 0.0,
+          "executed_mean": 0.381449618432206,
+          "executed_var": 0.0058401658860402685
+        },
+        {
+          "phi1": 0.5,
+          "objective": -0.9392325781886401,
+          "mean_log_wealth": 0.006848470164037107,
+          "mean_entropy_sum": -94.60810483526772,
+          "saturated_fraction": 0.0,
+          "executed_mean": 0.420260676841732,
+          "executed_var": 0.0036506307995851045
+        }
+      ],
+      "objective_grid_range": 0.384674796217243,
+      "objective_grid_argmax_phi1": 0.25,
+      "logwealth_grid_argmax_phi1": 0.5,
+      "ascent_check": {
+        "mean_delta_objective": 1.2807715532616306,
+        "paired_se": 0.0011475721176667482,
+        "n_paths": 512,
+        "z": 1116.0706447501568,
+        "objective_init": -1.6924374839343554,
+        "objective_final": -0.411665930672725
+      },
+      "market_direction_check": {
+        "mean_logwealth_hi_minus_lo": 0.005264596140194766,
+        "paired_se": 0.001530756359985879,
+        "z": 3.4392123252346516
+      },
+      "learned_executed_mean": 0.24989981627782493,
+      "learned_executed_variance": 0.02090155870011899,
+      "analytic_exploratory_merton": {
+        "constraint_bounds": [
+          0.0,
+          0.5
+        ],
+        "exploration_m": 0.01,
+        "mu_M": 0.0914416389554889,
+        "sigma_M": 0.2077734286932787,
+        "r_f": 0.0,
+        "unconstrained_merton_fraction": 2.1181854882076263,
+        "classical_constrained_fraction": 0.5,
+        "exploratory_latent_loc": 2.1181854882076263,
+        "exploratory_scale": 0.4812934966175245,
+        "phi": [
+          2.1181854882076263,
+          3.1426141562230243
+        ],
+        "executed_mean": 0.3818354203313943,
+        "executed_second_moment": 0.15659545822403997,
+        "executed_variance": 0.01079717000438743,
+        "entropy": -1.1533274925491668,
+        "policy_class": "TruncatedGaussian(loc=(mu-r)/sigma^2, scale=sqrt(m)/sigma) conditioned to [a, b]",
+        "is_rl_trained": false
+      },
+      "descriptive_gap_vs_analytic": {
+        "executed_mean_gap": -0.13193560405356936,
+        "is_a_gate": false,
+        "reason": "the frozen discrete learner objective adds m * H once per engine step, while the continuous-time analytic exploratory Merton policy carries m as a per-unit-time rate; at dt = 1/250 the learner's effective exploration weight is 250x the analytic benchmark's, so the two optima are not expected to coincide",
+        "effective_exploration_weight_ratio_learner_over_analytic": 250.0
+      },
+      "gates": {
+        "PC1_PLUMBING": true,
+        "PC2_SATURATION": true,
+        "PC3_MOVEMENT": true,
+        "PC4_NON_VACUITY": true,
+        "PC5_ASCENT": true,
+        "PC6_MARKET_DIRECTION": false
+      },
+      "all_gates_pass": false
+    },
+    {
+      "stratum_id": "S2_CONFIRMATORY_CONSTRAINT",
+      "constraint": "LONG_ONLY_CAP50",
+      "bounds": [
+        0.0,
+        0.5
+      ],
+      "exploration_m": 0.01,
+      "replication": 1,
+      "updates": 400,
+      "train_paths": 512,
+      "policy_sha256": "6c5d4d704a692e2f43ae5a2c2ea3c601666e1f8c942ce8d30a9d360eea569f99",
+      "w_init": [
+        [
+          0.5,
+          -0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          -0.0,
+          -0.0
+        ]
+      ],
+      "w_final": [
+        [
+          0.03211079956059101,
+          -0.08979143678642344,
+          -0.07098172101890836,
+          -0.011586308697510095
+        ],
+        [
+          0.4513098344069786,
+          0.40325024512556323,
+          0.3213859894056762,
+          0.1434303951427552
+        ]
+      ],
+      "parameter_movement_frobenius": 0.8498870586962679,
+      "plumbing": {
+        "finite_wealth": true,
+        "finite_entropy": true,
+        "finite_latent": true,
+        "executed_in_support": true,
+        "gradient_finite": true,
+        "gradient_nonzero": true,
+        "critic_status": "IDENTIFIED",
+        "critic_identified": true,
+        "ruin_count": 0,
+        "no_ruin": true
+      },
+      "saturated_fraction": 0.0,
+      "objective_grid": [
+        {
+          "phi1": 0.0,
+          "objective": -0.944497174328835,
+          "mean_log_wealth": 0.0015838740238423414,
+          "mean_entropy_sum": -94.60810483526772,
+          "saturated_fraction": 0.0,
+          "executed_mean": 0.08016436918742836,
+          "executed_var": 0.0037154948767468216
+        },
+        {
+          "phi1": 0.08333333333333333,
+          "objective": -0.7519973212185954,
+          "mean_log_wealth": 0.0022997197667454367,
+          "mean_entropy_sum": -75.42970409853409,
+          "saturated_fraction": 0.0,
+          "executed_mean": 0.11906948330008532,
+          "executed_var": 0.005912479181534512
+        },
+        {
+          "phi1": 0.16666666666666666,
+          "objective": -0.6104074767190626,
+          "mean_log_wealth": 0.003311762002409657,
+          "mean_entropy_sum": -61.37192387214722,
+          "saturated_fraction": 0.0,
+          "executed_mean": 0.17734177326376066,
+          "executed_var": 0.008227625037305217
+        },
+        {
+          "phi1": 0.25,
+          "objective": -0.559822378111592,
+          "mean_log_wealth": 0.004486906519757238,
+          "mean_entropy_sum": -56.430928463134926,
+          "saturated_fraction": 0.0,
+          "executed_mean": 0.2503233883800142,
+          "executed_var": 0.009232396537719461
+        },
+        {
+          "phi1": 0.3333333333333333,
+          "objective": -0.6081572108678173,
+          "mean_log_wealth": 0.005562027853655057,
+          "mean_entropy_sum": -61.37192387214722,
+          "saturated_fraction": 0.0,
+          "executed_mean": 0.3232676903670273,
+          "executed_var": 0.008174277954257066
+        },
+        {
+          "phi1": 0.41666666666666663,
+          "objective": -0.7479402732979382,
+          "mean_log_wealth": 0.006356767687402721,
+          "mean_entropy_sum": -75.42970409853409,
+          "saturated_fraction": 0.0,
+          "executed_mean": 0.381449618432206,
+          "executed_var": 0.0058401658860402685
+        },
+        {
+          "phi1": 0.5,
+          "objective": -0.9392325781886401,
+          "mean_log_wealth": 0.006848470164037107,
+          "mean_entropy_sum": -94.60810483526772,
+          "saturated_fraction": 0.0,
+          "executed_mean": 0.420260676841732,
+          "executed_var": 0.0036506307995851045
+        }
+      ],
+      "objective_grid_range": 0.384674796217243,
+      "objective_grid_argmax_phi1": 0.25,
+      "logwealth_grid_argmax_phi1": 0.5,
+      "ascent_check": {
+        "mean_delta_objective": 1.2807759355700141,
+        "paired_se": 0.0011479020471996883,
+        "n_paths": 512,
+        "z": 1115.7536818533185,
+        "objective_init": -1.6924374839343554,
+        "objective_final": -0.41166154836434143
+      },
+      "market_direction_check": {
+        "mean_logwealth_hi_minus_lo": 0.005264596140194766,
+        "paired_se": 0.001530756359985879,
+        "z": 3.4392123252346516
+      },
+      "learned_executed_mean": 0.24981058649194163,
+      "learned_executed_variance": 0.020899929081392283,
+      "analytic_exploratory_merton": {
+        "constraint_bounds": [
+          0.0,
+          0.5
+        ],
+        "exploration_m": 0.01,
+        "mu_M": 0.0914416389554889,
+        "sigma_M": 0.2077734286932787,
+        "r_f": 0.0,
+        "unconstrained_merton_fraction": 2.1181854882076263,
+        "classical_constrained_fraction": 0.5,
+        "exploratory_latent_loc": 2.1181854882076263,
+        "exploratory_scale": 0.4812934966175245,
+        "phi": [
+          2.1181854882076263,
+          3.1426141562230243
+        ],
+        "executed_mean": 0.3818354203313943,
+        "executed_second_moment": 0.15659545822403997,
+        "executed_variance": 0.01079717000438743,
+        "entropy": -1.1533274925491668,
+        "policy_class": "TruncatedGaussian(loc=(mu-r)/sigma^2, scale=sqrt(m)/sigma) conditioned to [a, b]",
+        "is_rl_trained": false
+      },
+      "descriptive_gap_vs_analytic": {
+        "executed_mean_gap": -0.13202483383945265,
+        "is_a_gate": false,
+        "reason": "the frozen discrete learner objective adds m * H once per engine step, while the continuous-time analytic exploratory Merton policy carries m as a per-unit-time rate; at dt = 1/250 the learner's effective exploration weight is 250x the analytic benchmark's, so the two optima are not expected to coincide",
+        "effective_exploration_weight_ratio_learner_over_analytic": 250.0
+      },
+      "gates": {
+        "PC1_PLUMBING": true,
+        "PC2_SATURATION": true,
+        "PC3_MOVEMENT": true,
+        "PC4_NON_VACUITY": true,
+        "PC5_ASCENT": true,
+        "PC6_MARKET_DIRECTION": false
+      },
+      "all_gates_pass": false
+    }
+  ]
+}

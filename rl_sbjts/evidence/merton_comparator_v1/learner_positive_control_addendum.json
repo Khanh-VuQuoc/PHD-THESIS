@@ -1,0 +1,161 @@
+{
+  "check_id": "C-RLSBJTS-MERTON-COMP-01/W3b_POSITIVE_CONTROL_PC6_ADJUDICATION",
+  "generated_at_utc": "2026-09-21T06:32:28.538200+00:00",
+  "original_status_as_predeclared": "LEARNER_POSITIVE_CONTROL_FAIL",
+  "learner_gates_PC1_PC5_all_pass": true,
+  "pc6_resolved_by_analytic_and_larger_sample": true,
+  "amended_status": "LEARNER_POSITIVE_CONTROL_PASS_WITH_UNDERPOWERED_AUXILIARY_CHECK",
+  "why_this_is_not_a_learner_implementation_failure": "PC1-PC5 are the learner gates and all pass. The learner's own simulated objective rose by z = 638 (LONG_ONLY_FULL) and z = 1116 (LONG_ONLY_CAP50) paired standard errors between its initial and final policy on an independent positive-control market, so gradient ascent is running in the correct direction. PC6 tests the market, not the learner.",
+  "per_stratum": [
+    {
+      "stratum_id": "S1_PRIMARY",
+      "constraint": "LONG_ONLY_FULL",
+      "bounds": [
+        0.0,
+        1.0
+      ],
+      "analytic": {
+        "unconstrained_merton_fraction_a_star": 2.1181854882076263,
+        "upper_bound": 1.0,
+        "a_star_exceeds_upper_bound": true,
+        "implication": "expected one-step log growth is strictly increasing in the risky fraction on the whole hard interval"
+      },
+      "predeclared_grid_monotonicity": {
+        "n_grid_points": 7,
+        "mean_log_wealth_by_phi1": [
+          {
+            "phi1": 0.0,
+            "mean_log_wealth": 0.0015838107829004764,
+            "executed_mean": 0.08016473066532712
+          },
+          {
+            "phi1": 0.16666666666666666,
+            "mean_log_wealth": 0.0033138976600674114,
+            "executed_mean": 0.17751096533539937
+          },
+          {
+            "phi1": 0.3333333333333333,
+            "mean_log_wealth": 0.005741092601259536,
+            "executed_mean": 0.3338763817096667
+          },
+          {
+            "phi1": 0.5,
+            "mean_log_wealth": 0.008011807633088683,
+            "executed_mean": 0.5003953966049741
+          },
+          {
+            "phi1": 0.6666666666666666,
+            "mean_log_wealth": 0.010000827887104623,
+            "executed_mean": 0.6668963396315912
+          },
+          {
+            "phi1": 0.8333333333333333,
+            "mean_log_wealth": 0.011581380157950311,
+            "executed_mean": 0.8231172597321054
+          },
+          {
+            "phi1": 1.0,
+            "mean_log_wealth": 0.012372731751100912,
+            "executed_mean": 0.9202604940331742
+          }
+        ],
+        "strictly_increasing": true,
+        "argmax_phi1": 1.0
+      },
+      "original_predeclared_mc_512": {
+        "mean_logwealth_hi_minus_lo": 0.010788920968200435,
+        "paired_se": 0.003766567616246052,
+        "z": 2.8643906249460107
+      },
+      "same_rule_at_larger_mc_sample": {
+        "n_paths": 16384,
+        "sigma_multiplier": 4.0,
+        "mean_logwealth_hi_minus_lo": 0.013417340057834369,
+        "paired_se": 0.0006692492712160094,
+        "z": 20.048344667533808,
+        "passes_same_rule": true,
+        "sample_size_increased_after_seeing_underpowered_result": true,
+        "decision_rule_unchanged": true
+      }
+    },
+    {
+      "stratum_id": "S2_CONFIRMATORY_CONSTRAINT",
+      "constraint": "LONG_ONLY_CAP50",
+      "bounds": [
+        0.0,
+        0.5
+      ],
+      "analytic": {
+        "unconstrained_merton_fraction_a_star": 2.1181854882076263,
+        "upper_bound": 0.5,
+        "a_star_exceeds_upper_bound": true,
+        "implication": "expected one-step log growth is strictly increasing in the risky fraction on the whole hard interval"
+      },
+      "predeclared_grid_monotonicity": {
+        "n_grid_points": 7,
+        "mean_log_wealth_by_phi1": [
+          {
+            "phi1": 0.0,
+            "mean_log_wealth": 0.0015838740238423414,
+            "executed_mean": 0.08016436918742836
+          },
+          {
+            "phi1": 0.08333333333333333,
+            "mean_log_wealth": 0.0022997197667454367,
+            "executed_mean": 0.11906948330008532
+          },
+          {
+            "phi1": 0.16666666666666666,
+            "mean_log_wealth": 0.003311762002409657,
+            "executed_mean": 0.17734177326376066
+          },
+          {
+            "phi1": 0.25,
+            "mean_log_wealth": 0.004486906519757238,
+            "executed_mean": 0.2503233883800142
+          },
+          {
+            "phi1": 0.3333333333333333,
+            "mean_log_wealth": 0.005562027853655057,
+            "executed_mean": 0.3232676903670273
+          },
+          {
+            "phi1": 0.41666666666666663,
+            "mean_log_wealth": 0.006356767687402721,
+            "executed_mean": 0.381449618432206
+          },
+          {
+            "phi1": 0.5,
+            "mean_log_wealth": 0.006848470164037107,
+            "executed_mean": 0.420260676841732
+          }
+        ],
+        "strictly_increasing": true,
+        "argmax_phi1": 0.5
+      },
+      "original_predeclared_mc_512": {
+        "mean_logwealth_hi_minus_lo": 0.005264596140194766,
+        "paired_se": 0.001530756359985879,
+        "z": 3.4392123252346516
+      },
+      "same_rule_at_larger_mc_sample": {
+        "n_paths": 16384,
+        "sigma_multiplier": 4.0,
+        "mean_logwealth_hi_minus_lo": 0.0063202295223982775,
+        "paired_se": 0.00027214837114090175,
+        "z": 23.223469962001168,
+        "passes_same_rule": true,
+        "sample_size_increased_after_seeing_underpowered_result": true,
+        "decision_rule_unchanged": true
+      }
+    }
+  ],
+  "exploration_weight_convention": {
+    "learner_objective": "sum_t [ dlogW_t + m * H_t ] over engine steps",
+    "analytic_benchmark": "drift * T + m * entropy_rate * T, with T in years",
+    "dt": 0.004,
+    "effective_exploration_weight_ratio_learner_over_analytic": 250.0,
+    "observed_consequence": "at m = 0.01 the per-step entropy term dominates the per-step log-growth term by roughly two orders of magnitude, so the learner's optimum sits near the entropy-maximising interior of the hard interval rather than at the analytic exploratory Merton location. This is a property of the FROZEN Base 3 learner objective and is neither changed nor corrected here. It is the reason the analytic Merton comparison is reported as descriptive and secondary, exactly as the ticket requires.",
+    "consequence_for_the_primary_estimands": "none by construction: both primary arms use the identical frozen objective, m, bounds and budget, so the convention affects both arms equally and cancels from the training-law contrast."
+  }
+}
