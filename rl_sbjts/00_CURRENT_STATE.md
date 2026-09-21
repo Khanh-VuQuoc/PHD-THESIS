@@ -15,9 +15,10 @@ Updated: 2026-09-21. Owner: GPT / PMO.
 | Primary endpoints | `mean_terminal_log_wealth` and `cvar_log_loss`, separately for LONG_ONLY_FULL and LONG_ONLY_CAP50. |
 | Secondary comparator | Analytic constrained Merton policy evaluated on the same target holdout, clearly separated from learned RL–Merton. |
 | Execution ownership | **Claude:** derivation, code, static checks, smoke only. **User/Colab:** frozen/real-data calibration, full model training, full holdout evaluation, research-scale inference. |
+| Research hardware | **Paid Google Colab NVIDIA T4 GPU.** Tensor-heavy training/simulation/evaluation must use CUDA; no silent CPU fallback. Default numerical path remains CUDA float32 batched, consistent with frozen Base 4. |
 | Frozen ancestry | Base 2 environment/calibration; Base 3 learner mathematics; Base 4 target law, constraints, `m=0.01`, state, wealth accounting, training budget, holdout namespaces and endpoint definitions. |
 | Permanent current limitation | Base 2 ancestry is smoke-scale; no external-market-validation or universal superiority claim. |
-| Next PMO decision | First audit Claude's code/smoke package. If accepted, authorize user Colab RESEARCH mode. After the user run, audit scientific results separately. |
+| Next PMO decision | First audit Claude's code/smoke/T4-readiness package. If accepted, authorize user Colab RESEARCH mode. After the user run, audit scientific results separately. |
 
 ## Claude start instruction
 
@@ -25,9 +26,11 @@ Read this state, `01_PMO_SKILL_RL_SBJTS.md`, the sole ticket, `04_CANONICAL_SOUR
 
 Claude must **not** execute the research-scale comparator. Prepare a standalone resumable notebook with a strict `SMOKE` versus `RESEARCH` split. Claude may run only the smallest smoke/preflight needed to prove the notebook, output writing and resume logic work.
 
+The RESEARCH path must be designed for the user's paid **NVIDIA T4 Colab GPU**, assert CUDA/T4 availability, keep tensor-heavy learner/simulation/evaluation work on CUDA, and preserve the frozen Base 4 `TORCH_CUDA_FLOAT32_BATCHED` numerical contract. Do not introduce AMP/float16/bfloat16 or silent CPU fallback without a separate PMO numerical-equivalence decision.
+
 Research-scale source fingerprinting against actual frozen artifacts, Base 4 reproduction, empirical Merton calibration on the real frozen training slice, positive-control run, 80-policy Merton training, 24,000 target-holdout evaluations and final inference are reserved for the user's Colab execution after PMO code audit.
 
-Claude should mark the ticket `READY_FOR_PMO_CODE` when implementation and smoke are complete, provide exact Colab run instructions, then stop.
+Claude should mark the ticket `READY_FOR_PMO_CODE` when implementation and smoke are complete, provide exact Colab T4 run instructions, then stop.
 
 ## Frozen boundaries
 
@@ -39,17 +42,18 @@ Claude should mark the ticket `READY_FOR_PMO_CODE` when implementation and smoke
 - 400 updates and 512 training paths/update for the eventual learned-policy comparator.
 - Existing Base 4 policies/results are immutable evidence; do not overwrite them.
 - Target holdout is evaluation-only.
+- Default research numerical backend is CUDA float32 batched on the rented Colab T4.
 
 ## Execution policy
 
 ```text
-Claude: derive -> implement -> static test -> SMOKE -> READY_FOR_PMO_CODE -> STOP
-PMO: audit code/smoke -> approve or patch
-User: run RESEARCH mode in Colab -> commit/publish outputs
+Claude: derive -> implement -> static test -> SMOKE -> verify T4/CUDA research path -> READY_FOR_PMO_CODE -> STOP
+PMO: audit code/smoke/GPU path -> approve or patch
+User: run RESEARCH mode on paid Colab NVIDIA T4 -> commit/publish outputs
 PMO: audit research outputs -> scientific decision
 ```
 
-No expensive run should be duplicated merely for verification.
+No expensive run should be duplicated merely for verification. Paid GPU time should be spent only on research-scale stages that actually require it.
 
 ## Closed / historical work
 
