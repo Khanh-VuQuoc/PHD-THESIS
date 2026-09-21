@@ -6,27 +6,31 @@ Updated: 2026-09-21. Owner: GPT / PMO.
 
 | Field | Current value |
 |---|---|
-| Project research status | **READY_FOR_COMPARATOR_EXTENSION** — Base 4 retained as complete estimation-first evidence with stated limitations. |
-| Sole executable ticket | `tickets/C-RLSBJTS-MERTON-COMP-01.md` — **OPEN_FOR_CLAUDE**. |
-| Current objective | Build and execute a fair RL–Merton/GBM comparator against the frozen RL–SBJTS target-trained policies on the same SBJTS target holdout. |
+| Project research status | **COMPARATOR_IMPLEMENTATION_FOR_USER_COLAB** — Base 4 retained as complete estimation-first evidence with stated limitations. |
+| Sole executable ticket | `tickets/C-RLSBJTS-MERTON-COMP-01.md` — **OPEN_FOR_CLAUDE (DESIGN + CODE + SMOKE ONLY)**. |
+| Current objective | Claude prepares and smoke-validates a fair RL–Merton/GBM comparator notebook; the user runs all research-scale calibration, training, evaluation and inference in Colab. |
 | Existing accepted evidence | Base 4: 160/160 training attempts complete, 96,000/96,000 evaluation attempts complete; target-training effect estimated under matched canonical one-step mean/variance control. |
-| Existing claim status | **No RL–SBJTS > RL–Merton claim has been tested.** Base 4 compares SBJTS target training against an affine-calibrated no-jump bridge control, not against Merton/GBM. |
+| Existing claim status | **No RL–SBJTS > RL–Merton claim has been tested.** Base 4 compares SBJTS target training against an affine-calibrated no-jump bridge control, not Merton/GBM. |
 | Primary new comparison | SBJTS-trained policy vs Merton/GBM-trained policy, both evaluated on the frozen SBJTS target holdout. |
 | Primary endpoints | `mean_terminal_log_wealth` and `cvar_log_loss`, separately for LONG_ONLY_FULL and LONG_ONLY_CAP50. |
 | Secondary comparator | Analytic constrained Merton policy evaluated on the same target holdout, clearly separated from learned RL–Merton. |
+| Execution ownership | **Claude:** derivation, code, static checks, smoke only. **User/Colab:** frozen/real-data calibration, full model training, full holdout evaluation, research-scale inference. |
+| Research hardware | **Paid Google Colab NVIDIA T4 GPU.** Tensor-heavy training/simulation/evaluation must use CUDA; no silent CPU fallback. Default numerical path remains CUDA float32 batched, consistent with frozen Base 4. |
 | Frozen ancestry | Base 2 environment/calibration; Base 3 learner mathematics; Base 4 target law, constraints, `m=0.01`, state, wealth accounting, training budget, holdout namespaces and endpoint definitions. |
 | Permanent current limitation | Base 2 ancestry is smoke-scale; no external-market-validation or universal superiority claim. |
-| Next PMO decision | Audit the comparator notebook/results and decide `ACCEPTED_WITH_QUALIFICATIONS`, `TARGETED_PATCH`, or `BLOCKED`. |
+| Next PMO decision | First audit Claude's code/smoke/T4-readiness package. If accepted, authorize user Colab RESEARCH mode. After the user run, audit scientific results separately. |
 
 ## Claude start instruction
 
 Read this state, `01_PMO_SKILL_RL_SBJTS.md`, the sole ticket, `04_CANONICAL_SOURCE_MAP.md`, and the relevant entries in `02_CLAIM_LEDGER.md` from `main` before work.
 
-Start from the ticket's pinned baseline on an isolated branch. Preserve Base 4 exactly. Do not recalibrate SBJTS, change learner mathematics, tune on target holdout, retrofit an SESOI, or reinterpret the comparison as a pure jump effect.
+Claude must **not** execute the research-scale comparator. Prepare a standalone resumable notebook with a strict `SMOKE` versus `RESEARCH` split. Claude may run only the smallest smoke/preflight needed to prove the notebook, output writing and resume logic work.
 
-The first required proof is **reproduction**: regenerate the frozen target holdout/evaluation randomness and reproduce a documented subset of Base 4 TT results before adding the Merton arm. If reproduction fails, stop and report `BLOCKED_REPRODUCTION` rather than continuing.
+The RESEARCH path must be designed for the user's paid **NVIDIA T4 Colab GPU**, assert CUDA/T4 availability, keep tensor-heavy learner/simulation/evaluation work on CUDA, and preserve the frozen Base 4 `TORCH_CUDA_FLOAT32_BATCHED` numerical contract. Do not introduce AMP/float16/bfloat16 or silent CPU fallback without a separate PMO numerical-equivalence decision.
 
-Commit checkpointed code/evidence. Mark only the assigned ticket `READY_FOR_PMO` when complete, then stop.
+Research-scale source fingerprinting against actual frozen artifacts, Base 4 reproduction, empirical Merton calibration on the real frozen training slice, positive-control run, 80-policy Merton training, 24,000 target-holdout evaluations and final inference are reserved for the user's Colab execution after PMO code audit.
+
+Claude should mark the ticket `READY_FOR_PMO_CODE` when implementation and smoke are complete, provide exact Colab T4 run instructions, then stop.
 
 ## Frozen boundaries
 
@@ -35,9 +39,21 @@ Commit checkpointed code/evidence. Mark only the assigned ticket `READY_FOR_PMO`
 - State `(1, t/N, log(W_t/W_0), r_{t-1})`.
 - Linear actor, truncated-Gaussian action policy, linear ridge critic, Adam update mathematics.
 - LONG_ONLY_FULL and LONG_ONLY_CAP50 bounds.
-- 400 updates and 512 training paths/update for learned-policy comparators unless the ticket explicitly stops at smoke/preflight.
+- 400 updates and 512 training paths/update for the eventual learned-policy comparator.
 - Existing Base 4 policies/results are immutable evidence; do not overwrite them.
 - Target holdout is evaluation-only.
+- Default research numerical backend is CUDA float32 batched on the rented Colab T4.
+
+## Execution policy
+
+```text
+Claude: derive -> implement -> static test -> SMOKE -> verify T4/CUDA research path -> READY_FOR_PMO_CODE -> STOP
+PMO: audit code/smoke/GPU path -> approve or patch
+User: run RESEARCH mode on paid Colab NVIDIA T4 -> commit/publish outputs
+PMO: audit research outputs -> scientific decision
+```
+
+No expensive run should be duplicated merely for verification. Paid GPU time should be spent only on research-scale stages that actually require it.
 
 ## Closed / historical work
 

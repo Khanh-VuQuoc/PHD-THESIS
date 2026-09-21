@@ -1,13 +1,18 @@
 # C-RLSBJTS-MERTON-COMP-01 — Direct RL–Merton comparator on frozen SBJTS holdout
 
-**Status:** `READY_FOR_PMO`  
+**Status:** `OPEN_FOR_CLAUDE`  
 **Owner:** Claude — Technical Research Verifier / Implementation Lead  
+**Research execution owner:** User / Google Colab  
 **PMO:** GPT  
-**Evidence target:** development -> holdout estimation evidence; no confirmatory-superiority promotion.
+**Evidence target:** Claude delivers code-ready + smoke-passed; user later produces research evidence.
 
 ## 1. Single objective
 
-Build a standalone, resumable GPU notebook that adds one scientifically fair **RL–Merton/GBM training-law arm** to the frozen RL–SBJTS study and estimates, on the **same frozen SBJTS target holdout**, the difference between:
+Build a standalone, resumable GPU notebook that adds one scientifically fair **RL–Merton/GBM training-law arm** to the frozen RL–SBJTS study and is ready for the user to run in Colab against the **same frozen SBJTS target holdout**.
+
+Claude's job is **design + implementation + smoke only**. Claude must not run the research-scale training/evaluation.
+
+The eventual scientific comparison is between:
 
 - frozen Base 4 SBJTS-target-trained policies; and
 - newly trained Merton/GBM policies using the same RL learner, constraints, exploration setting and training budget.
@@ -22,8 +27,8 @@ Read in this order:
 2. `../01_PMO_SKILL_RL_SBJTS.md`
 3. `../04_CANONICAL_SOURCE_MAP.md`
 4. `../02_CLAIM_LEDGER.md`
-5. `../notebooks/frozen/05B_BASE4_SCIENTIFIC_EXPERIMENT_GPU_RESEARCH_v2_0_POINTER.md`, then retrieve and verify the actual frozen Drive notebook named there
-6. frozen Base 3 / snapshot / Base 4 release artifacts loaded by the notebook at runtime.
+5. `../notebooks/frozen/05B_BASE4_SCIENTIFIC_EXPERIMENT_GPU_RESEARCH_v2_0_POINTER.md`
+6. frozen Base 3 / snapshot / Base 4 release artifacts resolved at runtime.
 
 Expected Base 4 protocol ID:
 
@@ -33,9 +38,54 @@ Frozen market snapshot expected SHA-256:
 
 `7e817762849118fc3abf8d4cf98ad8d65d921fa49cb0d1b3bb34d884b73c5b4a`
 
-If these identities cannot be verified, stop.
+## 3. Hard execution ownership
 
-## 3. Frozen scientific constraints
+### Claude may execute
+
+- static source/code checks;
+- synthetic/tiny unit tests;
+- minimal end-to-end `SMOKE` mode;
+- tiny checkpoint/resume test;
+- tiny output-schema test.
+
+### Claude must not execute
+
+- full frozen/real-data calibration;
+- research-scale Base 4 reproduction;
+- the 40-replication-per-constraint Merton training grid;
+- full target-holdout evaluation;
+- full bootstrap/inference;
+- any long GPU/CPU run whose purpose is to generate paper evidence.
+
+If implementation reaches the point where real training/evaluation is needed, return `USER_COLAB_RUN_REQUIRED`.
+
+## 4. Required notebook modes
+
+The notebook must expose an explicit switch such as:
+
+```python
+RUN_MODE = "SMOKE"      # Claude may run
+# RUN_MODE = "RESEARCH" # user runs in Colab after PMO code audit
+```
+
+### SMOKE namespace
+
+- tiny/synthetic or minimally hydrated inputs only;
+- tiny replications/path counts;
+- separate output directory;
+- cannot overwrite or be confused with research evidence;
+- validates that the pipeline starts, trains minimally, evaluates minimally, writes artifacts and resumes.
+
+### RESEARCH namespace
+
+- uses frozen real sources;
+- full budgets specified below;
+- resumable/checkpointed;
+- skips completed accepted units;
+- never overwrites Base 4 frozen evidence;
+- emits compact evidence files for GitHub/PMO audit.
+
+## 5. Frozen scientific constraints for RESEARCH mode
 
 Do not modify or retune:
 
@@ -55,43 +105,34 @@ Do not modify or retune:
 
 No post-result SESOI may be introduced.
 
-## 4. Merton/GBM comparator definition
+## 6. Merton/GBM comparator definition
 
-### 4.1 Main scientific comparator = empirical Merton/GBM
+### 6.1 Main scientific comparator = empirical Merton/GBM
 
-Use the **same frozen training slice** and the same equally weighted risky log increment consumed by the learner. Do not use target holdout statistics.
+On the frozen training slice only, use the same equally weighted risky log increment consumed by the learner. Do not use target holdout statistics.
 
-Let `dt` be the frozen time-step convention and `r_f` the Base 4 primary risk-free convention. Compute and freeze:
+Let `dt` be the frozen time-step convention and `r_f` the Base 4 primary risk-free convention. In RESEARCH mode compute and freeze:
 
 ```text
 m1 = mean(training risky log increment)
-v1 = variance(training risky log increment)  # explicitly record ddof
+v1 = variance(training risky log increment)  # record ddof
 sigma_M^2 = v1 / dt
 mu_M - r_f = m1 / dt + 0.5 * sigma_M^2
 ```
 
-Generate GBM/Merton risky log increments under those frozen parameters.
-
-Required calibration record:
-
-- input snapshot SHA;
-- exact training date/slice boundaries from the snapshot;
-- number of observations;
-- `dt`, `r_f`, `ddof`;
-- `m1`, `v1`, `mu_M`, `sigma_M`;
-- SHA-256 of the resulting calibration JSON.
-
 No parameter search is allowed.
 
-### 4.2 Secondary benchmark = analytic exploratory Merton policy
+Claude must implement this function and test it on synthetic known data; the user performs the actual frozen-data calibration in Colab.
+
+### 6.2 Secondary benchmark = analytic exploratory Merton policy
 
 For each constraint stratum, compute the exploratory log-utility Merton policy implied by the same empirical `mu_M`, `sigma_M`, `r_f`, `m=0.01`, conditioned to the same hard interval.
 
-This is a **secondary benchmark**. It must not replace the learned RL–Merton arm.
+This is secondary and must not replace learned RL–Merton.
 
-## 5. Fairness contract
+## 7. Fairness contract
 
-For RL–Merton versus RL–SBJTS:
+For eventual RL–Merton versus RL–SBJTS:
 
 - same learner code and optimizer;
 - same state representation;
@@ -99,18 +140,17 @@ For RL–Merton versus RL–SBJTS:
 - same `m`;
 - same number of updates and paths/update;
 - same replication count: 40 per constraint;
-- pair the replication index with the frozen SBJTS target-training replication where possible;
-- reuse the same learner-initialization/action-uniform seed schedule where structurally meaningful;
-- do not select or replace seeds based on convergence/performance;
+- pair replication index with frozen SBJTS target-training replication where possible;
+- reuse learner-initialization/action-uniform seed schedule where structurally meaningful;
+- no performance-based seed selection/replacement;
 - failures remain in accounting;
-- evaluate new Merton policies on the exact target holdout/evaluation seed namespace used by Base 4;
-- regenerate evaluation randomness deterministically and prove reproducibility before the full run.
+- evaluate new Merton policies on the exact target holdout/evaluation namespace used by Base 4.
 
-The Merton training environment may differ in its market innovation representation by definition; do not fake common random numbers across incompatible generators. Record exactly what is paired and what is not.
+The Merton training environment differs by definition; do not fabricate common random numbers across incompatible generators.
 
-## 6. Primary estimands
+## 8. Primary estimands
 
-For each stratum separately, with target SBJTS evaluation environment fixed:
+For each constraint stratum, with SBJTS target evaluation fixed:
 
 ```text
 Delta_W = E[mean_terminal_log_wealth | train=SBJTS]
@@ -120,216 +160,152 @@ Delta_CVaR = E[cvar_log_loss | train=SBJTS]
              - E[cvar_log_loss | train=MERTON_GBM]
 ```
 
-Interpretation of signs:
-
 - `Delta_W > 0` favours SBJTS training on wealth;
 - `Delta_CVaR < 0` favours SBJTS training on CVaR loss.
 
-Report two-sided 95% intervals using a paired/crossed bootstrap that respects replication x holdout x evaluation-seed structure. Do not invent a superiority margin.
+RESEARCH mode must report two-sided 95% intervals using a paired/crossed bootstrap that respects replication x holdout x evaluation-seed structure. No superiority margin may be invented after results are seen.
 
-### Secondary endpoints
+## 9. Claude work queue — code + smoke only
 
-Reuse the Base 4 endpoint set when available, including at least:
+### C0 — source interface and fingerprint code
 
-- q01 terminal wealth;
-- max-drawdown q95;
-- severe-loss probability;
-- executed action mean/variance;
-- boundary/saturation diagnostics.
+Implement source resolution, protocol/hash checks and `source_fingerprint.json` writer. A static or tiny smoke validation is enough. Do not launch a research replay.
 
-Analytic Merton evaluation is descriptive/secondary.
+### C1 — Base 4 reproduction module
 
-## 7. Work queue
+Implement deterministic reproduction code and comparison/tolerance logic for frozen target rows. In Claude smoke, test the mechanism on tiny/synthetic fixtures or the smallest harmless unit. The actual frozen-data reproduction gate is executed by the user in Colab.
 
-### W0 — hydrate and fingerprint sources
+### C2 — empirical GBM calibration module
 
-- Load frozen Base 4 notebook/release artifacts and Base 3 ancestry.
-- Verify protocol ID, snapshot SHA and required frozen artifacts.
-- Record hashes in `source_fingerprint.json`.
+Implement Section 6.1, with explicit units/ddof and a Monte Carlo tolerance calculator. Validate on synthetic known GBM data only or a tiny non-research fixture.
 
-**Stop if identity fails.**
+### C3 — Merton positive-control module
 
-### W1 — reproduce frozen Base 4 evaluation before adding Merton
+Implement analytic comparator and learner-recovery diagnostics. Claude may run a tiny toy/smoke training only. The frozen empirical positive-control run is reserved for user Colab.
 
-Using frozen SBJTS target policies, regenerate at least:
+### C4 — research training/evaluation implementation
 
-- 2 replication indices x
-- 2 constraints x
-- 2 holdout streams x
-- 2 evaluation seeds
+Implement, but do not execute, the eventual research loops:
 
-from the frozen target-evaluation namespace.
+- `2 constraints x 40 replications = 80` Merton policies;
+- `80 x 20 holdouts x 15 eval seeds = 24,000` learned-Merton target-evaluation attempts if all policies train;
+- analytic Merton secondary evaluation;
+- checkpoint/resume/attempt ledgers;
+- primary estimand and bootstrap code.
 
-Compare recomputed endpoints against the existing Base 4 result rows. Prefer exact equality where deterministic; otherwise predeclare numeric tolerances before inspecting differences and justify backend effects.
+### C5 — smoke end-to-end
 
-Required status: `BASE4_TARGET_REPRODUCTION_PASS`.
+Run the smallest end-to-end `SMOKE` configuration proving:
 
-**If this fails: stop with `BLOCKED_REPRODUCTION`. Do not train Merton.**
+- notebook launches;
+- a tiny Merton policy can train;
+- a tiny evaluation completes;
+- outputs have the expected schema;
+- checkpoint/resume works;
+- SMOKE artifacts are isolated from RESEARCH artifacts.
 
-### W2 — freeze empirical GBM calibration
+Then stop. Do not switch to RESEARCH mode.
 
-Implement Section 4.1. Run a Monte Carlo moment unit test on a disjoint calibration-test seed namespace. Predeclare tolerance from Monte Carlo standard error; do not tune parameters after the test.
+## 10. User Colab research queue — after PMO code audit
 
-Required status: `MERTON_GBM_CALIBRATION_PASS`.
+The notebook must expose these ordered research stages so the user can run them without rewriting code:
 
-### W3 — learner positive control
+### U0 — actual source fingerprint
 
-Before the expensive comparator, run a bounded Merton-world recovery check using the same learner and empirical GBM calibration. Compare learned executed policy summaries against the corresponding analytic exploratory Merton benchmark.
+Verify frozen protocol/snapshot/ancestry.
 
-This gate is about gross implementation failure, not exact finite-sample equality. Predeclare thresholds from prior Base 1 logic or justify a new smoke tolerance before execution.
+### U1 — actual Base 4 reproduction gate
 
-If the learner clearly fails the Merton-world check, stop before the research run.
+Reproduce the predeclared frozen evaluation subset. If it fails, stop before Merton training.
 
-### W4 — train only the new learned Merton arm
+### U2 — actual empirical Merton calibration
 
-Train:
+Calibrate from the frozen training slice only and freeze the calibration JSON.
 
-`2 constraints x 40 replications = 80 policies`
+### U3 — bounded empirical Merton positive control
 
-at the frozen research budget. Persist after every replication. Record immutable attempt IDs, seeds, status, failure type, final actor weights, and policy SHA-256.
+Run the predeclared learner sanity check. If gross failure occurs, stop before the full comparator.
 
-Do **not** retrain the 80 frozen SBJTS target policies.
+### U4 — full Merton training
 
-### W5 — evaluate Merton policies on the frozen SBJTS target holdout
+Train 80 policies with checkpointing. No seed replacement.
 
-For every new Merton policy, evaluate:
+### U5 — full target evaluation
 
-`20 holdout streams x 15 eval seeds`
+Evaluate the Merton policies on the frozen SBJTS target holdout, up to 24,000 attempts, checkpointed/resumable.
 
-with 600 paths/attempt, using the frozen Base 4 target holdout generator and deterministic seed schedule.
+### U6 — analytic Merton secondary evaluation
 
-This implies 24,000 learned-Merton target-evaluation attempts if all 80 policies train successfully. Preserve failed-policy rows in the denominator/accounting.
+Run the two analytic constrained policies on the same target holdout.
 
-Do not rerun all TT rows merely to generate duplicates. Reuse frozen TT evidence after W1 has established reproduction.
+### U7 — inference
 
-### W6 — analytic Merton secondary evaluation
+Compute primary/secondary estimands, uncertainty, accounting and compact report.
 
-Evaluate the two analytic constrained exploratory Merton policies on the same target holdout. Keep results in a separate table and clearly label that these policies were not RL-trained.
+## 11. Checkpoint policy
 
-### W7 — inference and compact report
-
-Produce primary estimates/intervals, secondary metrics, attempt accounting, and a claim-status block. Negative/parity results are fully acceptable.
-
-## 8. Compute / checkpoint policy
-
-- GPU notebook must be resumable after interruption.
-- Save calibration, training and evaluation ledgers incrementally.
-- Save policy/checkpoint material after every completed training replication.
-- Save evaluation results after each `(constraint, replication, holdout)` block or more frequently.
+- Save after every completed training replication.
+- Save evaluation after each `(constraint, replication, holdout)` block or more frequently.
 - Never delete failed/partial attempts.
 - No automatic seed replacement.
-- No rerunning a completed successful unit unless a reproducibility defect is documented.
-- If estimated remaining runtime exceeds the notebook's practical session budget, stop cleanly with a resume manifest rather than starting a unit likely to be lost.
+- Do not rerun a successful completed unit unless a documented reproducibility defect requires it.
+- If Colab runtime is running out, stop cleanly and write `resume_manifest.json`.
 
-## 9. Required files / edit allowlist
+## 12. Required files / edit allowlist
 
 Claude may create/update only:
 
 - `notebooks/06_RL_SBJTS_VS_MERTON_COMPARATOR_GPU_v1_0.ipynb`
 - `reports/claude/RL_SBJTS_VS_MERTON_COMPARATOR_v1.md`
-- `evidence/merton_comparator_v1/source_fingerprint.json`
-- `evidence/merton_comparator_v1/merton_calibration.json`
-- `evidence/merton_comparator_v1/reproduction_check.json`
-- `evidence/merton_comparator_v1/training_attempts.csv`
-- `evidence/merton_comparator_v1/policies_merton.npz` or a documented external artifact pointer if size blocks GitHub
-- `evidence/merton_comparator_v1/evaluation_attempts.csv`
-- `evidence/merton_comparator_v1/primary_estimands.json`
-- `evidence/merton_comparator_v1/analytic_merton_results.csv`
-- `evidence/merton_comparator_v1/resume_manifest.json`
+- `evidence/merton_comparator_v1/smoke/*`
+- `evidence/merton_comparator_v1/research/README_EXPECTED_OUTPUTS.md`
+- `evidence/merton_comparator_v1/resume_manifest.template.json`
 - this ticket's `Status` / `Progress` section only.
+
+Research output files are produced by the user's Colab run after PMO code approval.
 
 Do not modify `00_CURRENT_STATE.md`, claim ledger, decision log, PMO skill, frozen notebook or frozen evidence.
 
-## 10. Acceptance criteria
+## 13. Claude acceptance criteria
 
-- **AC1 Source identity:** protocol/snapshot/frozen ancestry checks pass.
-- **AC2 Reproduction:** required Base 4 target-evaluation subset reproduces before new training.
-- **AC3 No leakage:** Merton calibration uses training slice only.
-- **AC4 Calibration:** empirical GBM moment test passes under predeclared tolerance.
-- **AC5 Learner sanity:** bounded Merton-world positive control passes or is transparently blocked before research execution.
-- **AC6 Fairness:** same learner/constraints/`m`/budget and frozen target holdout.
-- **AC7 Accounting:** all attempted, failed and partial units are retained; no silent seed replacement.
-- **AC8 Resumability:** interrupted run can resume without repeating accepted units.
-- **AC9 Estimands:** both primary endpoints reported separately by constraint with uncertainty.
-- **AC10 Claim discipline:** no universal superiority, pure-jump effect, external market validation, or retrospective confirmatory claim.
+- **AC-C1 Design:** comparator implements the frozen fairness contract.
+- **AC-C2 Separation:** `SMOKE` and `RESEARCH` are explicit and isolated.
+- **AC-C3 Code path:** source fingerprint, reproduction, calibration, positive control, training, evaluation and inference stages are implemented.
+- **AC-C4 Smoke:** tiny end-to-end execution passes.
+- **AC-C5 Resumability:** checkpoint/resume is smoke-tested.
+- **AC-C6 Accounting:** attempt ledgers preserve failures/partials.
+- **AC-C7 Claim discipline:** smoke output is never reported as paper evidence.
+- **AC-C8 Handoff:** exact one-pass Colab instructions and expected outputs are documented.
 
-## 11. Stop conditions
+## 14. Stop conditions
 
-Stop and report rather than improvising if:
+Claude must stop and report rather than start a full run if:
 
-- frozen source identities fail;
-- Base 4 evaluation reproduction fails;
-- required snapshot/Base 3/Base 4 policy artifact cannot be resolved;
-- empirical Merton calibration accidentally touches holdout data;
-- learner positive control has a clear implementation failure;
-- a requested change would alter frozen Base 4 mathematics or endpoint definitions;
-- a full run would require seed replacement or hidden dropping of failures.
+- a required frozen interface cannot be resolved;
+- implementation needs a change to frozen Base 4 mathematics/endpoints;
+- smoke exposes a code defect requiring redesign;
+- the next step would require real-data/full-grid/research-scale compute.
 
-## 12. Completion response
+## 15. Claude completion response
 
 Return:
 
 ```text
-STATUS:
+STATUS: READY_FOR_PMO_CODE or BLOCKED
 FILES_CHANGED:
-TESTS_RUN / RESULTS:
+STATIC_TESTS:
+SMOKE_TESTS / RESULTS:
 COMMIT:
-PRIMARY_RESULT:
-ATTEMPT_ACCOUNTING:
+USER_COLAB_RUN_REQUIRED: YES
+COLAB_RUN_INSTRUCTION:
+EXPECTED_RESEARCH_OUTPUTS:
 UNRESOLVED_ISSUES:
-CLAIM_STATUS:
-RESUME_ACTION_IF_PARTIAL:
+CLAIM_STATUS: NOT_TESTED — smoke only
 ```
 
-Then set this ticket to `READY_FOR_PMO` and stop. PMO decides whether any claim is promoted.
+Then set this ticket to `READY_FOR_PMO_CODE` and stop. PMO audits the implementation before the user spends Colab compute.
 
 ## Progress
 
-- 2026-09-21 — PMO opened ticket. No comparator result exists yet.
-- 2026-09-21 — Claude executed W0–W7 on branch `claude/eager-ride-091ooh`. Status
-  `READY_FOR_PMO`. Full detail in `../reports/claude/RL_SBJTS_VS_MERTON_COMPARATOR_v1.md`
-  and `../evidence/merton_comparator_v1/`.
-
-  - **W0** protocol id `c9ef6548…` recomputed from the 27 component registries in
-    `BASE4_05A_FINAL_BUNDLE.zip`; 0 internal checksum failures, 0 component mismatches.
-    Base 3 embedded notebook, code-cell concat, all 17 native AST engine components,
-    the market snapshot and the training slice all verify against their pinned digests.
-    All 160 frozen Base 4 training `attempt_id`s reproduce exactly from the protocol id,
-    calibration id and frozen seed plan.
-  - **W1** `BASE4_TARGET_REPRODUCTION_PASS` — 800 frozen TT rows regenerated, 800/800
-    evaluation `attempt_id`s match, every endpoint inside the frozen Base 3
-    `GPU_EQ_ATOL`/`GPU_EQ_RTOL`; worst absolute deviation 7.8e-07.
-  - **W2** `MERTON_GBM_CALIBRATION_PASS` — training slice only, `sigma_M` 0.207773,
-    `mu_M - r_f` 0.091442, `dt` 1/250, `ddof` 0; Monte Carlo moment test z_mean −0.23,
-    z_var +0.92 against a predeclared 4-sigma band on a disjoint seed namespace.
-  - **W3** learner gates PC1–PC5 pass as predeclared (objective ascent z = 638 and
-    1116). One auxiliary **market** check, PC6, was underpowered at its predeclared
-    512-path 4-sigma band; the original outcome is preserved verbatim and adjudicated in
-    a disclosed addendum. Amended status
-    `LEARNER_POSITIVE_CONTROL_PASS_WITH_UNDERPOWERED_AUXILIARY_CHECK`.
-  - **W4** 80/80 Merton policies trained at the frozen budget, 0 failures, 0 seed
-    replacements, 0 frozen SBJTS policies retrained.
-  - **W5/W6** 48,000/48,000 learned evaluation attempts completed on the frozen target
-    holdout (24,000 per arm) plus 600 analytic attempts. No imputation.
-  - **W7** primary estimands, `Delta = SBJTS − MERTON_GBM`, crossed cluster bootstrap
-    executed verbatim from the frozen Base 4 notebook:
-
-    | Stratum | `Delta_W` (95% CI) | `Delta_CVaR` (95% CI) |
-    |---|---|---|
-    | LONG_ONLY_FULL | +0.0022063 [+0.0021715, +0.0022427] | −0.0031809 [−0.0033589, −0.0030012] |
-    | LONG_ONLY_CAP50 | +0.0005541 [+0.0005442, +0.0005637] | −0.0007611 [−0.0008115, −0.0007122] |
-
-    Both signs favour SBJTS training on both co-primary endpoints in both strata. The
-    arms hold nearly identical average exposure; the difference is state feedback the
-    GBM training law cannot teach. **No superiority claim is made and `CL-RL-006`
-    remains `NOT_TESTED`.**
-
-  - **PMO decision required** on two disclosed deviations: (D1) W1 covers one holdout
-    stream rather than two, because only the first 1 MiB of the 31 MB frozen
-    `evaluation_results_partial.csv` is retrievable in this session; (D2) consequently
-    the SBJTS arm of the comparator was regenerated for all 300 blocks from the
-    immutable frozen policies rather than read from the frozen ledger. Also recorded:
-    (D3) no CUDA in this environment, so the frozen fallback selected
-    `TORCH_CPU_FLOAT32_BATCHED`; (D4) the PC6 adjudication; (D5) the 21.5 MB Base 3
-    frozen zip could not be pulled, though both members Base 4 consumes from it verify
-    byte-identically; (D6) four evidence files beyond the named allowlist.
+- 2026-09-21 — PMO opened ticket.
+- 2026-09-21 — PMO amended execution policy: Claude is restricted to design/code/smoke; all research-scale execution is reserved for user Colab.
