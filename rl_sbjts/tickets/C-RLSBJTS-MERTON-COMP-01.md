@@ -22,7 +22,7 @@ Read in this order:
 2. `../01_PMO_SKILL_RL_SBJTS.md`
 3. `../04_CANONICAL_SOURCE_MAP.md`
 4. `../02_CLAIM_LEDGER.md`
-5. `../notebooks/frozen/05B_BASE4_SCIENTIFIC_EXPERIMENT_GPU_RESEARCH_v2_0.ipynb`
+5. `../notebooks/frozen/05B_BASE4_SCIENTIFIC_EXPERIMENT_GPU_RESEARCH_v2_0_POINTER.md`, then retrieve and verify the actual frozen Drive notebook named there
 6. frozen Base 3 / snapshot / Base 4 release artifacts loaded by the notebook at runtime.
 
 Expected Base 4 protocol ID:
