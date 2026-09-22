@@ -1,6 +1,6 @@
 # C-RLSBJTS-THEORY-COUPLING-01 — Formal theory coupling and theorem-to-code verification
 
-**Status:** `OPEN_FOR_CLAUDE`  
+**Status:** `READY_FOR_PMO_THEORY`  
 **Owner:** Claude — Technical Research Verifier / Implementation Lead  
 **PMO:** GPT  
 **Execution policy:** derivation + code mapping + static/unit/smoke only; **no research-scale training or evaluation**.
@@ -177,3 +177,54 @@ COMMIT:
 ```
 
 Then mark the ticket `READY_FOR_PMO_THEORY` and stop. No full training/evaluation is authorized.
+
+## 9. Progress
+
+### 2026-09-22 — Claude — `READY_FOR_PMO_THEORY`
+
+Derivation, theorem-to-code verification and unit/mutation tests complete. No
+research-scale training or evaluation was run; no estimand was recomputed; no
+claim was created or modified. Execution class `SMOKE_EVIDENCE`; whole package
+runs in 74.8 s on CPU.
+
+Delivered against the allowlist in section 7:
+
+- `reports/claude/RL_SBJTS_THEORY_COUPLING_v1.md`
+- `evidence/theory_coupling_v1/unit_checks.json`
+- `evidence/theory_coupling_v1/theorem_code_map.csv`
+
+T1–T5 of the blueprint are proved and verified against the frozen sources
+(Base 3 code-cell concat `db500333b57ae902…` and training slice
+`09811db465da1443…` both match their pinned digests; 17/17 native AST engine
+components, 0 mismatches). All 18 check groups pass, 16 theorem-to-code rows
+pass, and 20/20 gate-mutation controls behave as predeclared, 14 of them
+negative controls that must fail.
+
+Five items are referred to PMO rather than resolved here, all recorded in
+section "Unresolved theory issues for PMO" of the report:
+
+1. The T4 channel decomposition is **not split-invariant** — the occupancy
+   channel is −1.457e-4 with the soft advantage referenced at S and exactly
+   0.0 referenced at M, a disagreement of about a quarter of the total gap
+   (−5.830e-4). Only the total is convention free, so the manuscript must
+   declare the reference law. Presentation decision with mathematical content.
+2. **`SCOPE CHANGE REQUEST — PMO DECISION REQUIRED`** — the conditional-law
+   and lag-ablation diagnostic that would close the T5 attribution is
+   specified with a precise estimand but deliberately **not executed**, since
+   both parts exceed unit scale and `00_CURRENT_STATE.md` reserves that
+   decision for PMO.
+3. The fitted critic is a variance-reduction device and is not part of the
+   gradient theorem; its measured deviation from the provably unbiased
+   unbaselined estimator is 0.54 standard errors.
+4. T2b's optimal lag coefficient under the dependent law sits at the boundary
+   of the searched grid, so the rigorous content is the exact-zero-versus-
+   nonzero derivative contrast at zero, not a magnitude.
+5. T1's expansion is a local r→0 statement with a verified O(r⁴) remainder and
+   is not the right tool on jump steps; the exact coupling needs no expansion.
+
+The U1 reproduction fixture used by the mutation controls is the SMOKE-only
+mechanism subset, not the predeclared two-holdout gate, which cannot pass in
+this sandbox (only the first 1 MiB of the 31 MB frozen ledger is retrievable,
+so holdout stream 1 has no reference rows). The gate of record remains the
+user's Colab T4 run, which returned `BASE4_TARGET_REPRODUCTION_PASS_EXACT` on
+all 16 rows.

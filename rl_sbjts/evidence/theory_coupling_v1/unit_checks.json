@@ -1,0 +1,1480 @@
+{
+  "check_id": "C-RLSBJTS-THEORY-COUPLING-01/UNIT_CHECKS",
+  "ticket": "C-RLSBJTS-THEORY-COUPLING-01",
+  "evidence_class": "SMOKE_EVIDENCE",
+  "is_scientific_evidence": false,
+  "is_research_scale_execution": false,
+  "generated_at_utc": "2026-09-22T02:24:58.433008+00:00",
+  "elapsed_s": 74.8,
+  "claim_status": "no comparator claim is created or modified by this package; the accepted empirical claim remains the domain-scoped statement in 02_CLAIM_LEDGER CL-RL-006",
+  "frozen_source_identity": {
+    "base3_notebook_sha256": "344956031d9e89763370a020d92ec54a669a7cc400e3d2b674de613897c02129",
+    "base3_code_concat_sha256": "db500333b57ae9029bde99018877580978f3c0344567fa8f86b9c74ac788b26e",
+    "base3_code_concat_expected": "db500333b57ae9029bde99018877580978f3c0344567fa8f86b9c74ac788b26e",
+    "base3_code_concat_match": true,
+    "snapshot_sha256": "7e817762849118fc3abf8d4cf98ad8d65d921fa49cb0d1b3bb34d884b73c5b4a",
+    "training_slice_sha256": "09811db465da1443b092f6b5e18a78b2fe1dda1fbf1709061395b0ed0e72bf01",
+    "training_slice_match": true,
+    "environment_fingerprint": "63ba37cc4a26b48b497e424cdeef4981684c1aef1176f2db571efa6e8e48a060",
+    "native_ast_components": 17,
+    "native_ast_mismatches": [],
+    "frozen_toplevel_blocks_executed": [
+      "for _m in M_GRID:"
+    ]
+  },
+  "empirical_calibration_used_only_as_test_curvature": {
+    "mu_M": 0.0914416389554889,
+    "sigma_M": 0.2077734286932787,
+    "note": "the calibrated values appear only as parameters of unit-test fixtures; no estimand is recomputed and no comparator number is produced here"
+  },
+  "per_check_pass": {
+    "t1_symbolic": true,
+    "t1_remainder": true,
+    "t2a_higher_moment": true,
+    "t2b_conditional_law": true,
+    "t3_1": true,
+    "t3_2": true,
+    "t3_3": true,
+    "t3_4": true,
+    "t3_5": true,
+    "t4": true,
+    "t5": true,
+    "entropy_scaling": true,
+    "frozen_math": true,
+    "state_map": true,
+    "wealth_recursion": true,
+    "seeding": true,
+    "gate_mutations": true,
+    "theorem_code_map": true
+  },
+  "all_pass": true,
+  "checks": {
+    "t1_symbolic": {
+      "g": "log(1 + a*(exp(r)-1))",
+      "order1": {
+        "derived": "a",
+        "claimed": "a",
+        "identical": true
+      },
+      "order2": {
+        "derived": "-a**2/2 + a/2",
+        "claimed": "-a**2/2 + a/2",
+        "identical": true
+      },
+      "order3": {
+        "derived": "a**3/3 - a**2/2 + a/6",
+        "claimed": "a**3/3 - a**2/2 + a/6",
+        "identical": true
+      },
+      "all_identical": true
+    },
+    "t1_remainder": {
+      "rows": [
+        {
+          "r_scale": 0.1,
+          "max_abs_truncation_error": 5.204863744168176e-07,
+          "error_over_r4": 0.005204863744168175
+        },
+        {
+          "r_scale": 0.05,
+          "max_abs_truncation_error": 3.254665901716858e-08,
+          "error_over_r4": 0.0052074654427469716
+        },
+        {
+          "r_scale": 0.025,
+          "max_abs_truncation_error": 2.0344204428729418e-09,
+          "error_over_r4": 0.00520811633375473
+        },
+        {
+          "r_scale": 0.0125,
+          "max_abs_truncation_error": 1.2715525073841993e-10,
+          "error_over_r4": 0.00520827907024568
+        }
+      ],
+      "halving_ratios": [
+        15.992006249927451,
+        15.99800037951214,
+        15.999500068291258
+      ],
+      "consistent_with_fourth_order": true,
+      "note": "an O(r^4) remainder must shrink by ~16 when r halves"
+    },
+    "t1_moment_structure": {
+      "terms": [
+        {
+          "order_k": 1,
+          "action_polynomial": "a",
+          "action_moments_required": [
+            1
+          ],
+          "multiplies": "E[ r_t^1 | H_t ]"
+        },
+        {
+          "order_k": 2,
+          "action_polynomial": "-a**2/2 + a/2",
+          "action_moments_required": [
+            1,
+            2
+          ],
+          "multiplies": "E[ r_t^2 | H_t ]"
+        },
+        {
+          "order_k": 3,
+          "action_polynomial": "a**3/3 - a**2/2 + a/6",
+          "action_moments_required": [
+            1,
+            2,
+            3
+          ],
+          "multiplies": "E[ r_t^3 | H_t ]"
+        },
+        {
+          "order_k": 4,
+          "action_polynomial": "-a**4/4 + a**3/2 - 7*a**2/24 + a/24",
+          "action_moments_required": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "multiplies": "E[ r_t^4 | H_t ]"
+        }
+      ],
+      "statement": "E[X_{t+1}-X_t] = sum_k E[ c_k(A_t) * E(r_t^k | H_t) ] with c_1=a, c_2=a(1-a)/2, c_3=a(1-a)(1-2a)/6, ... so expected growth depends on CONDITIONAL return moments of every order and on the first k moments of the action law, not on the unconditional mean and variance alone",
+      "exploration_variance_enters_at_order": 2,
+      "why": "c_2(a)=a(1-a)/2 is not affine in a, so E[c_2(A)] involves E[A^2] and therefore the conditional variance of the exploratory action"
+    },
+    "t2a_higher_moment": {
+      "analytic_optimum_of_symmetric_two_point_law": 0.5,
+      "analytic_derivation": "a* = -(p+q)/(2pq) with p=e^d-1, q=e^-d-1; since p+q = 2(cosh d - 1) and pq = -2(cosh d - 1), a* = 1/2 for every d, exactly",
+      "argmax_A": {
+        "value": 0.49999999999999745,
+        "kind": "interior",
+        "matches_analytic_half": true
+      },
+      "argmax_B": {
+        "value": 0.5010916510551886,
+        "kind": "interior"
+      },
+      "delta_sweep": [
+        {
+          "delta": 0.0131,
+          "argmax_A": 0.49999999999999745,
+          "argmax_B": 0.5010916510551886,
+          "argmax_shift": 0.0010916510551911562,
+          "growth_gap_at_a_half": 3.0675320400117e-10,
+          "growth_gap_at_a_quarter": 3.5182063035229735e-08
+        },
+        {
+          "delta": 0.0262,
+          "argmax_A": 0.5000000000000013,
+          "argmax_B": 0.5021832084479618,
+          "argmax_shift": 0.002183208447960494,
+          "growth_gap_at_a_half": 4.907209170262883e-09,
+          "growth_gap_at_a_quarter": 2.8187175681862117e-07,
+          "ratio_gap_at_half": 15.997254816755445,
+          "ratio_gap_at_quarter": 8.011802961536606,
+          "ratio_argmax_shift": 1.9999142011347188,
+          "delta_ratio": 2.0
+        },
+        {
+          "delta": 0.0524,
+          "argmax_A": 0.4999999999999994,
+          "argmax_B": 0.5043656677893769,
+          "argmax_shift": 0.00436566778937747,
+          "growth_gap_at_a_half": 7.84614972420411e-08,
+          "growth_gap_at_a_quarter": 2.2609099056469448e-06,
+          "ratio_gap_at_half": 15.98902645469214,
+          "ratio_gap_at_quarter": 8.021058694084754,
+          "ratio_argmax_shift": 1.9996568781399604,
+          "delta_ratio": 2.0
+        },
+        {
+          "delta": 0.1048,
+          "argmax_A": 0.5000000000000001,
+          "argmax_B": 0.5087253488901192,
+          "argmax_shift": 0.008725348890119111,
+          "growth_gap_at_a_half": 1.2519488589296524e-06,
+          "growth_gap_at_a_quarter": 1.8160123706542977e-05,
+          "ratio_gap_at_half": 15.956219329687164,
+          "ratio_gap_at_quarter": 8.032219090723377,
+          "ratio_argmax_shift": 1.9986286889143523,
+          "delta_ratio": 2.0
+        }
+      ],
+      "empirical_scaling_orders": {
+        "growth_gap_at_a_half": 3.9982698657944105,
+        "growth_gap_at_a_quarter": 3.0039060772323674,
+        "argmax_shift": 0.9995670151359541
+      },
+      "predicted_scaling_orders": {
+        "growth_gap_at_a_half": 4,
+        "growth_gap_at_a_quarter": 3,
+        "argmax_shift": 1
+      },
+      "scaling_matches_T1_prediction": true,
+      "why_the_gap_at_a_half_is_fourth_order": "c_3(a) = a(1-a)(1-2a)/6 vanishes at a = 1/2, which is exactly law A's optimum, so the third-order contribution to the gap is zero there and the leading difference is fourth order. At a = 1/4, where c_3 != 0, the gap is third order. Both are consistency checks on the T1 expansion.",
+      "law_A": {
+        "name": "LAW_A_two_point_symmetric",
+        "rets": [
+          -0.0131,
+          0.0131
+        ],
+        "probs": [
+          0.5,
+          0.5
+        ],
+        "mean": 0.0,
+        "variance": 0.00017161000000000002,
+        "third_central_moment": 0.0
+      },
+      "law_B": {
+        "name": "LAW_B_three_point_negative_skew",
+        "rets": [
+          -0.0262,
+          0.0,
+          0.0131
+        ],
+        "probs": [
+          0.16666666666666666,
+          0.5,
+          0.3333333333333333
+        ],
+        "mean": 0.0,
+        "variance": 0.00017161,
+        "third_central_moment": -2.248091e-06
+      },
+      "moments_matched": {
+        "mean_gap": 0.0,
+        "variance_gap": 2.710505431213761e-20,
+        "third_moment_gap": 2.248091e-06,
+        "first_two_identical": true
+      },
+      "growth_optimal_constant_action": {
+        "law_A": 0.49999999999999745,
+        "law_B": 0.5010916510551886,
+        "gap": 0.0010916510551911562
+      },
+      "expected_growth_at_a_equals_argmax_A": {
+        "law_A": 2.1451096616378982e-05,
+        "law_B": 2.145078986317498e-05
+      },
+      "max_abs_growth_gap_over_grid": 3.60530026106802e-08,
+      "conclusion": "matching the unconditional one-step mean and variance leaves the growth functional, and hence its maximiser, different",
+      "pass": true
+    },
+    "t2b_conditional_law": {
+      "model": {
+        "n_steps": 2,
+        "returns": [
+          -0.08,
+          0.08
+        ],
+        "marginal_probs": [
+          0.5,
+          0.5
+        ],
+        "law_M": "r_1 independent of r_0",
+        "law_S": "r_1 = -r_0",
+        "marginals_identical_at_every_t": true,
+        "all_unconditional_one_step_moments_identical": true,
+        "constraint": "LONG_ONLY_FULL",
+        "m": 0.01,
+        "action_quadrature_nodes": 257
+      },
+      "gradients_at_zero_lag_coefficient": {
+        "M": {
+          "d_objective_d_lag_coefficient": 0.0,
+          "d_objective_d_intercept": 3.469446951953614e-14,
+          "objective_at_zero_lag": 0.0015356365392326238
+        },
+        "S": {
+          "d_objective_d_lag_coefficient": -0.01087473461945307,
+          "d_objective_d_intercept": 3.469446951953614e-14,
+          "objective_at_zero_lag": 0.0015356365392326238
+        }
+      },
+      "best_lag_coefficient": {
+        "M": {
+          "best_lag_coefficient": 0.0,
+          "objective": 0.0015356365392326238,
+          "at_grid_boundary": false,
+          "objective_range_over_lag_grid": 0.0007419269958846425
+        },
+        "S": {
+          "best_lag_coefficient": -200.0,
+          "objective": 0.040135328229086505,
+          "at_grid_boundary": true,
+          "objective_range_over_lag_grid": 0.07868323737147705
+        }
+      },
+      "argmax_lag_coefficient_exactly_zero_under_M": true,
+      "objective_sensitivity_to_lag_coefficient_ratio_S_over_M": 106.05253321138217,
+      "why_M_is_not_flat_in_the_lag_coefficient": "a non-zero lag coefficient under the iid law adds action dispersion with no first-order return benefit, and the order-2 term a(1-a)/2 * E[r^2] is not affine in a, so it is a pure cost; the derivative at zero is exactly zero and zero is the exact maximiser",
+      "lag_gradient_zero_under_M": true,
+      "lag_gradient_nonzero_under_S": true,
+      "optimal_policy_differs": true,
+      "conclusion": "identical unconditional one-step laws at every t, yet the observation-based policy gradient along the lagged-return coordinate is exactly zero under the iid law and non-zero under the conditionally dependent law; the optimal observation-based policies therefore differ",
+      "non_claim": "this is an existence result. It does NOT say that every pair of moment-matched laws must induce different policies: two laws equal as processes trivially induce the same policy.",
+      "pass": true
+    },
+    "t3_1": {
+      "n_regimes_checked": 38,
+      "max_abs_conditional_score_mean": 2.227551338497488e-12,
+      "tolerance": 1e-08,
+      "pass": true,
+      "rows": [
+        {
+          "regime": "LONG_ONLY_FULL",
+          "tag": "central",
+          "phi1": 0.5,
+          "phi2": -6.0,
+          "quadrature_mass": 0.9999999999999911,
+          "E_score_phi1": -1.4210854715202004e-14,
+          "E_score_phi2": 1.5265566588595902e-16,
+          "max_abs": 1.4210854715202004e-14
+        },
+        {
+          "regime": "LONG_ONLY_FULL",
+          "tag": "central",
+          "phi1": 0.5,
+          "phi2": -2.0,
+          "quadrature_mass": 0.9999999999999905,
+          "E_score_phi1": 0.0,
+          "E_score_phi2": -2.949029909160572e-17,
+          "max_abs": 2.949029909160572e-17
+        },
+        {
+          "regime": "LONG_ONLY_FULL",
+          "tag": "central",
+          "phi1": 0.5,
+          "phi2": 0.0,
+          "quadrature_mass": 0.9999999999999902,
+          "E_score_phi1": -4.440892098500626e-16,
+          "E_score_phi2": -1.0408340855860843e-17,
+          "max_abs": 4.440892098500626e-16
+        },
+        {
+          "regime": "LONG_ONLY_FULL",
+          "tag": "central",
+          "phi1": 0.5,
+          "phi2": 2.0,
+          "quadrature_mass": 0.999999999999994,
+          "E_score_phi1": 0.0,
+          "E_score_phi2": 3.677613769070831e-15,
+          "max_abs": 3.677613769070831e-15
+        },
+        {
+          "regime": "LONG_ONLY_FULL",
+          "tag": "lower_lock",
+          "phi1": -0.30000000000000004,
+          "phi2": -2.0,
+          "quadrature_mass": 1.0000000000005018,
+          "E_score_phi1": -1.847611946920167e-12,
+          "E_score_phi2": -4.2833216406601056e-13,
+          "max_abs": 1.847611946920167e-12
+        },
+        {
+          "regime": "LONG_ONLY_FULL",
+          "tag": "lower_lock",
+          "phi1": -0.30000000000000004,
+          "phi2": 0.0,
+          "quadrature_mass": 1.000000000000097,
+          "E_score_phi1": -2.373567062724458e-13,
+          "E_score_phi2": -8.13478524600907e-14,
+          "max_abs": 2.373567062724458e-13
+        },
+        {
+          "regime": "LONG_ONLY_FULL",
+          "tag": "lower_lock",
+          "phi1": -0.30000000000000004,
+          "phi2": 2.0,
+          "quadrature_mass": 1.0000000000000158,
+          "E_score_phi1": -4.2146841572332505e-14,
+          "E_score_phi2": -1.7513768213461844e-14,
+          "max_abs": 4.2146841572332505e-14
+        },
+        {
+          "regime": "LONG_ONLY_FULL",
+          "tag": "upper_lock",
+          "phi1": 1.3,
+          "phi2": -2.0,
+          "quadrature_mass": 1.0000000000004992,
+          "E_score_phi1": 1.8378168313903577e-12,
+          "E_score_phi2": -4.242669257494603e-13,
+          "max_abs": 1.8378168313903577e-12
+        }
+      ],
+      "statement": "E[grad_phi log lambda(A|S) | S] = 0, so any S-measurable quantity multiplying the score contributes nothing to the gradient"
+    },
+    "t3_2": {
+      "rows": [
+        {
+          "phi1": 0.5,
+          "phi2": 0.0,
+          "baseline": 3.7,
+          "E_psi_times_baseline": [
+            -1.6431300764452318e-15,
+            -3.851086116668512e-17
+          ]
+        },
+        {
+          "phi1": 0.2,
+          "phi2": -2.0,
+          "baseline": -11.0,
+          "E_psi_times_baseline": [
+            4.744744543226325e-13,
+            -1.0583683902697141e-14
+          ]
+        },
+        {
+          "phi1": 0.9,
+          "phi2": 2.0,
+          "baseline": 1000.0,
+          "E_psi_times_baseline": [
+            3.164135620181696e-11,
+            -3.191891195797325e-12
+          ]
+        }
+      ],
+      "max_abs": 3.164135620181696e-11,
+      "tolerance": 1e-06,
+      "pass": true
+    },
+    "t3_3": {
+      "max_abs_error_vs_u_greater_than_t_convention": 2.0816681711721685e-17,
+      "tolerance": 1e-12,
+      "pass": true,
+      "max_abs_difference_between_conventions": 0.014526450172777053,
+      "why_dropping_H_t_is_valid": "H_t is a deterministic function of S_t and theta and does not depend on A_t, so by T3.1 its score contribution E[psi_t * m H_t | S_t] is exactly zero; the frozen convention removes a provably zero-expectation term and avoids double counting against the analytic entropy gradient",
+      "double_counting_avoided": true
+    },
+    "t3_4": {
+      "design": {
+        "n_paths": 200000,
+        "n_steps": 6,
+        "m": 0.01,
+        "fd_step": 0.0001,
+        "constraint": "LONG_ONLY_FULL",
+        "market_fixture": "iid Gaussian log increments at the frozen empirical (m1, v1); no engine call, no training",
+        "sigma_multiplier": 4.0
+      },
+      "score_function_gradient": [
+        [
+          -0.24208878426297803,
+          -0.10329217670434296,
+          -0.00032646970021152176,
+          -0.0001802300355874839
+        ],
+        [
+          0.1567232889902445,
+          0.06570121842130523,
+          2.051284604599397e-07,
+          -4.101782394902649e-05
+        ]
+      ],
+      "pathwise_finite_difference_gradient": [
+        [
+          -0.24095562372238563,
+          -0.10289420856881648,
+          -0.0003237684100274393,
+          -0.00017976658796854444
+        ],
+        [
+          0.15597189004694267,
+          0.06544617334347524,
+          9.329606983887359e-07,
+          -3.725020963775248e-05
+        ]
+      ],
+      "paired_standard_error": [
+        [
+          0.0009056863023333536,
+          0.0002575744948356098,
+          1.1623324637361932e-05,
+          9.278476362211719e-06
+        ],
+        [
+          0.0005976638139215351,
+          0.0001606713161762559,
+          7.383957991236431e-06,
+          5.989180784081719e-06
+        ]
+      ],
+      "z_scores": [
+        [
+          -1.2511622817668704,
+          -1.545060335964049,
+          -0.23240254130040017,
+          -0.049948677007673276
+        ],
+        [
+          1.2572267649459665,
+          1.5873715601495682,
+          -0.09856939039910788,
+          -0.6290700593456325
+        ]
+      ],
+      "max_abs_z": 1.5873715601495682,
+      "frozen_actor_gradient_matches_replication": 7.827072323607354e-15,
+      "pass": true,
+      "critic_baseline": {
+        "max_abs_z_of_baseline_effect": 0.5416799082755067,
+        "interpretation": "the frozen critic is refit on the same batch, so the baseline is not exactly action independent and is not guaranteed unbiased at finite sample; this reports how far the baselined gradient sits from the provably unbiased unbaselined one in units of the latter's standard error"
+      },
+      "statement": "grad_theta J = E[ R_soft * sum_t psi_t ] + m E[ sum_t d_theta H_t ], with Q_L actor-parameter independent; verified end to end against the reparameterisation derivative"
+    },
+    "t3_5": {
+      "market_block_byte_identical_for_repeated_construction": true,
+      "market_constructed_before_the_actor_acts": true,
+      "market_seed_expression_contains_no_actor_state": true,
+      "market_seed_expression": "env_root * 1000 + it",
+      "frozen_engine_signature_has_no_actor_argument": true,
+      "pass": true,
+      "statement": "the market transition kernel is constructed from a deterministic seed schedule before the actor acts and takes no actor argument, so grad_theta log Q_L = 0 and the trajectory score reduces to the sum of policy scores"
+    },
+    "t4": {
+      "model": {
+        "n_decisions": 3,
+        "returns": [
+          -0.0131,
+          0.0131
+        ],
+        "action_nodes": 21,
+        "theta": [
+          0.0,
+          -2.0
+        ],
+        "theta_meaning": [
+          "raw1 intercept",
+          "raw1 lagged-return coefficient"
+        ],
+        "m": 0.01,
+        "constraint": "LONG_ONLY_FULL",
+        "law_M": "iid",
+        "law_S": "r_t = -r_{t-1}",
+        "marginals_identical_at_every_t": true,
+        "why_three_steps": "with two decisions the two laws cannot differ in occupancy at any decision time and the occupancy channel is zero for trivial reasons"
+      },
+      "representation_check": {
+        "per_law": {
+          "M": {
+            "direct_enumeration": [
+              6.925409511037093e-12,
+              3.400007517727462e-07
+            ],
+            "occupancy_advantage_form": [
+              -4.2859867131067597e-19,
+              3.400011181083184e-07
+            ],
+            "max_abs_gap": 6.925409939635764e-12
+          },
+          "S": {
+            "direct_enumeration": [
+              7.508439863814369e-17,
+              -0.0005826929253235244
+            ],
+            "occupancy_advantage_form": [
+              3.469446951953614e-18,
+              -0.000582692924973348
+            ],
+            "max_abs_gap": 3.5017637661088896e-13
+          }
+        },
+        "max_abs_gap": 6.925409939635764e-12,
+        "tolerance": 1e-10,
+        "pass": true,
+        "statement": "the occupancy-times-soft-advantage form equals brute-force trajectory enumeration, which is what licenses the channel decomposition"
+      },
+      "occupancy_really_differs": {
+        "d1_identical_across_laws": true,
+        "d2_M": {
+          "(-0.0131, -0.0131)": 0.25,
+          "(-0.0131, 0.0131)": 0.25,
+          "(0.0131, -0.0131)": 0.25,
+          "(0.0131, 0.0131)": 0.25
+        },
+        "d2_S": {
+          "(-0.0131, 0.0131)": 0.5,
+          "(0.0131, -0.0131)": 0.5
+        },
+        "d2_total_variation": 0.5
+      },
+      "gradient": {
+        "M": [
+          -4.2859867131067597e-19,
+          3.400011181083184e-07
+        ],
+        "S": [
+          3.469446951953614e-18,
+          -0.000582692924973348
+        ],
+        "S_minus_M": [
+          3.89804562326429e-18,
+          -0.0005830329260914564
+        ]
+      },
+      "split_advantage_referenced_at_S": {
+        "occupancy_channel": [
+          0.0,
+          -0.000145673231243337
+        ],
+        "continuation_value_channel": [
+          3.89804562326429e-18,
+          -0.0004373596948481193
+        ],
+        "sum": [
+          3.89804562326429e-18,
+          -0.0005830329260914564
+        ],
+        "max_abs_residual_vs_total": 0.0
+      },
+      "split_advantage_referenced_at_M": {
+        "occupancy_channel": [
+          0.0,
+          0.0
+        ],
+        "continuation_value_channel": [
+          3.89804562326429e-18,
+          -0.0005830329260914564
+        ],
+        "sum": [
+          3.89804562326429e-18,
+          -0.0005830329260914564
+        ],
+        "max_abs_residual_vs_total": 0.0
+      },
+      "decomposition_is_not_unique": {
+        "fact": "d_S A_S - d_M A_M = (d_S-d_M)A_S + d_M(A_S-A_M) = (d_S-d_M)A_M + d_S(A_S-A_M); both are exact and they attribute the interaction term to different channels",
+        "max_abs_occupancy_channel_disagreement": 0.000145673231243337,
+        "implication": "a channel magnitude is not split invariant, so the manuscript must state which law the advantage is referenced at; only the total is convention free"
+      },
+      "entropy_occupancy_term": {
+        "M": [
+          0.0,
+          5.939171376923014e-07
+        ],
+        "S": [
+          0.0,
+          5.939171376923014e-07
+        ],
+        "S_minus_M": [
+          0.0,
+          0.0
+        ],
+        "statement": "with the direct entropy derivative kept outside the soft advantage, its contribution to the law gap is purely an occupancy effect: the same d_theta H is averaged under two different occupancy measures"
+      },
+      "pass": true
+    },
+    "t5": {
+      "covariance_channel": {
+        "M": {
+          "rows": [
+            {
+              "r_prev": -0.0131,
+              "prob": 0.5,
+              "mean_action": 0.5445285782357084,
+              "conditional_mean_next_return": 0.0
+            },
+            {
+              "r_prev": 0.0131,
+              "prob": 0.5,
+              "mean_action": 0.4554714217642915,
+              "conditional_mean_next_return": 0.0
+            }
+          ],
+          "E_mean_action": 0.5,
+          "E_conditional_mean_return": 0.0,
+          "cov_mean_action_with_conditional_mean": 0.0,
+          "first_order_growth_term_E_pi_r": 0.0,
+          "product_of_marginals_E_pi_times_E_r": 0.0
+        },
+        "S": {
+          "rows": [
+            {
+              "r_prev": -0.0131,
+              "prob": 0.5,
+              "mean_action": 0.5445285782357084,
+              "conditional_mean_next_return": 0.0131
+            },
+            {
+              "r_prev": 0.0131,
+              "prob": 0.5,
+              "mean_action": 0.4554714217642915,
+              "conditional_mean_next_return": -0.0131
+            }
+          ],
+          "E_mean_action": 0.5,
+          "E_conditional_mean_return": 0.0,
+          "cov_mean_action_with_conditional_mean": 0.0005833243748877808,
+          "first_order_growth_term_E_pi_r": 0.0005833243748877806,
+          "product_of_marginals_E_pi_times_E_r": 0.0
+        }
+      },
+      "cov_exactly_zero_under_iid_law": true,
+      "cov_nonzero_under_conditional_law": true,
+      "identity": "E[A_t r_t] = E[ pibar_theta(S_t) * mu_L(H_t) ] = E[pibar] E[mu] + Cov( pibar_theta(S_t), mu_L(H_t) ), using that A_t is conditionally independent of r_t given H_t",
+      "structural_statement": "under an iid law mu_M is a CONSTANT, so its covariance with any observation-based policy is exactly zero and the lagged-return coordinate has no first-order effect on expected growth beyond what the intercept already controls. Under a history-dependent law mu_S is state dependent and the covariance term is non-zero and available to be exploited. The channel is therefore present under one law and provably absent under the other.",
+      "frozen_engine_is_history_dependent_by_construction": {
+        "carries_forward_the_position_state_Y": true,
+        "accumulates_a_path_kernel_weight_logw": true,
+        "jump_intensity_built_from_those_accumulated_weights": true,
+        "jump_class_conditioning_uses_the_accumulated_weights": true,
+        "bridge_drift_depends_on_the_current_position": true
+      },
+      "engine_history_dependence_confirmed": true,
+      "frozen_engine_evidence_lines": [
+        "logw = logw - np.log(np.clip(quartic_kernel_np(dold,h),1e-30,None))",
+        "logw = logw + np.log(np.clip(quartic_kernel_np(dcur,h),1e-30,None))",
+        "ell = np.clip(prob_scale*ell_raw, 0.0, 1.0)",
+        "lwe = np.where(pop, logw, -1e30)",
+        "lwe = np.where(empty[:,None], logw, lwe)",
+        "lwe = logw",
+        "Y = Y + drift*dt_sub + BM[:,bmi,:]*sig*math.sqrt(dt_sub)"
+      ],
+      "comparator_gbm_arm_is_iid_by_construction": "the Merton arm's market object is m1 + sd * standard_normal drawn independently per (path, step), so E(r_t | H_t) = m1 identically",
+      "non_claim": "this establishes that the lagged-return channel EXISTS under a history-dependent law and CANNOT exist under an iid law. It does not measure the frozen SBJTS conditional mean function, and it does not establish that the lagged-return channel accounts for any particular share of the observed performance gap. Occupancy, continuation-value, wealth-state and higher-moment channels remain unseparated.",
+      "diagnostic_that_would_close_the_gap": {
+        "estimand": "the frozen SBJTS conditional mean function mu_S(r_prev) = E_S(r_t | r_{t-1} = r_prev), and the lag-ablation contrast obtained by retraining with the r_{t-1} coordinate zeroed out of the frozen state",
+        "why_not_run_here": "it requires either market simulation beyond unit scale or a retraining arm; 00_CURRENT_STATE reserves that decision for PMO, so it is specified and not executed",
+        "status": "SCOPE CHANGE REQUEST \u2014 PMO DECISION REQUIRED"
+      },
+      "pass": true
+    },
+    "entropy_scaling": {
+      "check_id": "C-RLSBJTS-MERTON-COMP-01/ENTROPY_TIME_SCALING_UNIT_TESTS",
+      "evidence_class": "SMOKE_EVIDENCE",
+      "status": "ENTROPY_TIME_SCALING_TESTS_PASS",
+      "scaling": {
+        "frozen_discrete_objective": "E[log(W_T/W_0)] + m * sum_{t=0}^{N-1} H(pi_t)",
+        "continuous_time_objective_chau_nguyen_nguyen": "E[log W_T] + lambda * integral_0^T H(pi_t) dt",
+        "entropy_object": "differential entropy of the truncated-Gaussian action density on the hard interval; identical in both objectives",
+        "grid": {
+          "dt": 0.004,
+          "n_steps": 60,
+          "T_years": 0.24
+        },
+        "identity": "integral_0^T H dt ~= dt * sum_t H_t  =>  m = lambda * dt",
+        "frozen_m_discrete": 0.01,
+        "lambda_equivalent_of_frozen_m": 2.5,
+        "paper_nominal_lambda": 0.01,
+        "m_discrete_equivalent_of_paper_lambda": 4e-05,
+        "ratio_learner_over_continuous_at_equal_nominal_value": 250.0,
+        "frozen_objective_modified_by_this_module": false,
+        "affects_primary_contrast": false,
+        "why_not": "both comparator arms optimise the same frozen discrete objective at the same m, so the time-scaling factor is common to the arms and cancels from Delta",
+        "affects_analytic_benchmark": true,
+        "how": "the analytic exploratory Merton policy is reported at the paper's nominal lambda and, separately, at lambda = m/dt, which is the exploration weight the frozen learner actually applies"
+      },
+      "test_problem": {
+        "mu": 1.0,
+        "sigma": 5.0,
+        "r_f": 0.0,
+        "T_years": 0.24,
+        "grid_refinements": [
+          2,
+          4
+        ],
+        "comparison_unit": "executed (location, scale) of the frozen truncated-Gaussian policy",
+        "domain": "the frozen policy box: scale in [scale_floor, scale_ceiling], which phi2_box(m) reproduces for every m",
+        "synthetic": true,
+        "note": "synthetic curvature only, chosen so every optimum the test visits is strictly interior; not calibrated, not the empirical (mu_M, sigma_M), and entering no estimand"
+      },
+      "results": [
+        {
+          "constraint": "LONG_ONLY_CAP50",
+          "bounds": [
+            0.0,
+            0.5
+          ],
+          "T1_SUM_IDENTITY": {
+            "max_abs_term_difference": 0.0,
+            "frozen_soft_return_to_go_max_abs_error": 1.1102230246251565e-16,
+            "tolerance": 1e-12,
+            "pass": true
+          },
+          "T2_GRID_INVARIANCE": {
+            "lambda_used": 2.5,
+            "base_executed_policy": {
+              "loc": 0.04000001496419968,
+              "scale": 0.3162277501690444
+            },
+            "continuous_executed_policy": {
+              "loc": 0.03999999153323709,
+              "scale": 0.316227775866649
+            },
+            "refined_with_m_rescaled": [
+              {
+                "refinement": 2,
+                "dt": 0.002,
+                "n_steps": 120,
+                "m_rescaled": 0.005,
+                "executed_loc": 0.03999999854295669,
+                "executed_scale": 0.31622776477193565,
+                "abs_loc_gap_vs_base": 1.642124299039427e-08,
+                "abs_scale_gap_vs_base": 1.4602891229564818e-08,
+                "at_box_edge": false
+              },
+              {
+                "refinement": 4,
+                "dt": 0.001,
+                "n_steps": 240,
+                "m_rescaled": 0.0025,
+                "executed_loc": 0.04000000524463408,
+                "executed_scale": 0.31622776248657675,
+                "abs_loc_gap_vs_base": 9.719565596810753e-09,
+                "abs_scale_gap_vs_base": 1.2317532327443814e-08,
+                "at_box_edge": false
+              }
+            ],
+            "refined_with_m_held_fixed": [
+              {
+                "refinement": 2,
+                "m_held_fixed": 0.01,
+                "executed_loc": 0.04000004286813366,
+                "executed_scale": 0.44721355014581904,
+                "abs_scale_gap_vs_base": 0.13098579997677462,
+                "at_box_edge": false
+              },
+              {
+                "refinement": 4,
+                "m_held_fixed": 0.01,
+                "executed_loc": 0.04000000269771855,
+                "executed_scale": 0.632455480732949,
+                "abs_scale_gap_vs_base": 0.3162277305639046,
+                "at_box_edge": false
+              }
+            ],
+            "max_gap_rescaled": 1.642124299039427e-08,
+            "max_gap_vs_continuous": 2.5697604599805857e-08,
+            "min_gap_when_m_not_rescaled": 0.13098579997677462,
+            "all_optima_strictly_inside_frozen_policy_box": true,
+            "tolerance": 1e-06,
+            "minimum_required_separation": 0.001,
+            "pass": true
+          },
+          "T3_SCALE_SEPARATION": {
+            "naive_lambda_equals_m_executed_policy": {
+              "loc": 0.04000000018019666,
+              "scale": 0.019999999886108528
+            },
+            "max_abs_gap_vs_frozen_discrete_optimum": 0.2962277502829359,
+            "minimum_required": 0.001,
+            "pass": true,
+            "meaning": "identifying the frozen m directly with the paper's lambda moves the optimal exploratory policy materially, so the distinction is not cosmetic"
+          },
+          "all_pass": true
+        },
+        {
+          "constraint": "LONG_ONLY_FULL",
+          "bounds": [
+            0.0,
+            1.0
+          ],
+          "T1_SUM_IDENTITY": {
+            "max_abs_term_difference": 0.0,
+            "frozen_soft_return_to_go_max_abs_error": 4.440892098500626e-16,
+            "tolerance": 1e-12,
+            "pass": true
+          },
+          "T2_GRID_INVARIANCE": {
+            "lambda_used": 2.5,
+            "base_executed_policy": {
+              "loc": 0.04000001505899657,
+              "scale": 0.31622776109551465
+            },
+            "continuous_executed_policy": {
+              "loc": 0.03999998869868952,
+              "scale": 0.31622777105258576
+            },
+            "refined_with_m_rescaled": [
+              {
+                "refinement": 2,
+                "dt": 0.002,
+                "n_steps": 120,
+                "m_rescaled": 0.005,
+                "executed_loc": 0.03999999466914254,
+                "executed_scale": 0.31622777117557876,
+                "abs_loc_gap_vs_base": 2.0389854034352783e-08,
+                "abs_scale_gap_vs_base": 1.0080064116735343e-08,
+                "at_box_edge": false
+              },
+              {
+                "refinement": 4,
+                "dt": 0.001,
+                "n_steps": 240,
+                "m_rescaled": 0.0025,
+                "executed_loc": 0.03999999654756081,
+                "executed_scale": 0.31622776781996825,
+                "abs_loc_gap_vs_base": 1.851143575926084e-08,
+                "abs_scale_gap_vs_base": 6.724453605055913e-09,
+                "at_box_edge": false
+              }
+            ],
+            "refined_with_m_held_fixed": [
+              {
+                "refinement": 2,
+                "m_held_fixed": 0.01,
+                "executed_loc": 0.04000002533863732,
+                "executed_scale": 0.44721358745126427,
+                "abs_scale_gap_vs_base": 0.13098582635574962,
+                "at_box_edge": false
+              },
+              {
+                "refinement": 4,
+                "m_held_fixed": 0.01,
+                "executed_loc": 0.040000059626797306,
+                "executed_scale": 0.6324554929422938,
+                "abs_scale_gap_vs_base": 0.3162277318467791,
+                "at_box_edge": false
+              }
+            ],
+            "max_gap_rescaled": 2.0389854034352783e-08,
+            "max_gap_vs_continuous": 2.636030704827874e-08,
+            "min_gap_when_m_not_rescaled": 0.13098582635574962,
+            "all_optima_strictly_inside_frozen_policy_box": true,
+            "tolerance": 1e-06,
+            "minimum_required_separation": 0.001,
+            "pass": true
+          },
+          "T3_SCALE_SEPARATION": {
+            "naive_lambda_equals_m_executed_policy": {
+              "loc": 0.0399999997427411,
+              "scale": 0.019999999822686843
+            },
+            "max_abs_gap_vs_frozen_discrete_optimum": 0.2962277612728278,
+            "minimum_required": 0.001,
+            "pass": true,
+            "meaning": "identifying the frozen m directly with the paper's lambda moves the optimal exploratory policy materially, so the distinction is not cosmetic"
+          },
+          "all_pass": true
+        }
+      ],
+      "empirical_curvature_diagnostic": {
+        "check_id": "C-RLSBJTS-MERTON-COMP-01/EMPIRICAL_CURVATURE_DIAGNOSTIC",
+        "evidence_class": "SMOKE_EVIDENCE",
+        "is_a_gate": false,
+        "mu_M": 0.0914416389554889,
+        "sigma_M": 0.2077734286932787,
+        "r_f": 0.0,
+        "interpretation": "at the empirical curvature the frozen per-step entropy weight dominates the per-step log-growth term, so the exploratory optimum saturates the frozen scale ceiling. This is a property of the frozen objective at m = 0.01 on a 1/250 grid, it is identical for both comparator arms, and it is the reason the analytic Merton benchmark is reported at two exploration conventions rather than one.",
+        "rows": [
+          {
+            "constraint": "LONG_ONLY_CAP50",
+            "bounds": [
+              0.0,
+              0.5
+            ],
+            "per_step_log_growth_term": 8.525863919205965e-05,
+            "per_step_entropy_term_frozen_m": -0.009405154743855818,
+            "entropy_over_growth_magnitude_ratio": 110.31321673653622,
+            "optima": {
+              "frozen_discrete_m": {
+                "effective_lambda": 2.5,
+                "executed_loc": 2.118139355956494,
+                "executed_scale": 7.609793666682988,
+                "at_box_edge": false
+              },
+              "paper_nominal_lambda": {
+                "effective_lambda": 0.01,
+                "executed_loc": 2.118185250130409,
+                "executed_scale": 0.4812934691223872,
+                "at_box_edge": false
+              }
+            }
+          },
+          {
+            "constraint": "LONG_ONLY_FULL",
+            "bounds": [
+              0.0,
+              1.0
+            ],
+            "per_step_log_growth_term": 0.0001604349959583616,
+            "per_step_entropy_term_frozen_m": -0.008836545666945163,
+            "entropy_over_growth_magnitude_ratio": 55.0786666846587,
+            "optima": {
+              "frozen_discrete_m": {
+                "effective_lambda": 2.5,
+                "executed_loc": 3.2935876019064096,
+                "executed_scale": 10.000000000000002,
+                "at_box_edge": true
+              },
+              "paper_nominal_lambda": {
+                "effective_lambda": 0.01,
+                "executed_loc": 2.1181854150467485,
+                "executed_scale": 0.48129347804803685,
+                "at_box_edge": false
+              }
+            }
+          }
+        ]
+      }
+    },
+    "frozen_math": {
+      "policy_math": {
+        "scalar_batch_max": 5.449224266262931e-10,
+        "score_fd_max": 2.3698812583461404e-06,
+        "entropy_grad_rel_max": 8.044021643227595e-07,
+        "normalization_max": 1.6229288348990067e-05,
+        "scipy_mean_max": 1.1102230246251565e-15,
+        "scipy_var_max": 2.4202861936828413e-14,
+        "all_samples_in_support": true,
+        "n_regimes_total": 144,
+        "n_regimes_resolvable": 118,
+        "frozen_tolerance_checks": {
+          "scalar_vs_batch_equivalence": {
+            "observed": 5.449224266262931e-10,
+            "frozen_tolerance": 1e-08,
+            "pass": true
+          },
+          "analytic_score_vs_finite_difference": {
+            "observed": 2.3698812583461404e-06,
+            "frozen_tolerance": 0.0001,
+            "pass": true
+          },
+          "entropy_gradient_relative": {
+            "observed": 8.044021643227595e-07,
+            "frozen_tolerance": 0.001,
+            "pass": true
+          },
+          "density_normalisation": {
+            "observed": 1.6229288348990067e-05,
+            "frozen_tolerance": 0.001,
+            "pass": true
+          }
+        },
+        "pass": true
+      },
+      "actor_estimator": {
+        "m=1.0": {
+          "max_abs_z": 1.9096827059582435,
+          "sign_agreement": true,
+          "estimate_nonzero": true,
+          "pass": true
+        },
+        "m=0.1": {
+          "max_abs_z": 1.518329002250571,
+          "sign_agreement": true,
+          "estimate_nonzero": true,
+          "pass": true
+        },
+        "m=0.01": {
+          "max_abs_z": 1.859911510650718,
+          "sign_agreement": true,
+          "estimate_nonzero": true,
+          "pass": true
+        },
+        "frozen_tolerance_estimator_z": 4.0,
+        "pass": true
+      },
+      "transform_jacobian": {
+        "max_abs_observed": 4.784257967571648e-08,
+        "frozen_tolerance": 1e-06,
+        "n_configurations": 6,
+        "frozen_passed_column_all_true": null,
+        "pass": true
+      },
+      "pass": true
+    },
+    "state_map": {
+      "feature_names": [
+        "const",
+        "t_over_N",
+        "log_wealth_ratio",
+        "prev_risky_log_return"
+      ],
+      "n_features": 4,
+      "constant_feature_is_one": true,
+      "time_feature_is_t_over_N": true,
+      "log_wealth_feature": true,
+      "lagged_return_feature": true,
+      "r_minus_one_initialised_to_zero": true,
+      "lagged_return_updated_only_after_the_action_is_taken": true,
+      "pass": true
+    },
+    "wealth_recursion": {
+      "max_abs_error_log_growth_identity": 3.903127820947816e-16,
+      "max_abs_error_per_step_recursion": 0.0,
+      "max_abs_error_vs_frozen_wealth_engine": 0.0,
+      "frozen_tolerance": 1e-10,
+      "pass": true
+    },
+    "seeding": {
+      "forbidden_pattern_counts": {
+        "np_random_seed": 0,
+        "random_seed": 0,
+        "np_random_default_rng_from_time": 0,
+        "time_based_seed": 0,
+        "global_np_random_draw": 0
+      },
+      "no_forbidden_patterns": true,
+      "seed_namespaces": [
+        "EVAL_ENV",
+        "LEARNER",
+        "ORACLE_ENV",
+        "TRAIN_ENV",
+        "VERIFY_ENV"
+      ],
+      "base3_seed_root": 20260801,
+      "rng_is_hash_derived_not_global": true,
+      "definitions": {
+        "seed_of": "base3 code-cell concat line 435",
+        "rng_of": "base3 code-cell concat line 442"
+      },
+      "pass": true
+    },
+    "gate_mutations": {
+      "U0_source_identity": [
+        {
+          "control": "U0_BASELINE_HONEST_SOURCES",
+          "expect": "PASS",
+          "member_sha_ok": true,
+          "code_concat_ok": true,
+          "native_ast_mismatches": 0,
+          "train_sha_ok": true,
+          "observed": "PASS",
+          "pass": true
+        },
+        {
+          "control": "U0_M1_NOTEBOOK_SINGLE_BYTE_FLIP",
+          "expect": "FAIL",
+          "observed": "FROZEN_MEMBER_SHA256_MISMATCH",
+          "pass": true
+        },
+        {
+          "control": "U0_M2_SNAPSHOT_SINGLE_BYTE_FLIP",
+          "expect": "FAIL",
+          "observed": "SNAPSHOT_SHA256_MISMATCH",
+          "pass": true
+        },
+        {
+          "control": "U0_M3_FROZEN_ENGINE_CONSTANT_EDIT",
+          "expect": "FAIL",
+          "mutation": "BASE2_PARAMETERS.diffusion_scale last digit",
+          "constant_found_and_edited": true,
+          "observed": "FROZEN_MEMBER_SHA256_MISMATCH",
+          "native_ast_mismatches_after_mutation": [],
+          "pass": true
+        },
+        {
+          "control": "U0_M4_TRAINING_SLICE_REPLACED_BY_VALIDATION_WINDOW",
+          "expect": "FAIL",
+          "leaked_slice_sha256": "f97292b1ae8e1d02...",
+          "expected_train_sha256": "09811db465da1443...",
+          "observed": "TRAIN_SLICE_SHA256_MISMATCH",
+          "pass": true
+        }
+      ],
+      "U1_reproduction": [
+        {
+          "control": "U1_BASELINE_HONEST_LEDGER",
+          "expect": "PASS",
+          "observed": "BASE4_TARGET_REPRODUCTION_PASS_WITHIN_FROZEN_BACKEND_TOLERANCE",
+          "rows": 8,
+          "attempt_ids_all_match": true,
+          "pass": true
+        },
+        {
+          "control": "U1_M1_ENDPOINT_PERTURBED_BY_1e-3",
+          "expect": "FAIL",
+          "observed": "BLOCKED_REPRODUCTION",
+          "frozen_atol": 0.0002,
+          "pass": true
+        },
+        {
+          "control": "U1_M2_ATTEMPT_ID_CORRUPTED",
+          "expect": "FAIL",
+          "observed": "BLOCKED_REPRODUCTION_ATTEMPT_ID_MISMATCH",
+          "pass": true
+        },
+        {
+          "control": "U1_M3_REFERENCE_ROW_DELETED",
+          "expect": "FAIL",
+          "observed": "BLOCKED_REPRODUCTION_REFERENCE_ROWS_MISSING",
+          "missing_count": 1,
+          "pass": true
+        },
+        {
+          "control": "U1_M4_SUBSET_OVERRIDE_REFUSED_IN_RESEARCH",
+          "expect": "FAIL",
+          "observed": "REPRODUCTION_SUBSET_OVERRIDE_FORBIDDEN_OUTSIDE_SMOKE",
+          "pass": true
+        }
+      ],
+      "U2_calibration": [
+        {
+          "control": "U2_BASELINE_RECOVERS_KNOWN_SYNTHETIC_MOMENTS",
+          "expect": "PASS",
+          "target_m1": 0.0003,
+          "target_v1": 0.0002,
+          "abs_error_m1": 4.336808689942018e-19,
+          "abs_error_v1": 0.0,
+          "observed": "PASS",
+          "pass": true
+        },
+        {
+          "control": "U2_BASELINE_MONTE_CARLO_MOMENT_TEST",
+          "expect": "PASS",
+          "z_mean": 0.3637301094976344,
+          "z_variance": 0.6432162645217808,
+          "observed": "PASS",
+          "pass": true
+        },
+        {
+          "control": "U2_M1_SIMULATOR_VARIANCE_INFLATED_2_PERCENT",
+          "expect": "FAIL",
+          "detection_band_on_the_mean": 8.068715304598785e-05,
+          "injected": {
+            "scale": 1.02
+          },
+          "z_mean": 0.37100471484178416,
+          "z_variance": 20.69717374276873,
+          "mean_within": true,
+          "variance_within": false,
+          "observed": "FAIL",
+          "pass": true
+        },
+        {
+          "control": "U2_M2a_MEAN_SHIFTED_BY_HALF_THE_DETECTION_BAND",
+          "expect": "PASS",
+          "detection_band_on_the_mean": 8.068715304598785e-05,
+          "injected": {
+            "shift": 4.0343576522993926e-05
+          },
+          "z_mean": 2.3637300895793434,
+          "z_variance": 0.6432165944263528,
+          "mean_within": true,
+          "variance_within": true,
+          "observed": "PASS",
+          "pass": true
+        },
+        {
+          "control": "U2_M2b_MEAN_SHIFTED_BY_THREE_TIMES_THE_DETECTION_BAND",
+          "expect": "FAIL",
+          "detection_band_on_the_mean": 8.068715304598785e-05,
+          "injected": {
+            "shift": 0.00024206145913796356
+          },
+          "z_mean": 12.363730124473783,
+          "z_variance": 0.6432165831147918,
+          "mean_within": false,
+          "variance_within": true,
+          "observed": "FAIL",
+          "pass": true
+        },
+        {
+          "control": "U2_M3_SEED_NAMESPACE_COLLIDES_WITH_A_FROZEN_NAMESPACE",
+          "expect": "FAIL",
+          "n_collisions": 4,
+          "observed": "FAIL",
+          "pass": true
+        }
+      ],
+      "U3_positive_control": [
+        {
+          "control": "U3_BASELINE_TINY_POSITIVE_CONTROL",
+          "expect": "PASS",
+          "observed": "LEARNER_POSITIVE_CONTROL_PASS",
+          "gates": {
+            "PC1_PLUMBING": true,
+            "PC2_SATURATION": true,
+            "PC3_MOVEMENT": true,
+            "PC4_NON_VACUITY": true,
+            "PC5_ASCENT": true
+          },
+          "pass": true
+        },
+        {
+          "control": "U3_M1_GRADIENT_SIGN_FLIPPED",
+          "expect": "FAIL",
+          "observed": "LEARNER_POSITIVE_CONTROL_FAIL",
+          "gates": {
+            "PC1_PLUMBING": true,
+            "PC2_SATURATION": true,
+            "PC3_MOVEMENT": true,
+            "PC4_NON_VACUITY": true,
+            "PC5_ASCENT": false
+          },
+          "failing_gate_expected": "PC5_ASCENT",
+          "expected_gate_failed": true,
+          "pass": true
+        },
+        {
+          "control": "U3_M2_GRADIENT_ZEROED",
+          "expect": "FAIL",
+          "observed": "LEARNER_POSITIVE_CONTROL_FAIL",
+          "gates": {
+            "PC1_PLUMBING": false,
+            "PC2_SATURATION": true,
+            "PC3_MOVEMENT": false,
+            "PC4_NON_VACUITY": true,
+            "PC5_ASCENT": true
+          },
+          "failing_gate_expected": "PC3_MOVEMENT",
+          "expected_gate_failed": true,
+          "pass": true
+        },
+        {
+          "control": "U3_M3_NON_FINITE_WEALTH_INJECTED",
+          "expect": "FAIL",
+          "observed": "LEARNER_POSITIVE_CONTROL_FAIL",
+          "plumbing": {
+            "finite_wealth": false,
+            "finite_entropy": true,
+            "finite_latent": true,
+            "executed_in_support": true,
+            "gradient_finite": true,
+            "gradient_nonzero": true,
+            "critic_identified": true,
+            "no_ruin": true
+          },
+          "gates": {
+            "PC1_PLUMBING": false,
+            "PC2_SATURATION": true,
+            "PC3_MOVEMENT": true,
+            "PC4_NON_VACUITY": true,
+            "PC5_ASCENT": false
+          },
+          "pass": true
+        }
+      ],
+      "summary": {
+        "n_controls": 20,
+        "n_pass": 20,
+        "all_pass": true,
+        "n_negative_controls": 14,
+        "statement": "each gate is shown to pass on an honest fixture and to fail on a targeted corruption; a gate that cannot be made to fail is not a gate"
+      }
+    }
+  },
+  "theorem_code_map": [
+    {
+      "object": "T1 wealth coupling  X_{t+1}-X_t = log(1+A(e^r-1))",
+      "implementation": "rollout_states_actions / wealth_engine",
+      "source_location": "base3 code-cell concat line 2934",
+      "verification": "exact per-step identity and agreement with the frozen wealth engine",
+      "pass": true,
+      "observed": "identity 3.9e-16"
+    },
+    {
+      "object": "T1 third-order expansion coefficients",
+      "implementation": "sympy series of the same expression",
+      "source_location": "derivation only",
+      "verification": "symbolic coefficient identity plus O(r^4) remainder scaling",
+      "pass": true,
+      "observed": "coefficients identical; remainder ratio ~16"
+    },
+    {
+      "object": "state map  S_t=(1,t/N,log(W_t/W_0),r_{t-1})",
+      "implementation": "state_features + rollout timing",
+      "source_location": "base3 code-cell concat line 2727",
+      "verification": "feature-by-feature check and the r_{-1}=0 / lag-update-after-action contract",
+      "pass": true,
+      "observed": "all four features and both conventions verified"
+    },
+    {
+      "object": "truncated-Gaussian density and normalisation",
+      "implementation": "TruncatedGaussian / TruncatedGaussianBatch",
+      "source_location": "base3 code-cell concat line 2216",
+      "verification": "frozen run_policy_math_tests: logZ/mean/var/entropy/log-prob/scipy/mass",
+      "pass": true,
+      "observed": "worst scalar-batch 5.4e-10"
+    },
+    {
+      "object": "raw-to-policy smooth bounded transform and its Jacobian",
+      "implementation": "policy_from_raw_batch",
+      "source_location": "base3 code-cell concat line 2409",
+      "verification": "frozen evidence_transform_jacobian: analytic Jacobian vs finite difference",
+      "pass": true,
+      "observed": "max 4.8e-08"
+    },
+    {
+      "object": "policy entropy and its analytic gradient",
+      "implementation": "TruncatedGaussianBatch.entropy / entropy_gradient_batch",
+      "source_location": "base3 code-cell concat line 2509",
+      "verification": "frozen run_policy_math_tests entropy and entropy-gradient columns",
+      "pass": true,
+      "observed": "rel 8.0e-07"
+    },
+    {
+      "object": "T3 soft return-to-go  G_t = sum_{u>=t} D_u + m sum_{u>t} H_u",
+      "implementation": "soft_return_to_go",
+      "source_location": "base3 code-cell concat line 3221",
+      "verification": "exact match to the stated formula; H_t dropped because its score is zero",
+      "pass": true,
+      "observed": "err 2.1e-17"
+    },
+    {
+      "object": "critic target and value fit (baseline)",
+      "implementation": "fit_linear_critic / critic_values",
+      "source_location": "base3 code-cell concat line 3245",
+      "verification": "baseline invariance E[psi b(S)|S]=0 and rank/condition reporting",
+      "pass": true,
+      "observed": "max 3.2e-11"
+    },
+    {
+      "object": "T3 score  psi = grad_theta log lambda ; E[psi|S]=0",
+      "implementation": "TruncatedGaussianBatch.score_phi",
+      "source_location": "base3 code-cell concat line 2216",
+      "verification": "quadrature over the frozen density on frozen test regimes",
+      "pass": true,
+      "observed": "max 2.2e-12"
+    },
+    {
+      "object": "T3 gradient estimator and its sign",
+      "implementation": "actor_gradient (+ frozen actor_estimator_toy_test)",
+      "source_location": "base3 code-cell concat line 3435",
+      "verification": "frozen toy test against an analytic target, and score vs pathwise reparameterisation gradient of the frozen objective",
+      "pass": true,
+      "observed": "toy z<= 4.0; score-vs-pathwise max|z| 1.59"
+    },
+    {
+      "object": "T3 actor-parameter independence of the market kernel",
+      "implementation": "market batch construction precedes the actor",
+      "source_location": "merton_arm.train_merton_policy / simulate_three_channel_*",
+      "verification": "byte-identical market block across constructions; no actor argument; seed schedule free of actor state",
+      "pass": true,
+      "observed": "grad_theta log Q_L = 0"
+    },
+    {
+      "object": "T4 occupancy x soft-advantage representation of the gradient",
+      "implementation": "derivation, verified on an exactly enumerable model",
+      "source_location": "derivation only",
+      "verification": "brute-force trajectory enumeration vs occupancy/advantage form",
+      "pass": true,
+      "observed": "max gap 6.9e-12"
+    },
+    {
+      "object": "T4 two-channel split and its non-uniqueness",
+      "implementation": "derivation",
+      "source_location": "derivation only",
+      "verification": "both reference conventions sum to the total exactly; channels disagree",
+      "pass": true,
+      "observed": "occupancy channel differs by 1.5e-04 between conventions"
+    },
+    {
+      "object": "T5 lagged-return covariance channel",
+      "implementation": "derivation + frozen engine source structure",
+      "source_location": "base3 code-cell concat line 978",
+      "verification": "Cov(pibar, mu_L) exactly zero under iid, non-zero under the conditional law; frozen engine carries path functionals",
+      "pass": true,
+      "observed": "channel present under S, provably absent under M"
+    },
+    {
+      "object": "entropy time scaling  m = lambda * dt",
+      "implementation": "soft_return_to_go vs the continuous-time objective",
+      "source_location": "derivation only",
+      "verification": "sum identity, grid invariance and scale separation",
+      "pass": true,
+      "observed": "lambda equivalent of frozen m = 2.5"
+    },
+    {
+      "object": "seed namespaces; no hidden wall-clock seeding",
+      "implementation": "seed_of / rng_of",
+      "source_location": "base3 code-cell concat line 442",
+      "verification": "source scan for global/temporal seeding; hash-derived generators only",
+      "pass": true,
+      "observed": "forbidden patterns 0"
+    }
+  ]
+}
