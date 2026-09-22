@@ -112,3 +112,63 @@ Commit `0bdd16b` and its research-scale outputs are retained only as `DEVELOPMEN
 ### Claim status
 
 `CL-RL-006` remains **NOT_TESTED** until PMO audits the user's Colab research outputs. Code readiness does not promote a scientific claim.
+
+---
+
+## DEC-RL-004 — Direct Merton comparator accepted as scoped empirical paper evidence
+
+**Date:** 2026-09-22  
+**Decision:** `EMPIRICAL_EVIDENCE_ACCEPTED_WITH_SCOPE`; close the direct-comparator research question and move the project bottleneck to theory coupling.
+
+### Research evidence accepted
+
+The user Colab T4 run produced the intended research lineage:
+
+- U0 source identity/fingerprint completed;
+- U1 two-holdout Base 4 reproduction passed **bitwise exactly** on the 16 predeclared rows;
+- U2 empirical Merton/GBM calibration passed using the frozen training slice only;
+- U3 learner positive control passed;
+- U4 trained 80/80 empirical-GBM RL policies with no seed replacement;
+- U5 completed 24,000/24,000 Merton-on-SBJTS evaluations and reused the frozen 24,000 TT rows rather than retraining or re-evaluating the SBJTS arm;
+- U6 analytic Merton remained secondary/descriptive;
+- U7 produced the frozen crossed-cluster estimands.
+
+### Primary scientific result
+
+On the same frozen SBJTS target holdout:
+
+- FULL: `Delta_W = +0.0022063`; `Delta_CVaR = -0.0031810`;
+- CAP50: `Delta_W = +0.0005541`; `Delta_CVaR = -0.0007611`.
+
+The frozen crossed-cluster 95% intervals exclude zero for all four contrasts.
+
+PMO independently recomputed the contrasts from the raw TT and MT ledgers, obtaining 24,000 one-to-one matched pairs after removing the single previously known exact duplicate TT row. A stricter policy-level sensitivity analysis that collapses the 300 evaluation blocks within each training replication and bootstraps only the 40 paired policy units also leaves all four intervals away from zero, with the favorable sign in 40/40 replications for every endpoint/constraint stratum.
+
+### Mechanism evidence retained
+
+Average executed exposure is nearly identical across arms, so the gain is not primarily a leverage-level effect. Saved-policy analysis shows materially different state feedback:
+
+- FULL lag-return response slope of executed mean action: about `-0.674` for SBJTS versus `+0.015` for Merton;
+- FULL log-wealth response slope: about `-0.238` versus `-0.003`;
+- CAP50 shows the same qualitative separation.
+
+This supports the paper mechanism `training market law -> learned state feedback -> deployment outcome`, without claiming lagged return is the sole causal channel.
+
+### Scope restrictions retained
+
+- no universal superiority claim;
+- no pure-jump causal claim;
+- no external-market-validity claim from the current Base 2 ancestry;
+- no retrospective conversion to confirmatory superiority;
+- no claim that the four-feature learner observation is a complete Markov state;
+- no claim that truncated Gaussian is globally optimal under SBJTS.
+
+### Evidence preservation
+
+The research outputs remain on Google Drive and are now pinned in GitHub by Drive file ID, byte size and SHA-256 in `evidence/merton_comparator_v1/research/ARTIFACT_MANIFEST.json`. Compact mechanism/sensitivity evidence is also stored in the repository.
+
+### Next research action
+
+Open exactly one new executable ticket: `C-RLSBJTS-THEORY-COUPLING-01`.
+
+The next deliverable is formal theory: wealth-law coupling, moment-matching non-equivalence, likelihood-ratio policy gradient under history dependence/partial observation, occupancy/continuation-value decomposition, theorem-to-code mapping, and cheap gate-mutation tests. No additional research-scale training is authorized at this stage.
