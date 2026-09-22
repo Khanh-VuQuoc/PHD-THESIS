@@ -4,8 +4,8 @@
   "evidence_class": "SMOKE_EVIDENCE",
   "is_scientific_evidence": false,
   "is_research_scale_execution": false,
-  "generated_at_utc": "2026-09-22T03:04:34.337454+00:00",
-  "elapsed_s": 115.9,
+  "generated_at_utc": "2026-09-22T04:26:37.683810+00:00",
+  "elapsed_s": 117.8,
   "claim_status": "no comparator claim is created or modified by this package; the accepted empirical claim remains the domain-scoped statement in 02_CLAIM_LEDGER CL-RL-006",
   "frozen_source_identity": {
     "base3_notebook_sha256": "344956031d9e89763370a020d92ec54a669a7cc400e3d2b674de613897c02129",
@@ -28,8 +28,13 @@
     "note": "the calibrated values appear only as parameters of unit-test fixtures; no estimand is recomputed and no comparator number is produced here"
   },
   "per_check_pass": {
-    "t1_symbolic": true,
+    "entropy_scaling": true,
+    "frozen_math": true,
+    "seeding": true,
+    "state_map": true,
     "t1_remainder": true,
+    "t1_series_validity": true,
+    "t1_symbolic": true,
     "t2a_higher_moment": true,
     "t2b_conditional_law": true,
     "t3_1": true,
@@ -37,16 +42,16 @@
     "t3_3": true,
     "t3_4": true,
     "t3_5": true,
+    "t3_6": true,
     "t4": true,
     "t5": true,
-    "entropy_scaling": true,
-    "frozen_math": true,
-    "state_map": true,
     "wealth_recursion": true,
-    "seeding": true,
     "gate_mutations": true,
     "theorem_code_map": true
   },
+  "blocks_recorded_but_not_gated": [
+    "t1_moment_structure"
+  ],
   "all_pass": true,
   "checks": {
     "t1_symbolic": {
@@ -614,6 +619,199 @@
       "frozen_engine_signature_has_no_actor_argument": true,
       "pass": true,
       "statement": "the market transition kernel is constructed from a deterministic seed schedule before the actor acts and takes no actor argument, so grad_theta log Q_L = 0 and the trajectory score reduces to the sum of policy scores"
+    },
+    "t3_6": {
+      "source_evidence": {
+        "actor_gradient_contracts_with_the_state_matrix": true,
+        "state_matrix_is_the_rollout_state": true,
+        "raw_is_linear_in_the_state": true,
+        "state_features_include_the_log_wealth_ratio": true,
+        "log_wealth_ratio_is_unbounded_by_construction": "state_features takes log_wealth_ratio as a free float argument; no clip, bound or truncation is applied to it anywhere in the frozen state construction"
+      },
+      "chain_rule": {
+        "identity": "grad_{w[k]} log lambda = [J_transform(raw)^T grad_phi log lambda]_k * S_t",
+        "max_abs_error_vs_finite_difference": 1.1215394124519662e-06,
+        "max_relative_error_vs_finite_difference": 3.016525087158281e-09,
+        "relative_tolerance": 1e-06,
+        "fd_step": 1e-06,
+        "why_relative": "the gradient magnitude itself scales with ||S_t||, so the agreement is judged relative to the gradient norm rather than on an absolute scale",
+        "pass": true
+      },
+      "score_phi_is_bounded_but_grad_w_is_not": {
+        "witness_of_unboundedness": {
+          "label": "no state feedback in raw: grad_w proportional to ||S||",
+          "actor_weights": [
+            [
+              0.3,
+              0.0,
+              0.0,
+              0.0
+            ],
+            [
+              0.2,
+              0.0,
+              0.0,
+              0.0
+            ]
+          ],
+          "rows": [
+            {
+              "log_wealth_ratio": 1.0,
+              "state_norm": 1.5000333329629714,
+              "norm_score_phi": 8.511145540925273,
+              "norm_grad_w_log_lambda": 45.30197187893108,
+              "max_abs_chain_rule_vs_finite_difference": 1.480918498941719e-09,
+              "max_rel_chain_rule_vs_finite_difference": 6.56518346836235e-11
+            },
+            {
+              "log_wealth_ratio": 2.0,
+              "state_norm": 2.2913096691630312,
+              "norm_score_phi": 8.511145540925273,
+              "norm_grad_w_log_lambda": 69.19902639317473,
+              "max_abs_chain_rule_vs_finite_difference": 1.480918498941719e-09,
+              "max_rel_chain_rule_vs_finite_difference": 3.357002781031574e-11
+            },
+            {
+              "log_wealth_ratio": 4.0,
+              "state_norm": 4.153323970026899,
+              "norm_score_phi": 8.511145540925273,
+              "norm_grad_w_log_lambda": 125.4330564258825,
+              "max_abs_chain_rule_vs_finite_difference": 4.523172947301646e-09,
+              "max_rel_chain_rule_vs_finite_difference": 5.185423432481375e-11
+            },
+            {
+              "log_wealth_ratio": 8.0,
+              "state_norm": 8.07775340054399,
+              "norm_score_phi": 8.511145540925273,
+              "norm_grad_w_log_lambda": 243.95335047225717,
+              "max_abs_chain_rule_vs_finite_difference": 1.7928130091604544e-08,
+              "max_rel_chain_rule_vs_finite_difference": 1.0335764308741644e-10
+            },
+            {
+              "log_wealth_ratio": 16.0,
+              "state_norm": 16.039018049743568,
+              "norm_score_phi": 8.511145540925273,
+              "norm_grad_w_log_lambda": 484.3886656971292,
+              "max_abs_chain_rule_vs_finite_difference": 1.3977313528812374e-07,
+              "max_rel_chain_rule_vs_finite_difference": 4.040685036440653e-10
+            },
+            {
+              "log_wealth_ratio": 32.0,
+              "state_norm": 32.01952685471789,
+              "norm_score_phi": 8.511145540925273,
+              "norm_grad_w_log_lambda": 967.0103145534003,
+              "max_abs_chain_rule_vs_finite_difference": 1.1215394124519662e-06,
+              "max_rel_chain_rule_vs_finite_difference": 1.623469145125683e-09
+            }
+          ],
+          "norm_score_phi_range": [
+            8.511145540925273,
+            8.511145540925273
+          ],
+          "norm_grad_w_range": [
+            45.30197187893108,
+            967.0103145534003
+          ],
+          "grad_w_over_state_norm_ratio_range": [
+            30.200643468000433,
+            30.20064346800044
+          ],
+          "grad_w_proportional_to_state_norm": true,
+          "grad_w_growth_factor": 21.345876888929308,
+          "state_norm_growth_factor": 21.345876888929304,
+          "max_abs_chain_rule_error": 1.1215394124519662e-06,
+          "max_rel_chain_rule_error": 1.623469145125683e-09
+        },
+        "opposite_regime_for_contrast": {
+          "label": "wealth feedback present: tanh saturation dominates",
+          "actor_weights": [
+            [
+              0.3,
+              -0.1,
+              -0.4,
+              -0.9
+            ],
+            [
+              0.2,
+              0.1,
+              0.05,
+              -0.05
+            ]
+          ],
+          "rows": [
+            {
+              "log_wealth_ratio": 1.0,
+              "state_norm": 1.5000333329629714,
+              "norm_score_phi": 2.274940046204056,
+              "norm_grad_w_log_lambda": 15.656480064006484,
+              "max_abs_chain_rule_vs_finite_difference": 3.175868457105935e-10,
+              "max_rel_chain_rule_vs_finite_difference": 2.98198157949496e-11
+            },
+            {
+              "log_wealth_ratio": 2.0,
+              "state_norm": 2.2913096691630312,
+              "norm_score_phi": 5.834728365016204,
+              "norm_grad_w_log_lambda": 55.93133807698893,
+              "max_abs_chain_rule_vs_finite_difference": 3.0826541319584067e-09,
+              "max_rel_chain_rule_vs_finite_difference": 6.611095225827073e-11
+            },
+            {
+              "log_wealth_ratio": 4.0,
+              "state_norm": 4.153323970026899,
+              "norm_score_phi": 6.808450242524534,
+              "norm_grad_w_log_lambda": 109.46890384003133,
+              "max_abs_chain_rule_vs_finite_difference": 1.7195134205394424e-08,
+              "max_rel_chain_rule_vs_finite_difference": 1.6195876021972968e-10
+            },
+            {
+              "log_wealth_ratio": 8.0,
+              "state_norm": 8.07775340054399,
+              "norm_score_phi": 3.3748306747153864,
+              "norm_grad_w_log_lambda": 85.85571544515611,
+              "max_abs_chain_rule_vs_finite_difference": 1.59901532015283e-08,
+              "max_rel_chain_rule_vs_finite_difference": 1.858697828607668e-10
+            },
+            {
+              "log_wealth_ratio": 16.0,
+              "state_norm": 16.039018049743568,
+              "norm_score_phi": 0.7784414444655671,
+              "norm_grad_w_log_lambda": 22.50344451305271,
+              "max_abs_chain_rule_vs_finite_difference": 1.7220061132236508e-08,
+              "max_rel_chain_rule_vs_finite_difference": 7.343716615329034e-10
+            },
+            {
+              "log_wealth_ratio": 32.0,
+              "state_norm": 32.01952685471789,
+              "norm_score_phi": 0.18162103397283733,
+              "norm_grad_w_log_lambda": 2.5279298423771817,
+              "max_abs_chain_rule_vs_finite_difference": 1.0637438485616713e-08,
+              "max_rel_chain_rule_vs_finite_difference": 3.016525087158281e-09
+            }
+          ],
+          "norm_score_phi_range": [
+            0.18162103397283733,
+            6.808450242524534
+          ],
+          "norm_grad_w_range": [
+            2.5279298423771817,
+            109.46890384003133
+          ],
+          "grad_w_over_state_norm_ratio_range": [
+            0.07894963138734531,
+            26.35693835348037
+          ],
+          "grad_w_proportional_to_state_norm": false,
+          "grad_w_growth_factor": 0.16146220811079842,
+          "state_norm_growth_factor": 21.345876888929304,
+          "max_abs_chain_rule_error": 1.7220061132236508e-08,
+          "max_rel_chain_rule_error": 3.016525087158281e-09
+        },
+        "score_phi_constant_in_the_witness": true,
+        "statement": "at the witness parameter point the raw outputs do not depend on the state, so score_phi and the transform Jacobian are constant while ||grad_w log lambda|| = const * ||S_t|| exactly. Since the log-wealth coordinate of S_t is unbounded, sup over the state space of ||grad_theta log lambda|| is infinite. In the contrasting regime a non-zero wealth coefficient pushes raw into tanh saturation and the same norm decays instead, so the transform alone determines neither a bound nor a growth rate",
+        "pass": true
+      },
+      "consequence_for_A4": "A4 must not be reduced to a condition on the soft return alone. A sufficient mixed condition is E[(1 + max_t ||S_t||)(1 + |R_soft|)] < infinity uniformly on a local theta-neighbourhood; it is assumed, not verified for the frozen engine",
+      "pass": true
     },
     "t4": {
       "model": {
@@ -1530,12 +1728,20 @@
       "observed": "max 3.2e-11"
     },
     {
-      "object": "T3 score  psi = grad_theta log lambda ; E[psi|S]=0",
+      "object": "T3 POLICY-PARAMETER score  psi_phi = grad_phi log lambda ; E[psi_phi|S]=0 (bounded on the frozen phi box)",
       "implementation": "TruncatedGaussianBatch.score_phi",
       "source_location": "base3 code-cell concat line 2216",
       "verification": "quadrature over the frozen density on frozen test regimes",
       "pass": true,
       "observed": "max 2.2e-12"
+    },
+    {
+      "object": "T3 ACTOR-WEIGHT score  grad_theta log lambda = [J_transform(raw)^T psi_phi] (x) S_t  -- chains through the state features and is NOT uniformly bounded over the state space",
+      "implementation": "actor_gradient (einsum with roll['states']) via LinearActor.latent and state_features",
+      "source_location": "base3 code-cell concat line 3435",
+      "verification": "chain rule vs finite differences in the actor weights, plus a witness parameter point where the norm is exactly proportional to ||S_t|| and a contrasting saturating point where it decays",
+      "pass": true,
+      "observed": "relative chain-rule error 3.0e-09; grad_w / ||S|| constant to 7.1e-15"
     },
     {
       "object": "T3 gradient estimator and its sign",

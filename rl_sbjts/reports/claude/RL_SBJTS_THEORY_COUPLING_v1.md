@@ -2,9 +2,9 @@
 
 **Ticket:** `C-RLSBJTS-THEORY-COUPLING-01`  
 **Status:** `READY_FOR_PMO_THEORY` — derivation, theorem-to-code verification and unit/mutation tests only.  
-**Revision:** second submission, patching commit `64cd35b` per the PMO audit (DEC-RL-005, patches P1–P5). See *Patch response* below.  
+**Revision:** third submission. Patches P1–P5 applied to commit `64cd35b` (DEC-RL-005); patch P6 applied to commit `6bc4796` per `reports/pmo/PMO_THEORY_COUPLING_PATCH_AUDIT_v2.md`. P6 touches T3 regularity only — T1–T5 substance is unchanged. See *Patch response* below.  
 **Execution class:** `SMOKE_EVIDENCE`. No research-scale training or evaluation was run; no estimand was recomputed; no claim was created or modified.  
-**Generated:** 2026-09-22T03:04:34.337454+00:00 · full package runs in 115.9 s on CPU.
+**Generated:** 2026-09-22T04:26:37.683810+00:00 · full package runs in 117.8 s on CPU.
 
 **Frozen sources this package is written against**
 
@@ -23,6 +23,7 @@ This revision addresses the five requested patches. Nothing else in the submissi
 | **P3** | explicit integrability assumptions | (A3) is restated as a structural property of the frozen policy class; (A4) is now an explicit domination condition reduced to first-moment integrability of terminal log wealth; (A4′) **withdraws** the bounded-support justification and says plainly that this is an assumption on the training law, not a verified property. |
 | **P4** | correct the finite-difference claim | §T3.4 is reframed as an independent numerical agreement check that is explicitly *not* the proof, with the $O(h^2)$ truncation error named and **measured** by refining $h\to h/2$ alongside the Monte Carlo error. |
 | **P5** | symmetric T4 decomposition | The symmetric midpoint identity is adopted for the manuscript, verified on the enumerable fixture (residual exactly 0.0, equal to the mean of the two reference splits), with the common dominating measure named explicitly. The S- and M-reference splits are retained as supporting identities, the entropy-occupancy term stays separate, and the attribution-not-causation caveat is stated. |
+| **P6** | score regularity must account for state dependence | New §T3.0 distinguishes the bounded policy-parameter score `score_phi` from the actor-weight score $\nabla_\theta\log\lambda$, which chains through the state features. The reduction of (A4) to $E\lvert X_N-X_0\rvert<\infty$ is **withdrawn**; (A4) stays a general domination assumption and (A4-mixed) gives the explicit mixed state/soft-return moment condition. The theorem-to-code map now carries both scores as separate rows. |
 
 Preserved unchanged: the partial-observation treatment, the critic finite-sample-bias caveat, the non-pure-jump interpretation, the entropy time-scaling discipline, and the T5 non-claim.
 
@@ -137,6 +138,47 @@ Let $H_t$ be the full simulator history state, $S_t=g(H_t,W_t)=(1,t/N,\log(W_t/W
 
 $$ p_{\theta,L}(\tau)=p_0(H_0)\prod_{t=0}^{N-1}\lambda_\theta(A_t\mid S_t)\,Q_L(dH_{t+1}\mid H_t,A_t). $$
 
+### T3.0 Two different scores, and why the distinction matters
+
+The frozen learner has two nested parameterisations, and conflating their scores is what produced the withdrawn regularity claim in the previous revision.
+
+- **Policy-parameter score.** With $\phi=(\text{loc},\phi_2)$ and $\text{scale}^2=e^{\phi_2}m$, the frozen `score_phi` returns $\psi_\phi=\nabla_\phi\log\lambda_\phi(a)$. This one *is* bounded on the frozen $\phi$ box, because the location is confined to the constraint interval and the scale to $[\text{scale\_floor},\text{scale\_ceiling}]$.
+- **Actor-weight score.** The learned parameter is the actor weight matrix $\theta=w$, and the frozen actor is linear: $\text{raw}_k=S_t\cdot w[k]$. So the score that appears in the policy gradient is obtained by the chain rule
+
+$$ \nabla_{w[k]}\log\lambda_\theta(A_t\mid S_t)=\big[J_{\rm transform}(\text{raw})^{\!\top}\psi_\phi\big]_k\;S_t^{\!\top}, $$
+
+  which carries an explicit factor of the **state features**. This is not an interpretation of the code; it is what the code computes. The frozen `actor_gradient` forms `g_raw` from `score_phi` and the transform Jacobians `J11, J12, J22`, then contracts with the state matrix:
+
+```python
+sc      = law.score_phi(roll["actions"], m)        # (P, N, 2), wrt phi
+g_raw1  = roll["J11"] * g_phi[..., 0]
+g_raw2  = roll["J12"] * g_phi[..., 0] + roll["J22"] * g_phi[..., 1]
+grad    = np.einsum("ptk,ptf->kf", coeff, S) / float(P)   # S = roll["states"]
+```
+
+Verified statically against the frozen source: the contraction with the state matrix (`True`), the state matrix being the rollout state (`True`), the raw output being linear in the state (`True`), and the state carrying the log-wealth ratio (`True`). The frozen `state_features` takes the log-wealth ratio as a free float argument; no clip, bound or truncation is applied to it anywhere in the frozen state construction.
+
+The chain-rule identity itself is checked numerically against central differences in the actor weights: worst relative error 3.0e-09 at $h=10^{-6}$ (relative because the quantity being checked scales with the state norm).
+
+**What transfers and what does not.**
+
+The *zero-mean lemma transfers*, which is why the quadrature checks below are sufficient. Both $J_{\rm transform}(\text{raw})$ and $S_t$ are $S_t$-measurable, so
+
+$$ E\big[\nabla_\theta\log\lambda_\theta\,\big|\,S_t\big]=\big[J_{\rm transform}^{\!\top}\,E(\psi_\phi\mid S_t)\big]\,S_t^{\!\top}=0 \quad\text{whenever}\quad E(\psi_\phi\mid S_t)=0, $$
+
+so verifying $E[\psi_\phi\mid S_t]=0$ by quadrature (T3.1) establishes the lemma for the full actor score as well.
+
+**Uniform boundedness does not transfer.** Take a parameter point whose raw outputs carry no state feedback (only intercepts). Then $\psi_\phi$ and $J_{\rm transform}$ are constant in the state, and $\lVert\nabla_\theta\log\lambda\rVert=\text{const}\cdot\lVert S_t\rVert$ **exactly**:
+
+| regime | $\lVert\psi_\phi\rVert$ range | $\lVert\nabla_\theta\log\lambda\rVert$ range | growth over the grid | $\lVert S_t\rVert$ growth |
+|---|---|---|---|---|
+| no state feedback in raw (**witness**) | 8.511 – 8.511 | 45.30 – 967.01 | 21.346× | 21.346× |
+| wealth feedback present (contrast) | 0.182 – 6.808 | 2.53 – 109.47 | 0.161× | 21.346× |
+
+In the witness regime the ratio $\lVert\nabla_\theta\log\lambda\rVert/\lVert S_t\rVert$ is constant to 7.1e-15 across a log-wealth sweep, and the growth factor matches the state-norm growth factor to the digit (21.346× versus 21.346×). Since the log-wealth coordinate of $S_t$ is unbounded, $\sup_s\lVert\nabla_\theta\log\lambda(a\mid s)\rVert=\infty$. The bounded policy transform therefore does **not** dominate the actor score.
+
+The contrast row is recorded because the behaviour is direction dependent and the manuscript should not overclaim in either direction: with a non-zero wealth coefficient the raw output is driven into `tanh` saturation, $J_{\rm transform}\to0$ exponentially, and the same norm *decays* (0.161× over the same sweep). So the transform yields neither a uniform bound nor a uniform growth rate; a domination assumption is genuinely needed, in the mixed form given as (A4-mixed) below.
+
 ### Assumptions
 
 - **(A1) actor-parameter independence of the market kernel.** $Q_L$ does not depend on $\theta$. Verified in code, not assumed: see T3.5.
@@ -146,8 +188,13 @@ $$ p_{\theta,L}(\tau)=p_0(H_0)\prod_{t=0}^{N-1}\lambda_\theta(A_t\mid S_t)\,Q_L(
 
 $$ \Big|R^{\rm soft}_\theta(\tau)\sum_t\psi_\theta(A_t,S_t)\Big|+\Big|m\sum_t\partial_\theta\mathcal H(\lambda_\theta(\cdot\mid S_t))\Big|\;\le\;\Phi(\tau),\qquad E_{\theta_0}[\Phi]<\infty. $$
 
-  This is the sufficient condition for differentiating under the expectation and for the two-term product rule below. **It is stated as an assumption, not derived from the SBJTS law.** What the frozen implementation does supply is the part that depends on the policy, not the market: by (A3), $|\psi_\theta|$ and $|\partial_\theta\mathcal H|$ are bounded uniformly on $U\times$(action interval), so a sufficient condition reduces to $E\big[\sup_{\theta\in U}|R^{\rm soft}_\theta(\tau)|\big]<\infty$, i.e. an integrability requirement on the soft return alone. Since $R^{\rm soft}=X_N-X_0+m\sum_t\mathcal H_t$ and the entropy term is bounded under (A3), it reduces further to $E|X_N-X_0|<\infty$: **first-moment integrability of terminal log wealth under the training law**.
-- **(A4′) what is *not* claimed.** The first submission justified (A4) by asserting that the simulated returns have bounded support. That is withdrawn: nothing verified here bounds the support of the frozen SBJTS return law, and its jump component is not shown to be bounded. The correct status is that $E|X_N-X_0|<\infty$ is an assumption on the training law. It is a weak one — under a long-only action $a\in[0,1]$ one has $0\le 1+a(e^r-1)\le\max(1,e^r)$, so $X_N-X_0\le\sum_t r_t^+$ and a finite first moment of the positive part of the return suffices for the upper bound — but the lower tail is genuinely a condition on $L$, and this report does not verify it for the frozen engine.
+  This is the sufficient condition for differentiating under the expectation and for the two-term product rule below. **It is stated as an assumption and is not reduced further.** In particular it is *not* claimed to follow from the bounded policy transform: as §T3.0 shows, the actor-weight score carries a factor $S_t$, which is not bounded, so (A3) alone does not dominate the integrand.
+- **(A4-mixed) an explicit sufficient form.** For the finite horizon $N$, a manuscript-safe sufficient condition that dominates both the score-weighted soft return and the direct entropy derivative is
+
+$$ \sup_{\theta\in U}\;E\Big[\big(1+\max_{t\le N}\lVert S_t\rVert\big)\big(1+\lvert R^{\rm soft}_\theta(\tau)\rvert\big)\Big]\;<\;\infty. $$
+
+  This is a **mixed state / soft-return moment condition**, and the mixing is the point: the chain rule multiplies the soft return by the state norm, so a condition on either factor separately will not dominate the product. Given (A3) and the compact action interval, the per-step factors $\lVert J_{\rm transform}(\text{raw})\rVert$ and $\lVert\psi_\phi\rVert$ are bounded uniformly on $U$, so the displayed condition dominates $\lvert R^{\rm soft}\sum_t\psi_\theta\rvert$ and $\lvert m\sum_t\partial_\theta\mathcal H\rvert$ term by term, the finite horizon absorbing the sum over $t$. It may be assumed on the training law; the theorem is then presented **conditionally**, which is what the manuscript requires.
+- **(A4′) what is *not* claimed.** Two justifications are withdrawn and should not reappear. First, that the simulated returns have bounded support: nothing verified here bounds the support of the frozen SBJTS return law, and its jump component is not shown to be bounded. Second — corrected in this revision — that (A4) *reduces* to first-moment integrability of terminal log wealth, $E\lvert X_N-X_0\rvert<\infty$. That reduction presumed a uniformly bounded actor score and is **false** for the frozen parameterisation; see §T3.0. Neither condition is verified for the frozen engine, and (A4) / (A4-mixed) stands as an assumption on the training law.
 
 **$S_t$ is nowhere assumed to be a Markov state.** The correct object is a history-state process with an observation-based policy; the derivation uses only that the policy is $S_t$-measurable and that $Q_L$ is $\theta$-free.
 
@@ -176,11 +223,12 @@ is therefore not an arbitrary convention: it removes a provably zero-expectation
 
 | check | what it establishes | observed | tolerance | pass |
 |---|---|---|---|---|
-| T3.1 $E[\psi\mid S]=0$ | the lemma, on 38 frozen resolvable test regimes by quadrature | 2.2e-12 | 1e-08 | True |
-| T3.2 baseline invariance | $E[\psi\,b(S)\mid S]=0$ for arbitrary $b$ | 3.2e-11 | 1e-06 | True |
+| T3.1 $E[\psi_\phi\mid S]=0$ | the lemma for the policy-parameter score, on 38 frozen resolvable test regimes by quadrature; transfers to the actor score by §T3.0 | 2.2e-12 | 1e-08 | True |
+| T3.2 baseline invariance | $E[\psi_\phi\,b(S)\mid S]=0$ for arbitrary $b$ | 3.2e-11 | 1e-06 | True |
 | T3.3 entropy convention | frozen `soft_return_to_go` equals $\sum_{u\ge t}\Delta_u+m\sum_{u>t}\mathcal H_u$ | 2.1e-17 | 1e-12 | True |
 | T3.4 numerical agreement | score estimator vs a CRN pathwise finite difference — a cross-check, **not** the proof | max $\|z\|$ = 1.59 | 4$\sigma$ | True |
 | T3.5 $\nabla_\theta\log Q_L=0$ | (A1), in code | see below | exact | True |
+| T3.6 score chain | $\nabla_\theta\log\lambda$ chains through $S_t$ and is not uniformly bounded (§T3.0) | rel. 3.0e-09 | 1e-06 | True |
 
 T3.3 is not vacuous: the two conventions differ numerically by 0.0145 on the fixture, yet both give the same gradient in expectation.
 
@@ -308,7 +356,8 @@ Machine-readable copy: `evidence/theory_coupling_v1/theorem_code_map.csv`.
 | policy entropy and its analytic gradient | `TruncatedGaussianBatch.entropy / entropy_gradient_batch` | frozen run_policy_math_tests entropy and entropy-gradient columns | rel 8.0e-07 | True |
 | T3 soft return-to-go  G_t = sum_{u>=t} D_u + m sum_{u>t} H_u | `soft_return_to_go` | exact match to the stated formula; H_t dropped because its score is zero | err 2.1e-17 | True |
 | critic target and value fit (baseline) | `fit_linear_critic / critic_values` | baseline invariance E[psi b(S)\|S]=0 and rank/condition reporting | max 3.2e-11 | True |
-| T3 score  psi = grad_theta log lambda ; E[psi\|S]=0 | `TruncatedGaussianBatch.score_phi` | quadrature over the frozen density on frozen test regimes | max 2.2e-12 | True |
+| T3 POLICY-PARAMETER score  psi_phi = grad_phi log lambda ; E[psi_phi\|S]=0 (bounded on the frozen phi box) | `TruncatedGaussianBatch.score_phi` | quadrature over the frozen density on frozen test regimes | max 2.2e-12 | True |
+| T3 ACTOR-WEIGHT score  grad_theta log lambda = [J_transform(raw)^T psi_phi] (x) S_t  -- chains through the state features and is NOT uniformly bounded over the state space | `actor_gradient (einsum with roll['states']) via LinearActor.latent and state_features` | chain rule vs finite differences in the actor weights, plus a witness parameter point where the norm is exactly proportional to \|\|S_t\|\| and a contrasting saturating point where it decays | relative chain-rule error 3.0e-09; grad_w / \|\|S\|\| constant to 7.1e-15 | True |
 | T3 gradient estimator and its sign | `actor_gradient (+ frozen actor_estimator_toy_test)` | frozen toy test against an analytic target, and score vs pathwise reparameterisation gradient of the frozen objective | toy z<= 4.0; score-vs-pathwise max\|z\| 1.59 | True |
 | T3 actor-parameter independence of the market kernel | `market batch construction precedes the actor` | byte-identical market block across constructions; no actor argument; seed schedule free of actor state | grad_theta log Q_L = 0 | True |
 | T4 occupancy x soft-advantage representation of the gradient | `derivation, verified on an exactly enumerable model` | brute-force trajectory enumeration vs occupancy/advantage form | max gap 6.9e-12 | True |
@@ -395,7 +444,7 @@ The accepted empirical claim remains the domain-scoped statement of `CL-RL-006`:
 2. **The conditional-law diagnostic is specified but not executed.** T5 is a structural result. Closing the attribution needs the estimand named in `unit_checks.json`: the frozen conditional mean $\mu_S(r_{\rm prev})=E_S(r_t\mid r_{t-1})$, and a lag-ablation contrast obtained by retraining with the $r_{t-1}$ coordinate zeroed out of the frozen state. Both exceed unit scale, and `00_CURRENT_STATE` reserves that decision for PMO, so it is specified rather than run. **`SCOPE CHANGE REQUEST — PMO DECISION REQUIRED`.**
 3. **The fitted critic is not part of the theorem.** The frozen critic is refit on the same batch that supplies the actions, so the baselined estimator is not provably unbiased at finite sample. Measured deviation from the unbiased unbaselined estimator is 0.54 standard errors, i.e. within noise here. The manuscript should present the critic as a variance-reduction device and not lean on it in the gradient statement.
 4. **T2b's maximiser under the dependent law is unbounded in the searched range.** The exact-zero-versus-nonzero contrast at $b_{\rm lag}=0$ is the rigorous content; the magnitude of the optimal lag coefficient is not, because the objective is monotone in $|b_{\rm lag}|$ toward a bang-bang limit over the range searched. The text should use the derivative statement, not an optimal-coefficient figure.
-5. **The T1 series conditions are stated but not verified for the frozen engine.** Per P1 the report now gives a precise sufficient condition — long-only actions and returns inside the disc of radius $\pi$, which the frozen training slice satisfies with room to spare (largest increment 0.1559, 4.96% of the radius). It is **not** verified for the frozen SBJTS deployment law, whose jump sizes are not bounded by anything established here. Checking it would take a bounded-jump argument or a tail bound on the frozen engine's jump law; until then the manuscript should use the finite-order form with remainder on jump steps, or the exact coupling, which needs no expansion. Likewise the (A4) integrability condition of P3 is assumed, not proved, for the frozen law.
+5. **The T1 series conditions are stated but not verified for the frozen engine.** Per P1 the report now gives a precise sufficient condition — long-only actions and returns inside the disc of radius $\pi$, which the frozen training slice satisfies with room to spare (largest increment 0.1559, 4.96% of the radius). It is **not** verified for the frozen SBJTS deployment law, whose jump sizes are not bounded by anything established here. Checking it would take a bounded-jump argument or a tail bound on the frozen engine's jump law; until then the manuscript should use the finite-order form with remainder on jump steps, or the exact coupling, which needs no expansion. The same status applies to the T3 domination condition: (A4) / (A4-mixed) is assumed, not proved, for the frozen law. §T3.0 shows why no shortcut is available — the actor score is unbounded over the state space at some parameter points and decays at others, so a genuine mixed state/soft-return moment condition is required and the theorem is presented conditionally on it.
 
 ## Files
 
@@ -403,4 +452,6 @@ The accepted empirical claim remains the domain-scoped statement of `CL-RL-006`:
 - `evidence/theory_coupling_v1/unit_checks.json` — every check, its inputs, its tolerance and its outcome
 - `evidence/theory_coupling_v1/theorem_code_map.csv` — the map above, machine readable
 
-All 18 check groups pass; the package runs in 115.9 s on CPU with no research-scale execution.
+All 20 gated check groups pass and all 19 theorem-to-code rows pass; the package runs in 117.8 s on CPU with no research-scale execution.
+
+One housekeeping correction made in this revision: the pass aggregation previously ran over a hardcoded list of check names, so the `t1_series_validity` block added in P1 and the `t3_6` block added in P6 were written into the evidence without being covered by `all_pass`. Both passed on their own, so nothing was misreported, but a gate that silently omits checks is not a gate. The aggregation now derives its key set from the blocks actually computed and **raises** if any of them carries no verdict field, rather than defaulting it to pass. Exactly 1 block is recorded but deliberately not gated (`t1_moment_structure`), because it is a record of the expansion polynomials rather than a test.

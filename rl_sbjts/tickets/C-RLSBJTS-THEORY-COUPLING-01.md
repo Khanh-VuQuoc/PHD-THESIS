@@ -307,3 +307,88 @@ interpretation, the entropy time-scaling discipline (`m = λ·dt`, frozen `m=0.0
 `λ=2.5`), and the T5 non-claim. The `SCOPE CHANGE REQUEST — PMO DECISION REQUIRED` for
 the conditional-law / lag-ablation diagnostic also stands: still specified, still not
 executed.
+
+### 2026-09-22 — Claude — P6 patch submission — `READY_FOR_PMO_THEORY`
+
+P6 only, per `reports/pmo/PMO_THEORY_COUPLING_PATCH_AUDIT_v2.md`. **T1–T5 substance is
+unchanged**; the diff is confined to T3 regularity, the two score rows of the
+theorem-to-code map, and one housekeeping fix noted below. No training, holdout
+evaluation, Colab run or new empirical estimand. Cheap unit/static fixture re-run in
+full: 117.8 s on CPU, 20 gated check groups and 19 theorem-to-code rows all pass. `main`
+synced first; PMO state, decision log, claim ledger and frozen evidence untouched.
+
+**The audit is right, and the previous reduction was wrong.** `grad_theta log lambda` is
+not dominated by the bounded policy transform, because the frozen actor is linear in the
+state: `raw_k = S_t . w[k]`, so the chain rule gives
+
+    grad_{w[k]} log lambda = [ J_transform(raw)^T grad_phi log lambda ]_k * S_t,
+
+and `S_t` carries `log(W_t/W_0)`, which nothing bounds.
+
+New §T3.0 in the report distinguishes the two scores and establishes the point rather
+than asserting it:
+
+- **Static source evidence.** The frozen `actor_gradient` literally contracts against the
+  state matrix — `grad = np.einsum("ptk,ptf->kf", coeff, S)` with `S = roll["states"]` —
+  `LinearActor.latent` returns `S @ self.w[0], S @ self.w[1]`, and `state_features`
+  returns `np.stack([ones, tt, lw, pr], axis=-1)` with `lw` a free float argument carrying
+  no clip, bound or truncation. All four checks True.
+- **Chain rule verified numerically.** Against central differences in the actor weights,
+  worst relative error 3.0e-09 at h = 1e-6. Relative rather than absolute because the
+  quantity being checked itself scales with the state norm.
+- **Witness of non-uniform-boundedness.** At a parameter point whose raw outputs carry no
+  state feedback, `score_phi` is exactly constant (norm 8.511 across the whole sweep)
+  while `||grad_w log lambda||` runs 45.30 -> 967.01, with the ratio to `||S_t||` constant
+  to 7.1e-15 and the growth factor matching the state-norm growth factor to the digit
+  (21.346x versus 21.346x). Since the log-wealth coordinate is unbounded,
+  `sup_s ||grad_theta log lambda|| = infinity`.
+- **Contrast regime, recorded deliberately.** With a non-zero wealth coefficient the raw
+  output is driven into `tanh` saturation, `J_transform -> 0` exponentially, and the same
+  norm *decays* (0.161x over the identical sweep). So the transform yields neither a
+  uniform bound nor a uniform growth rate, and the behaviour is direction dependent. The
+  manuscript should not overclaim in either direction.
+
+**Assumption changes.** The reduction of (A4) to `E|X_N-X_0| < infinity` is **withdrawn**
+and named as withdrawn in (A4'), alongside the previously withdrawn bounded-support
+rationale. (A4) stays a general domination assumption, and a new (A4-mixed) gives the
+explicit mixed state/soft-return moment condition
+
+    sup_{theta in U} E[ (1 + max_{t<=N} ||S_t||) (1 + |R_soft_theta(tau)|) ] < infinity,
+
+with the reason the mixing is necessary: the chain rule multiplies the soft return by the
+state norm, so a condition on either factor alone does not dominate the product. Given
+(A3) and the compact action interval the per-step factors `||J_transform||` and
+`||psi_phi||` are bounded on `U`, so this condition dominates both the score-weighted soft
+return and the direct entropy derivative term by term, the finite horizon absorbing the
+sum over `t`. It is assumed on the training law and the theorem is presented conditionally
+on it, as the audit permits.
+
+**What still transfers.** The zero-mean lemma is unaffected and this is now stated
+explicitly: `J_transform` and `S_t` are both `S_t`-measurable, so
+`E[grad_theta log lambda | S_t] = [J^T E(psi_phi | S_t)] S_t^T = 0` whenever
+`E[psi_phi | S_t] = 0`. The existing T3.1 quadrature check on `psi_phi` therefore
+establishes the lemma for the full actor score, and T3.1/T3.2 are relabelled `psi_phi` to
+make the scope exact.
+
+**Theorem-to-code map.** The single conflated score row is split into two: a
+POLICY-PARAMETER score row (`score_phi`, bounded on the frozen phi box) and an
+ACTOR-WEIGHT score row (`grad_theta log lambda = [J_transform^T psi_phi] (x) S_t`, chains
+through the state features, not uniformly bounded), the latter carrying the new `t3_6`
+verification. Map grows 18 -> 19 rows.
+
+**Housekeeping fix, disclosed.** While wiring `t3_6` in I found that the pass aggregation
+ran over a hardcoded list of check names, so `t1_series_validity` (added in P1) and
+`t3_6` were written into the evidence file without being covered by `all_pass`. Both
+passed on their own, so nothing was misreported, but a gate that silently omits checks is
+not a gate. The aggregation now derives its key set from the blocks actually computed and
+raises if any of them carries no verdict field instead of defaulting it to pass;
+`blocks_recorded_but_not_gated` records the one deliberate exclusion
+(`t1_moment_structure`, a record of the expansion polynomials rather than a test). Gated
+groups 18 -> 20.
+
+Preserved unchanged: T1 local expansion and its convergence conditions, T2 both
+non-equivalence constructions, T4 symmetric midpoint decomposition and the S/M supporting
+identities, T5 structural result and non-claim, the partial-observation treatment, the
+critic finite-sample-bias caveat, the entropy time-scaling discipline, and the standing
+`SCOPE CHANGE REQUEST — PMO DECISION REQUIRED` for the conditional-law / lag-ablation
+diagnostic.
