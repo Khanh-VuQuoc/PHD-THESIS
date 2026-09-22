@@ -1,0 +1,28 @@
+{
+  "date": "2026-09-22",
+  "protocol_id": "c9ef65485a49d40356f3bbb02d491c4b73fcc9ebf0a22f02f64ab87e04a590d4",
+  "research_lineage": "USER_COLAB_T4_RESEARCH_EVIDENCE",
+  "hardware": "NVIDIA Tesla T4 / TORCH_CUDA_FLOAT32_BATCHED market engine",
+  "reproduction_gate": "BASE4_TARGET_REPRODUCTION_PASS_EXACT",
+  "matched_pairs": 24000,
+  "merton_training": {"completed":80,"failed":0,"seed_replacements":0},
+  "merton_evaluation": {"completed":24000,"failed":0},
+  "primary": [
+    {"constraint":"LONG_ONLY_FULL","endpoint":"mean_terminal_log_wealth","sbjts_mean":0.01484303205756342,"merton_mean":0.012636714835138634,"delta":0.0022063172224247854,"crossed_ci_low":0.002172621754354325,"crossed_ci_high":0.0022422710416884445,"policy_level_ci_low":0.002180913107379879,"policy_level_ci_high":0.0022333693761159763,"favorable_replications":"40/40"},
+    {"constraint":"LONG_ONLY_FULL","endpoint":"cvar_log_loss","sbjts_mean":0.0838585274617056,"merton_mean":0.08703948132638266,"delta":-0.00318095386467705,"crossed_ci_low":-0.0033636217861181374,"crossed_ci_high":-0.0029956024414749946,"policy_level_ci_low":-0.0032173880037773806,"policy_level_ci_high":-0.003143887840969956,"favorable_replications":"40/40"},
+    {"constraint":"LONG_ONLY_CAP50","endpoint":"mean_terminal_log_wealth","sbjts_mean":0.00752283598687836,"merton_mean":0.006968744283455719,"delta":0.0005540917034226411,"crossed_ci_low":0.000544995,"crossed_ci_high":0.00056374,"policy_level_ci_low":0.000547440388944327,"policy_level_ci_high":0.0005610852544821491,"favorable_replications":"40/40"},
+    {"constraint":"LONG_ONLY_CAP50","endpoint":"cvar_log_loss","sbjts_mean":0.041546635,"merton_mean":0.042307699,"delta":-0.0007610644145843932,"crossed_ci_low":-0.00081033,"crossed_ci_high":-0.00071250,"policy_level_ci_low":-0.0007692643945389206,"policy_level_ci_high":-0.0007524190904537375,"favorable_replications":"40/40"}
+  ],
+  "average_exposure": {
+    "LONG_ONLY_FULL":{"SBJTS":0.500677,"MERTON":0.499760},
+    "LONG_ONLY_CAP50":{"SBJTS":0.249915,"MERTON":0.249670}
+  },
+  "executed_mean_action_local_slopes_at_t_half_wealth_zero_lag_zero": [
+    {"constraint":"LONG_ONLY_FULL","coordinate":"lag_return","SBJTS":-0.6742324668464471,"MERTON":0.014525907735526977},
+    {"constraint":"LONG_ONLY_FULL","coordinate":"logwealth","SBJTS":-0.23769618361775544,"MERTON":-0.0032518166061257237},
+    {"constraint":"LONG_ONLY_CAP50","coordinate":"lag_return","SBJTS":-0.21037842656103717,"MERTON":0.0061002136763736725},
+    {"constraint":"LONG_ONLY_CAP50","coordinate":"logwealth","SBJTS":-0.07551100516310985,"MERTON":-0.00953050689058571}
+  ],
+  "claim_scope": "Domain-scoped training-law advantage on the tested frozen SBJTS deployment law; no universal superiority or pure-jump causal claim.",
+  "raw_artifact_manifest": "ARTIFACT_MANIFEST.json"
+}
