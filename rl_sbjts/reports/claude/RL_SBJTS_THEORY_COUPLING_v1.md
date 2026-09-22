@@ -2,14 +2,31 @@
 
 **Ticket:** `C-RLSBJTS-THEORY-COUPLING-01`  
 **Status:** `READY_FOR_PMO_THEORY` — derivation, theorem-to-code verification and unit/mutation tests only.  
+**Revision:** second submission, patching commit `64cd35b` per the PMO audit (DEC-RL-005, patches P1–P5). See *Patch response* below.  
 **Execution class:** `SMOKE_EVIDENCE`. No research-scale training or evaluation was run; no estimand was recomputed; no claim was created or modified.  
-**Generated:** 2026-09-22T02:24:58.433008+00:00 · full package runs in 74.8 s on CPU.
+**Generated:** 2026-09-22T03:04:34.337454+00:00 · full package runs in 115.9 s on CPU.
 
 **Frozen sources this package is written against**
 
 - Base 3 embedded notebook `344956031d9e8976…`, code-cell concat `db500333b57ae902…` (matches pinned: `True`)
 - 17 native AST engine components, 0 mismatches
 - market snapshot `7e817762849118fc…`, training slice `09811db465da1443…` (matches pinned: `True`), environment fingerprint `63ba37cc4a26b48b…`
+
+## Patch response (PMO audit of commit `64cd35b`, DEC-RL-005)
+
+This revision addresses the five requested patches. Nothing else in the submission changed in substance, and no research-scale execution was run.
+
+| patch | requested | done in this revision |
+|---|---|---|
+| **P1** | localize the T1 moment series | §T1.2 now states the finite-order form with an explicit remainder as what is claimed unconditionally, labelled local/asymptotic around $r=0$. §T1.3 adds explicit convergence and interchange conditions with the radius computed in closed form ($\pi$, attained at $a=\tfrac12$), and states that the conditions are *not* verified for the frozen SBJTS jump law. The exact coupling remains global. |
+| **P2** | correct the market-entry wording | The "only through this scalar map" sentence is removed. §T1 now states the market law's two roles — one-step wealth coupling **and** the transition kernel governing occupancy and continuation values — and notes that the mechanism needs both. |
+| **P3** | explicit integrability assumptions | (A3) is restated as a structural property of the frozen policy class; (A4) is now an explicit domination condition reduced to first-moment integrability of terminal log wealth; (A4′) **withdraws** the bounded-support justification and says plainly that this is an assumption on the training law, not a verified property. |
+| **P4** | correct the finite-difference claim | §T3.4 is reframed as an independent numerical agreement check that is explicitly *not* the proof, with the $O(h^2)$ truncation error named and **measured** by refining $h\to h/2$ alongside the Monte Carlo error. |
+| **P5** | symmetric T4 decomposition | The symmetric midpoint identity is adopted for the manuscript, verified on the enumerable fixture (residual exactly 0.0, equal to the mean of the two reference splits), with the common dominating measure named explicitly. The S- and M-reference splits are retained as supporting identities, the entropy-occupancy term stays separate, and the attribution-not-causation caveat is stated. |
+
+Preserved unchanged: the partial-observation treatment, the critic finite-sample-bias caveat, the non-pure-jump interpretation, the entropy time-scaling discipline, and the T5 non-claim.
+
+---
 
 Everything below is either exact algebra, exact finite enumeration, Gauss–Legendre quadrature on the frozen density, source inspection of the frozen code text, or execution of the frozen project's own mathematics suite. Where the frozen source already carries a verification of an object, that frozen test is **executed** rather than replaced.
 
@@ -25,7 +42,10 @@ and under the Base 4 primary convention $R^f_t=1$, with $X_t=\log W_t$,
 
 $$ X_{t+1}-X_t=g(A_t,r_t)=\log\{1+A_t(e^{r_t}-1)\}. $$
 
-This is the exact market-to-RL coupling: the market enters the learning problem only through this scalar map.
+This scalar map is the exact **one-step wealth coupling**, and it is global: it holds for every admissible action and every real return, with no expansion. It is not, however, the only way the market law enters the learning problem. The law $L$ plays two distinct roles, and the paper's mechanism needs both:
+
+1. **Per-step coupling.** Given the current wealth and action, the increment is $g(A_t,r_t)$, so $L$ enters through the conditional law of $r_t$.
+2. **Path role.** $L$ is the transition kernel $Q_L$, so it also determines the distribution of future histories and observations — the state-occupancy measures $d^\theta_{L,t}$ and, through them, the continuation values that the policy gradient integrates against. T4 shows these are separate channels and that the second is not reducible to the first.
 
 ### T1.1 Third-order expansion
 
@@ -45,9 +65,11 @@ The truncation error scales as $r^4$: halving $r$ divides the maximum error by 1
 
 ### T1.2 Which return features can enter expected growth
 
-The action is drawn from $\lambda_\theta(\cdot\mid S_t)$ and is conditionally independent of the contemporaneous return given the history state, so each expansion term factorises into an action polynomial moment times a **conditional** return moment:
+The action is drawn from $\lambda_\theta(\cdot\mid S_t)$ and is conditionally independent of the contemporaneous return given the history state, so each expansion term factorises into an action polynomial moment times a **conditional** return moment. The statement below is **local/asymptotic around $r=0$**. What is claimed without further conditions is the finite-order form with an explicit remainder:
 
-$$ E[X_{t+1}-X_t]=\sum_{k\ge1}E\big[c_k(A_t)\,E(r_t^k\mid H_t)\big]. $$
+$$ E[X_{t+1}-X_t]=\sum_{k=1}^{K}E\big[c_k(A_t)\,E(r_t^k\mid H_t)\big]+E\big[R_{K+1}(A_t,r_t)\big],\qquad R_{K+1}=O(r^{K+1}), $$
+
+valid whenever $E|R_{K+1}|<\infty$. The infinite-sum form is a further claim and is stated separately below with its conditions.
 
 | $k$ | $c_k(a)$ | action moments required | multiplies |
 |---|---|---|---|
@@ -56,7 +78,21 @@ $$ E[X_{t+1}-X_t]=\sum_{k\ge1}E\big[c_k(A_t)\,E(r_t^k\mid H_t)\big]. $$
 | 3 | `a**3/3 - a**2/2 + a/6` | [1, 2, 3] | `E[ r_t^3 \| H_t ]` |
 | 4 | `-a**4/4 + a**3/2 - 7*a**2/24 + a/24` | [1, 2, 3, 4] | `E[ r_t^4 \| H_t ]` |
 
-Two consequences matter for the comparator. First, expected growth depends on **conditional** return moments of every order, not on the unconditional mean and variance alone. Second, because $c_2(a)=\tfrac12a(1-a)$ is not affine in $a$, the **exploration variance of the action enters expected growth at second order**: two policies with the same mean action but different dispersion have different expected growth. That is the precise sense in which the frozen entropy-regularised objective is coupled to the market law rather than merely regularised.
+### T1.3 When the infinite sum is exact
+
+The conditions are explicit and, for this problem, mild. At fixed $a$ the singularities of $g(a,r)$ in the complex $r$ plane are the zeros of $1+a(e^r-1)$, i.e. $e^r=1-1/a$. For a long-only action $a\in(0,1)$ one has $1-1/a<0$, so the nearest zeros are at $r=\log(1/a-1)\pm i\pi$ and the radius of convergence is $\sqrt{\log^2(1/a-1)+\pi^2}\ge\pi$, minimised at $a=\tfrac12$ where it equals exactly $\pi$; $a=0$ and $a=1$ give entire functions. So:
+
+- the executed action lies in [0,1] (both frozen long-only constraint regimes satisfy this)
+- |r_t| <= rho < pi almost surely, or more generally the returns are supported in the open disc of radius pi with E[sum_k |c_k(A_t)| |r_t|^k] finite
+- under those two the Cauchy bound |c_k(a)| <= M(rho')/rho'^k holds uniformly in a in [0,1] for rho < rho' < pi, so dominated convergence justifies exchanging the sum and the expectation
+
+Verified rather than asserted: $1+\tfrac12(e^{i\pi}-1)=0$ exactly, and minimising the singularity modulus over $a$ returns 3.14159265358979 at $a=0.5000$. The coefficient root test is reported only as a slowly-converging consistency diagnostic (corrected estimate 3.1014 against $\pi$, relative error 1.3%), because a logarithmic singularity makes the raw root test converge only like $1+\log k/k$.
+
+On the frozen training slice the largest daily log increment of the risky object is 0.1559 over 2,110 observations, i.e. 4.9615% of the radius. The condition is therefore comfortable for diffusive steps. It is **not** verified for the frozen SBJTS deployment law, whose jumps are not bounded by anything established here, so on jump steps only the finite-order form with remainder — or the exact coupling, which needs no expansion at all — is claimed.
+
+### T1.4 Reading
+
+Two consequences matter for the comparator. First, expected growth depends on **conditional** return moments beyond the first two, not on the unconditional mean and variance alone. Second, because $c_2(a)=\tfrac12a(1-a)$ is not affine in $a$, the **exploration variance of the action enters expected growth at second order**: two policies with the same mean action but different dispersion have different expected growth. That is the precise sense in which the frozen entropy-regularised objective is coupled to the market law rather than merely regularised.
 
 ## T2 — local moment matching does not imply RL equivalence
 
@@ -105,8 +141,13 @@ $$ p_{\theta,L}(\tau)=p_0(H_0)\prod_{t=0}^{N-1}\lambda_\theta(A_t\mid S_t)\,Q_L(
 
 - **(A1) actor-parameter independence of the market kernel.** $Q_L$ does not depend on $\theta$. Verified in code, not assumed: see T3.5.
 - **(A2)** the initial law $p_0$ does not depend on $\theta$.
-- **(A3) strict positivity and smoothness.** $\lambda_\theta(a\mid s)>0$ on the open interval $(\text{lo},\text{hi})$ and is $C^1$ in $\theta$. The frozen policy is a truncated Gaussian whose scale is confined to $[\text{scale\_floor},\text{scale\_ceiling}]$ by construction and whose location is confined to a finite box, so the density is bounded away from zero on compacts.
-- **(A4) interchange of $\nabla_\theta$ and $E$.** The action set is compact, the returns are bounded on the simulated support, and the raw-to-policy transform is smooth and bounded, so the integrand and its $\theta$-derivative are dominated locally uniformly in $\theta$.
+- **(A3) strict positivity and smoothness of the policy.** $\lambda_\theta(a\mid s)>0$ on the open interval $(\text{lo},\text{hi})$ and $\theta\mapsto\lambda_\theta(a\mid s)$ is $C^1$. This one is a **structural property of the frozen policy class**, not an assumption about the market: the executed action law is a Gaussian truncated to the frozen constraint interval, its scale is confined to $[\text{scale\_floor},\text{scale\_ceiling}]$ with $\text{scale\_floor}>0$ by construction, and the raw-to-policy transform is smooth with bounded image, so on any compact $\theta$-neighbourhood the density is bounded above and below away from zero uniformly in $(a,s)$.
+- **(A4) domination / integrability, assumed.** Fix $\theta_0$ and a neighbourhood $U\ni\theta_0$. Assume there exists an integrable $\Phi(\tau)$ with, for all $\theta\in U$,
+
+$$ \Big|R^{\rm soft}_\theta(\tau)\sum_t\psi_\theta(A_t,S_t)\Big|+\Big|m\sum_t\partial_\theta\mathcal H(\lambda_\theta(\cdot\mid S_t))\Big|\;\le\;\Phi(\tau),\qquad E_{\theta_0}[\Phi]<\infty. $$
+
+  This is the sufficient condition for differentiating under the expectation and for the two-term product rule below. **It is stated as an assumption, not derived from the SBJTS law.** What the frozen implementation does supply is the part that depends on the policy, not the market: by (A3), $|\psi_\theta|$ and $|\partial_\theta\mathcal H|$ are bounded uniformly on $U\times$(action interval), so a sufficient condition reduces to $E\big[\sup_{\theta\in U}|R^{\rm soft}_\theta(\tau)|\big]<\infty$, i.e. an integrability requirement on the soft return alone. Since $R^{\rm soft}=X_N-X_0+m\sum_t\mathcal H_t$ and the entropy term is bounded under (A3), it reduces further to $E|X_N-X_0|<\infty$: **first-moment integrability of terminal log wealth under the training law**.
+- **(A4′) what is *not* claimed.** The first submission justified (A4) by asserting that the simulated returns have bounded support. That is withdrawn: nothing verified here bounds the support of the frozen SBJTS return law, and its jump component is not shown to be bounded. The correct status is that $E|X_N-X_0|<\infty$ is an assumption on the training law. It is a weak one — under a long-only action $a\in[0,1]$ one has $0\le 1+a(e^r-1)\le\max(1,e^r)$, so $X_N-X_0\le\sum_t r_t^+$ and a finite first moment of the positive part of the return suffices for the upper bound — but the lower tail is genuinely a condition on $L$, and this report does not verify it for the frozen engine.
 
 **$S_t$ is nowhere assumed to be a Markov state.** The correct object is a history-state process with an observation-based policy; the derivation uses only that the policy is $S_t$-measurable and that $Q_L$ is $\theta$-free.
 
@@ -138,12 +179,17 @@ is therefore not an arbitrary convention: it removes a provably zero-expectation
 | T3.1 $E[\psi\mid S]=0$ | the lemma, on 38 frozen resolvable test regimes by quadrature | 2.2e-12 | 1e-08 | True |
 | T3.2 baseline invariance | $E[\psi\,b(S)\mid S]=0$ for arbitrary $b$ | 3.2e-11 | 1e-06 | True |
 | T3.3 entropy convention | frozen `soft_return_to_go` equals $\sum_{u\ge t}\Delta_u+m\sum_{u>t}\mathcal H_u$ | 2.1e-17 | 1e-12 | True |
-| T3.4 score vs pathwise | the whole gradient identity, end to end | max $\|z\|$ = 1.59 | 4$\sigma$ | True |
+| T3.4 numerical agreement | score estimator vs a CRN pathwise finite difference — a cross-check, **not** the proof | max $\|z\|$ = 1.59 | 4$\sigma$ | True |
 | T3.5 $\nabla_\theta\log Q_L=0$ | (A1), in code | see below | exact | True |
 
 T3.3 is not vacuous: the two conventions differ numerically by 0.0145 on the fixture, yet both give the same gradient in expectation.
 
-T3.4 is the strongest check in the package. With inverse-CDF sampling from a **fixed** uniform block the action is a smooth reparameterisation of $\theta$, so the central difference of the per-path objective is an unbiased *pathwise* estimator of $\nabla_\theta J$ — and because the state path itself moves with $\theta$ under common random numbers, it includes the occupancy effect. The score-function estimator is a different unbiased estimator of the same quantity. On 200,000 paths at 6 steps the two agree to a worst paired $z$ of 1.59, and the frozen `actor_gradient` reproduces the replicated contraction to 7.8e-15.
+**T3.4 is a numerical cross-check, not the proof.** The gradient identity is established analytically above; T3.4 independently confirms that the frozen implementation computes that quantity. With inverse-CDF sampling from a **fixed** uniform block the action is a smooth reparameterisation of $\theta$, so the per-path objective is differentiable in $\theta$ and a common-random-number central difference approximates its pathwise derivative — and because the state path itself moves with $\theta$ under CRN, that approximation includes the occupancy effect. Two distinct error sources are therefore in play and both are reported:
+
+1. **Monte Carlo error.** The score estimator is unbiased for $\nabla_\theta J$ under (A1)–(A4); the comparison is made on the paired per-path difference. On 200,000 paths at 6 steps the worst paired $z$ is 1.59 against a predeclared 4$\sigma$ band.
+2. **Finite-difference truncation error.** A central difference at a nonzero step $h=10^{-4}$ is a numerical approximation carrying an $O(h^2)$ truncation error under the required smoothness — it is *not* an unbiased estimator of the derivative. Measured directly by refining $h\to h/2$: the estimate moves by at most 6.52e-09, against a smallest paired standard error of 5.99e-06. The truncation error is thus about 0.1% of the Monte Carlo noise at this step size, i.e. negligible in the comparison but not zero.
+
+Separately, the frozen `actor_gradient` reproduces the independently replicated score contraction to 7.8e-15, which is an exactness check on the implementation rather than a statistical one.
 
 One honest qualification on the critic. The frozen critic is refit on the same batch that supplies the actions, so the fitted baseline is not exactly action-independent and the baselined estimator is not guaranteed unbiased at finite sample. Measured against the provably unbiased unbaselined estimator the baselined gradient sits 0.54 standard errors away, i.e. within noise at this sample size. This is a variance-reduction device, not part of the theorem.
 
@@ -155,28 +201,41 @@ Let $d^\theta_{L,t}(h)$ be the time-$t$ occupancy of the full history state unde
 
 $$ G^{\rm score}_L=\sum_t\int d^\theta_{L,t}(h)\int\lambda_\theta(a\mid g(h))\,\psi_\theta(a,g(h))\,A^{\theta,\rm soft}_{L,t}(h,a)\,da\,dh, $$
 
-and the training-law gradient gap splits as
+and the training-law gradient gap is to be attributed to an **occupancy** and a **continuation-value** contribution. The naive way to do that is to reference the advantage at one of the two laws, which yields two exact but *different* splits (both retained below as supporting identities). The manuscript instead uses the **symmetric midpoint identity**, which treats the two laws alike:
 
-$$ d_SA_S-d_MA_M=\underbrace{(d_S-d_M)A_S}_{\text{occupancy channel}}+\underbrace{d_M(A_S-A_M)}_{\text{continuation-value channel}}. $$
+$$ d_SA_S-d_MA_M=\underbrace{\tfrac12(d_S-d_M)(A_S+A_M)}_{\text{symmetric occupancy contribution}}+\underbrace{\tfrac12(d_S+d_M)(A_S-A_M)}_{\text{symmetric continuation-value contribution}}. $$
+
+The identity is elementary — expand both products and the four cross terms cancel in pairs — but it requires the differences and sums of the two occupancy measures to be defined pointwise, i.e. **a common dominating measure**. That cannot be taken for granted, as the fixture below shows.
+
+**This is still an attribution convention, not a causal identification.** The symmetric split removes the arbitrary choice of reference law, and nothing more. No intervention in the frozen experiment separates occupancy from continuation value, so neither contribution should be read as the effect of manipulating one while holding the other fixed.
 
 ### Verification on an exactly enumerable model
 
-Three decisions, returns $\pm\delta$, 21 quadrature action nodes, law $M$ iid and law $S$ the mirror chain $r_t=-r_{t-1}$. All one-step marginals agree at every $t$. With two decisions the two laws cannot differ in occupancy at any decision time and the occupancy channel is zero for trivial reasons.
+Three decisions, returns $\pm\delta$, 21 quadrature action nodes, law $M$ iid and law $S$ the mirror chain $r_t=-r_{t-1}$. All one-step marginals agree at every $t$. Three are needed, not two: with two decisions the two laws cannot differ in occupancy at any decision time and the occupancy channel is zero for trivial reasons.
 
 - **Representation check.** The occupancy-times-advantage form equals brute-force trajectory enumeration to 6.9e-12. This is what licenses the decomposition at all.
 - **Occupancy genuinely differs.** Identical at $t=1$ (`True`) and total variation 0.50 at $t=2$.
 
-| split | occupancy channel | continuation-value channel | residual vs total |
+| split | occupancy contribution | continuation-value contribution | residual vs total |
 |---|---|---|---|
-| advantage referenced at $S$ | -1.456732e-04 | -4.373597e-04 | 0.0e+00 |
-| advantage referenced at $M$ | +0.000000e+00 | -5.830329e-04 | 0.0e+00 |
+| **symmetric midpoint (manuscript)** | **-7.283662e-05** | **-5.101963e-04** | 0.0e+00 |
+| advantage referenced at $S$ (appendix) | -1.456732e-04 | -4.373597e-04 | 0.0e+00 |
+| advantage referenced at $M$ (appendix) | +0.000000e+00 | -5.830329e-04 | 0.0e+00 |
 | total gap | — | — | -5.830329e-04 |
 
-### A finding the manuscript must carry: the split is not unique
+All three sum to the same total, the symmetric one to a residual of exactly 0.0e+00. The symmetric contributions are exactly the arithmetic means of the two reference splits — verified to 2.7e-20 — so the symmetric identity divides the interaction term evenly between the two channels rather than assigning all of it to one.
 
-Both identities are exact and both sum to the total, but they attribute the interaction term differently. In this model the occupancy channel is -1.457e-04 when the advantage is referenced at $S$ and **exactly zero** when it is referenced at $M$ — a disagreement of 1.457e-04, which is about a quarter of the total gap. A channel magnitude is not split invariant, so the manuscript must state which law the advantage is referenced at; only the total is convention free.
+### The dominating measure has to be named, not assumed
 
-### The entropy channel is purely occupancy
+On this fixture the two occupancy measures **do not share a support**: under the mirror chain $r_t=-r_{t-1}$ half of the length-2 return prefixes carry zero mass, so $d_S$ is supported on 4 of the 6 prefixes that $d_M$ reaches. Hence $d_S\ll d_M$ (`True`) but **not** conversely (`False`). Counting measure on the 6-point union dominates both, which is what makes $d_S-d_M$ and $d_S+d_M$ well defined pointwise and the symmetric identity exact. In the manuscript the dominating measure should be stated explicitly for the same reason: one-sided absolute continuity is the generic situation once the training law constrains the reachable histories.
+
+### Supporting identity: why a reference convention was needed at all
+
+The two reference splits are retained as appendix identities because they document the non-uniqueness that motivates the symmetric form. Both are exact and both sum to the total, yet they attribute the interaction term differently: the occupancy contribution is -1.457e-04 when the advantage is referenced at $S$ and **exactly zero** when it is referenced at $M$ — a disagreement of 1.457e-04, about a quarter of the total gap. A channel magnitude is therefore not split invariant. Only the total is convention free, under any of the three splits.
+
+### The entropy term is carried separately
+
+The direct entropy derivative is **not** folded into the soft advantage, so its law-gap contribution is an additional term alongside the two symmetric contributions above, and the manuscript must carry all three.
 
 With the direct entropy derivative kept outside the soft advantage, its contribution to the law gap is $m\sum_t\int(d_{S,t}-d_{M,t})\,\partial_\theta\mathcal H\,dh$: the same $\partial_\theta\mathcal H$ averaged under two different occupancy measures. In this model that term is 0.0e+00, and it vanishes for a specific and instructive reason — the design matches every one-step marginal, and $\partial_\theta\mathcal H$ depends on the history only through $r_{t-1}$, whose marginal is matched by construction. With unmatched marginals it would not vanish, so the manuscript should state the convention rather than omit the term.
 
@@ -253,7 +312,9 @@ Machine-readable copy: `evidence/theory_coupling_v1/theorem_code_map.csv`.
 | T3 gradient estimator and its sign | `actor_gradient (+ frozen actor_estimator_toy_test)` | frozen toy test against an analytic target, and score vs pathwise reparameterisation gradient of the frozen objective | toy z<= 4.0; score-vs-pathwise max\|z\| 1.59 | True |
 | T3 actor-parameter independence of the market kernel | `market batch construction precedes the actor` | byte-identical market block across constructions; no actor argument; seed schedule free of actor state | grad_theta log Q_L = 0 | True |
 | T4 occupancy x soft-advantage representation of the gradient | `derivation, verified on an exactly enumerable model` | brute-force trajectory enumeration vs occupancy/advantage form | max gap 6.9e-12 | True |
-| T4 two-channel split and its non-uniqueness | `derivation` | both reference conventions sum to the total exactly; channels disagree | occupancy channel differs by 1.5e-04 between conventions | True |
+| T4 symmetric midpoint split (manuscript decomposition) | `derivation` | 1/2(d_S-d_M)(A_S+A_M) + 1/2(d_S+d_M)(A_S-A_M) summed on the enumerable fixture under counting measure on the union of supports | residual vs total 0.0e+00; equals the average of the two reference splits to 2.7e-20 | True |
+| T4 reference-split non-uniqueness (supporting identity) | `derivation` | both reference conventions sum to the total exactly; channels disagree | occupancy channel differs by 1.5e-04 between conventions | True |
+| T1 series convergence and interchange conditions | `closed-form singularity of log(1+a(e^r-1))` | exact nearest-singularity modulus over long-only actions, plus a corrected coefficient root test as a consistency diagnostic | radius = pi exactly at a = 1/2 | True |
 | T5 lagged-return covariance channel | `derivation + frozen engine source structure` | Cov(pibar, mu_L) exactly zero under iid, non-zero under the conditional law; frozen engine carries path functionals | channel present under S, provably absent under M | True |
 | entropy time scaling  m = lambda * dt | `soft_return_to_go vs the continuous-time objective` | sum identity, grid invariance and scale separation | lambda equivalent of frozen m = 2.5 | True |
 | seed namespaces; no hidden wall-clock seeding | `seed_of / rng_of` | source scan for global/temporal seeding; hash-derived generators only | forbidden patterns 0 | True |
@@ -330,11 +391,11 @@ The accepted empirical claim remains the domain-scoped statement of `CL-RL-006`:
 
 ## Unresolved theory issues for PMO
 
-1. **The channel decomposition is not split-invariant.** Demonstrated above: the occupancy channel is about a quarter of the total gap under one reference convention and exactly zero under the other. PMO should decide which convention the manuscript adopts, and the text must report that only the total is convention free. This is a presentation decision with mathematical content, not a defect.
+1. **Channel attribution is a convention, now fixed by choice rather than open.** Per P5 the manuscript uses the symmetric midpoint split, which removes the reference asymmetry; the S- and M-reference identities remain in the appendix to document the non-uniqueness (a quarter of the total gap moves between channels depending on the reference law). What remains open is *interpretive*, not mathematical: no split — symmetric included — identifies a causal channel, because nothing in the frozen experiment intervenes on occupancy while holding continuation values fixed. The manuscript should say so wherever the contributions are quoted.
 2. **The conditional-law diagnostic is specified but not executed.** T5 is a structural result. Closing the attribution needs the estimand named in `unit_checks.json`: the frozen conditional mean $\mu_S(r_{\rm prev})=E_S(r_t\mid r_{t-1})$, and a lag-ablation contrast obtained by retraining with the $r_{t-1}$ coordinate zeroed out of the frozen state. Both exceed unit scale, and `00_CURRENT_STATE` reserves that decision for PMO, so it is specified rather than run. **`SCOPE CHANGE REQUEST — PMO DECISION REQUIRED`.**
 3. **The fitted critic is not part of the theorem.** The frozen critic is refit on the same batch that supplies the actions, so the baselined estimator is not provably unbiased at finite sample. Measured deviation from the unbiased unbaselined estimator is 0.54 standard errors, i.e. within noise here. The manuscript should present the critic as a variance-reduction device and not lean on it in the gradient statement.
 4. **T2b's maximiser under the dependent law is unbounded in the searched range.** The exact-zero-versus-nonzero contrast at $b_{\rm lag}=0$ is the rigorous content; the magnitude of the optimal lag coefficient is not, because the objective is monotone in $|b_{\rm lag}|$ toward a bang-bang limit over the range searched. The text should use the derivative statement, not an optimal-coefficient figure.
-5. **T1's expansion is a local statement.** It is an $r\to0$ expansion with a verified $O(r^4)$ remainder. The frozen SBJTS law has jumps, so on jump steps the increment is not small and the expansion is not the right tool there; the exact coupling $g(A_t,r_t)$ remains valid without expansion, and the manuscript should use the expansion only for the moment-entry argument.
+5. **The T1 series conditions are stated but not verified for the frozen engine.** Per P1 the report now gives a precise sufficient condition — long-only actions and returns inside the disc of radius $\pi$, which the frozen training slice satisfies with room to spare (largest increment 0.1559, 4.96% of the radius). It is **not** verified for the frozen SBJTS deployment law, whose jump sizes are not bounded by anything established here. Checking it would take a bounded-jump argument or a tail bound on the frozen engine's jump law; until then the manuscript should use the finite-order form with remainder on jump steps, or the exact coupling, which needs no expansion. Likewise the (A4) integrability condition of P3 is assumed, not proved, for the frozen law.
 
 ## Files
 
@@ -342,4 +403,4 @@ The accepted empirical claim remains the domain-scoped statement of `CL-RL-006`:
 - `evidence/theory_coupling_v1/unit_checks.json` — every check, its inputs, its tolerance and its outcome
 - `evidence/theory_coupling_v1/theorem_code_map.csv` — the map above, machine readable
 
-All 18 check groups pass; the package runs in 74.8 s on CPU with no research-scale execution.
+All 18 check groups pass; the package runs in 115.9 s on CPU with no research-scale execution.

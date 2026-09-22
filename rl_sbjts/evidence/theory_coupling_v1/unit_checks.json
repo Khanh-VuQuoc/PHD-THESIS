@@ -4,8 +4,8 @@
   "evidence_class": "SMOKE_EVIDENCE",
   "is_scientific_evidence": false,
   "is_research_scale_execution": false,
-  "generated_at_utc": "2026-09-22T02:24:58.433008+00:00",
-  "elapsed_s": 74.8,
+  "generated_at_utc": "2026-09-22T03:04:34.337454+00:00",
+  "elapsed_s": 115.9,
   "claim_status": "no comparator claim is created or modified by this package; the accepted empirical claim remains the domain-scoped statement in 02_CLAIM_LEDGER CL-RL-006",
   "frozen_source_identity": {
     "base3_notebook_sha256": "344956031d9e89763370a020d92ec54a669a7cc400e3d2b674de613897c02129",
@@ -140,9 +140,55 @@
           "multiplies": "E[ r_t^4 | H_t ]"
         }
       ],
-      "statement": "E[X_{t+1}-X_t] = sum_k E[ c_k(A_t) * E(r_t^k | H_t) ] with c_1=a, c_2=a(1-a)/2, c_3=a(1-a)(1-2a)/6, ... so expected growth depends on CONDITIONAL return moments of every order and on the first k moments of the action law, not on the unconditional mean and variance alone",
+      "statement": "LOCAL / ASYMPTOTIC around r = 0. To finite order K the exact statement is E[X_{t+1}-X_t] = sum_{k<=K} E[ c_k(A_t) E(r_t^k | H_t) ] + E[R_{K+1}], with c_1=a, c_2=a(1-a)/2, c_3=a(1-a)(1-2a)/6 and a remainder R_{K+1} = O(r^{K+1}). The infinite-sum form requires the convergence and interchange conditions recorded in t1_series_validity; the exact coupling g(a,r) = log(1+a(e^r-1)) is global and needs no expansion",
+      "reading": "expected growth depends on CONDITIONAL return moments beyond the first two and on the first k moments of the action law, not on the unconditional mean and variance alone",
       "exploration_variance_enters_at_order": 2,
       "why": "c_2(a)=a(1-a)/2 is not affine in a, so E[c_2(A)] involves E[A^2] and therefore the conditional variance of the exploratory action"
+    },
+    "t1_series_validity": {
+      "exact_coupling_is_global": "g(a,r) = log(1+a(e^r-1)) holds for every a in [0,1] and every real r; it is not an expansion",
+      "singularity_structure": "zeros of 1+a(e^r-1) at r = log(1/a-1) +/- i*pi for a in (0,1); a=0 and a=1 give entire functions",
+      "radius_lower_bound_over_long_only_actions": 3.141592653589793,
+      "radius_minimising_action": 0.5,
+      "exact_singularity_check": {
+        "one_plus_half_times_exp_i_pi_minus_one_is_zero": true,
+        "nearest_singularity_modulus_min_over_a": 3.141592653589793,
+        "argmin_action": 0.49999999999999994,
+        "matches_pi": true,
+        "statement": "the radius is read off the singularity in closed form, not from coefficient asymptotics"
+      },
+      "coefficient_root_test_diagnostic": {
+        "orders_used": [
+          40,
+          42,
+          44,
+          46,
+          48,
+          50,
+          52,
+          54,
+          56,
+          58
+        ],
+        "raw_estimate": 3.3396229975628318,
+        "k_to_the_1_over_k_corrected_estimate": 3.101415669681292,
+        "target": 3.141592653589793,
+        "relative_error_of_corrected_estimate": 0.012788731175122978,
+        "within_15_percent": true,
+        "note": "a logarithmic singularity gives |c_k| ~ C k^{-1} R^{-k}, so the root test converges only like 1 + log(k)/k; it is a consistency diagnostic, not the source of the radius"
+      },
+      "sufficient_conditions_for_the_infinite_sum": [
+        "the executed action lies in [0,1] (both frozen long-only constraint regimes satisfy this)",
+        "|r_t| <= rho < pi almost surely, or more generally the returns are supported in the open disc of radius pi with E[sum_k |c_k(A_t)| |r_t|^k] finite",
+        "under those two the Cauchy bound |c_k(a)| <= M(rho')/rho'^k holds uniformly in a in [0,1] for rho < rho' < pi, so dominated convergence justifies exchanging the sum and the expectation"
+      ],
+      "if_conditions_fail": "claim only the finite-order form with an explicit remainder; on jump steps the increment need not be small and the truncated series is not the right tool, while the exact coupling remains valid",
+      "empirical_scale_of_the_frozen_training_slice": {
+        "n_observations": 2110,
+        "max_abs_log_return": 0.155870244065186,
+        "ratio_to_radius_pi": 0.049615039647829026
+      },
+      "pass": true
     },
     "t2a_higher_moment": {
       "analytic_optimum_of_symmetric_two_point_law": 0.5,
@@ -516,13 +562,49 @@
         ]
       ],
       "max_abs_z": 1.5873715601495682,
+      "finite_difference_truncation": {
+        "fd_step_h": 0.0001,
+        "fd_step_h_over_2": 5e-05,
+        "gradient_at_h": [
+          [
+            -0.24095562372238563,
+            -0.10289420856881648,
+            -0.0003237684100274393,
+            -0.00017976658796854444
+          ],
+          [
+            0.15597189004694267,
+            0.06544617334347524,
+            9.329606983887359e-07,
+            -3.725020963775248e-05
+          ]
+        ],
+        "gradient_at_h_over_2": [
+          [
+            -0.24095562303919663,
+            -0.10289420879589656,
+            -0.0003237684100663655,
+            -0.00017976658797682032
+          ],
+          [
+            0.15597189657093147,
+            0.06544617455988584,
+            9.329607193365658e-07,
+            -3.725020962890083e-05
+          ]
+        ],
+        "max_abs_change_on_halving_h": 6.52398879363858e-09,
+        "smallest_paired_standard_error": 5.989180784081719e-06,
+        "truncation_to_monte_carlo_noise_ratio": 0.00108929568647824,
+        "statement": "a central difference at nonzero h carries an O(h^2) truncation error; halving h changes the estimate by at most this much, which is the scale of that error and is compared with the Monte Carlo standard error of the paired difference"
+      },
       "frozen_actor_gradient_matches_replication": 7.827072323607354e-15,
       "pass": true,
       "critic_baseline": {
         "max_abs_z_of_baseline_effect": 0.5416799082755067,
         "interpretation": "the frozen critic is refit on the same batch, so the baseline is not exactly action independent and is not guaranteed unbiased at finite sample; this reports how far the baselined gradient sits from the provably unbiased unbaselined one in units of the latter's standard error"
       },
-      "statement": "grad_theta J = E[ R_soft * sum_t psi_t ] + m E[ sum_t d_theta H_t ], with Q_L actor-parameter independent; verified end to end against the reparameterisation derivative"
+      "statement": "grad_theta J = E[ R_soft * sum_t psi_t ] + m E[ sum_t d_theta H_t ], with Q_L actor-parameter independent. The identity is established analytically in T3; this check is an independent NUMERICAL agreement test against a common-random-number pathwise central finite difference, subject to Monte Carlo error and O(h^2) finite-difference truncation error, and is not itself the proof"
     },
     "t3_5": {
       "market_block_byte_identical_for_repeated_construction": true,
@@ -644,10 +726,45 @@
         ],
         "max_abs_residual_vs_total": 0.0
       },
+      "split_symmetric_midpoint": {
+        "occupancy_channel": [
+          0.0,
+          -7.283661562166848e-05
+        ],
+        "continuation_value_channel": [
+          3.89804562326429e-18,
+          -0.0005101963104697879
+        ],
+        "sum": [
+          3.89804562326429e-18,
+          -0.0005830329260914564
+        ],
+        "max_abs_residual_vs_total": 0.0,
+        "identity": "d_S A_S - d_M A_M = 1/2 (d_S-d_M)(A_S+A_M) + 1/2 (d_S+d_M)(A_S-A_M)",
+        "equals_average_of_the_two_reference_splits": {
+          "max_abs_gap_occupancy": 2.710505431213761e-20,
+          "max_abs_gap_continuation_value": 0.0,
+          "statement": "the symmetric split is exactly the average of the S-reference and M-reference splits, so it splits the interaction term evenly between the two channels instead of assigning all of it to one"
+        },
+        "common_dominating_measure": {
+          "measure": "counting measure on the finite union of the two supports",
+          "n_history_prefixes_in_union": 6,
+          "n_history_prefixes_support_M": 6,
+          "n_history_prefixes_support_S": 4,
+          "supports_identical": false,
+          "S_absolutely_continuous_wrt_M": true,
+          "M_absolutely_continuous_wrt_S": false,
+          "statement": "the supports are NOT identical: under the mirror chain half of the length-2 return prefixes carry zero mass, so d_S << d_M but not conversely. This is exactly why the dominating measure has to be named. Counting measure on the finite union dominates both, so d_S - d_M and d_S + d_M are defined pointwise and the symmetric identity is exact",
+          "well_defined_on_the_union": true
+        },
+        "still_an_attribution_convention": "the symmetric split removes the reference asymmetry but remains an attribution convention, not a causal identification: no intervention separates occupancy from continuation value in the frozen experiment",
+        "pass": true
+      },
       "decomposition_is_not_unique": {
         "fact": "d_S A_S - d_M A_M = (d_S-d_M)A_S + d_M(A_S-A_M) = (d_S-d_M)A_M + d_S(A_S-A_M); both are exact and they attribute the interaction term to different channels",
         "max_abs_occupancy_channel_disagreement": 0.000145673231243337,
-        "implication": "a channel magnitude is not split invariant, so the manuscript must state which law the advantage is referenced at; only the total is convention free"
+        "implication": "a channel magnitude is not split invariant, so the manuscript must state which law the advantage is referenced at; only the total is convention free",
+        "role_after_P5": "retained as a supporting/appendix identity demonstrating non-uniqueness; the main manuscript uses the symmetric midpoint split"
       },
       "entropy_occupancy_term": {
         "M": [
@@ -1445,12 +1562,28 @@
       "observed": "max gap 6.9e-12"
     },
     {
-      "object": "T4 two-channel split and its non-uniqueness",
+      "object": "T4 symmetric midpoint split (manuscript decomposition)",
+      "implementation": "derivation",
+      "source_location": "derivation only",
+      "verification": "1/2(d_S-d_M)(A_S+A_M) + 1/2(d_S+d_M)(A_S-A_M) summed on the enumerable fixture under counting measure on the union of supports",
+      "pass": true,
+      "observed": "residual vs total 0.0e+00; equals the average of the two reference splits to 2.7e-20"
+    },
+    {
+      "object": "T4 reference-split non-uniqueness (supporting identity)",
       "implementation": "derivation",
       "source_location": "derivation only",
       "verification": "both reference conventions sum to the total exactly; channels disagree",
       "pass": true,
       "observed": "occupancy channel differs by 1.5e-04 between conventions"
+    },
+    {
+      "object": "T1 series convergence and interchange conditions",
+      "implementation": "closed-form singularity of log(1+a(e^r-1))",
+      "source_location": "derivation only",
+      "verification": "exact nearest-singularity modulus over long-only actions, plus a corrected coefficient root test as a consistency diagnostic",
+      "pass": true,
+      "observed": "radius = pi exactly at a = 1/2"
     },
     {
       "object": "T5 lagged-return covariance channel",

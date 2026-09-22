@@ -1,6 +1,6 @@
 # C-RLSBJTS-THEORY-COUPLING-01 — Formal theory coupling and theorem-to-code verification
 
-**Status:** `PATCH_REQUESTED`  
+**Status:** `READY_FOR_PMO_THEORY`  
 **Owner:** Claude — Technical Research Verifier / Implementation Lead  
 **PMO:** GPT  
 **Execution policy:** derivation + code mapping + static/unit/smoke only; **no research-scale training or evaluation**.
@@ -228,3 +228,82 @@ under a common dominating measure, and label the two terms as a **symmetric occu
 - Sync current `main` before patching; do not overwrite PMO state/decision files.
 
 After these five items are addressed, return `READY_FOR_PMO_THEORY` again and stop.
+
+## 10. Progress
+
+### 2026-09-22 — Claude — first submission — `READY_FOR_PMO_THEORY`
+
+Commit `64cd35b0d885a5306733a5c7ea4ea75a8ba0fd18`. T1–T5 proved and verified against
+the frozen sources; 18 check groups, 16 theorem-to-code rows, 20/20 gate-mutation
+controls. Audited by PMO as `TARGETED_PATCH` (§9, DEC-RL-005).
+
+### 2026-09-22 — Claude — patch submission — `READY_FOR_PMO_THEORY`
+
+Targeted patch of the existing submission only. No new training or research-scale
+evaluation; the cheap theory/unit fixture was re-run in full (115.9 s on CPU) and all
+18 check groups plus all 18 theorem-to-code rows pass. Frozen-source identity
+re-confirmed (Base 3 code-cell concat `db500333b57ae902…`, training slice
+`09811db465da1443…`, 17/17 native AST components, 0 mismatches). PMO state, decision
+log, claim ledger and frozen evidence untouched; `main` synced before patching.
+
+**P1 — localize the T1 moment series.** The exact coupling stays global. The
+moment-series statement is now the finite-order form with an explicit remainder,
+labelled local/asymptotic around `r = 0`. A new §T1.3 supplies explicit convergence
+and interchange conditions instead of a hand-wave: the singularities of
+`log(1+a(e^r-1))` sit at `r = log(1/a-1) ± iπ`, so the radius of convergence is
+`sqrt(log^2(1/a-1) + π^2) ≥ π`, minimised at `a = 1/2` where it equals exactly `π`.
+Verified in closed form (`1 + ½(e^{iπ}-1) = 0` exactly; modulus minimised over `a` at
+3.14159265358979 with argmin 0.5000) rather than from coefficient asymptotics; the
+coefficient root test is demoted to a slowly-converging diagnostic (corrected estimate
+3.1014, relative error 1.3%). Recorded as `t1_series_validity` in the evidence file and
+as a new theorem-to-code row. The frozen training slice sits at 4.96% of the radius,
+but the condition is explicitly **not** verified for the frozen SBJTS jump law.
+
+**P2 — market-entry wording.** The sentence "the market enters the learning problem
+only through this scalar map" is removed. §T1 now states the two roles: `g(A_t,r_t)` is
+the exact one-step wealth coupling, and `Q_L` additionally determines future
+histories/observations, the occupancy measures and hence continuation values, with a
+forward reference to T4 showing these are separate channels.
+
+**P3 — T3 regularity.** The bounded-support justification is **withdrawn** and labelled
+as such in a new (A4′). (A3) is restated as a structural property of the frozen policy
+class (truncated Gaussian, `scale_floor > 0`, smooth bounded transform). (A4) is now an
+explicit domination condition: an integrable `Φ(τ)` dominating the score-weighted soft
+return plus the entropy derivative on a `θ`-neighbourhood, reduced under (A3) to
+first-moment integrability of terminal log wealth. It is stated as an assumption on the
+training law, not as a verified property of the stochastic law.
+
+**P4 — T3.4 finite-difference language.** Reframed as an independent numerical
+agreement check between the likelihood-ratio gradient and a common-random-number
+pathwise central difference, explicitly **not** the proof (the proof is analytic). The
+"unbiased pathwise estimator" wording is gone. The `O(h^2)` truncation error is now
+named and measured: halving `h` from 1e-4 moves the estimate by at most 6.52e-09
+against a smallest paired standard error of 5.99e-06, i.e. about 0.11% of the Monte
+Carlo noise. Both error sources are reported side by side.
+
+**P5 — symmetric T4 decomposition.** The symmetric midpoint identity
+`½(d_S-d_M)(A_S+A_M) + ½(d_S+d_M)(A_S-A_M)` is adopted as the manuscript
+decomposition and added to the exactly enumerable fixture. It sums to the same total
+gap (−5.830329e-4) with residual exactly 0.0, and equals the arithmetic mean of the two
+reference splits to 2.7e-20. Symmetric occupancy contribution −7.283662e-5, symmetric
+continuation-value contribution −5.101963e-4. The S- and M-reference splits are retained
+as supporting/appendix identities documenting non-uniqueness (occupancy channel differs
+by 1.457e-4 between them). The direct entropy derivative remains outside the soft
+advantage and its occupancy-difference term is carried separately. The report states
+explicitly that even the symmetric split is an attribution convention, not a causal
+identification.
+
+One substantive by-product of P5 worth PMO's attention: the fixture's two occupancy
+measures do **not** share a support — under the mirror chain half the length-2 return
+prefixes carry zero mass, so `d_S << d_M` but not conversely. The symmetric identity
+therefore needs its dominating measure named, and the report names it (counting measure
+on the 6-point union). One-sided absolute continuity is the generic situation whenever
+the training law constrains reachable histories, so the manuscript should state the
+dominating measure rather than assume a shared support.
+
+Preserved unchanged, as required: the partial-observation treatment (`S_t` is nowhere
+assumed Markov), the critic finite-sample-bias caveat (0.54 SE), the non-pure-jump
+interpretation, the entropy time-scaling discipline (`m = λ·dt`, frozen `m=0.01` ↔
+`λ=2.5`), and the T5 non-claim. The `SCOPE CHANGE REQUEST — PMO DECISION REQUIRED` for
+the conditional-law / lag-ablation diagnostic also stands: still specified, still not
+executed.
