@@ -1,75 +1,79 @@
 # 00_CURRENT_STATE — RL–SBJTS
 
-Updated: 2026-09-21. Owner: GPT / PMO.
+Updated: 2026-09-22. Owner: GPT / PMO.
 
 ## Current work
 
 | Field | Current value |
 |---|---|
-| Project research status | **USER_COLAB_RESEARCH_AUTHORIZED** — comparator code/smoke package passed PMO code audit and is merged to `main`. |
-| Sole executable ticket | `tickets/C-RLSBJTS-MERTON-COMP-01.md` — Claude implementation phase complete; user research execution now authorized. |
-| Current objective | Run the direct RL–Merton/GBM comparator on the user's paid Google Colab NVIDIA T4, with U0–U3 acting as hard pre-training gates before U4–U7. |
-| PMO-reviewed implementation | PR #2 / merged commit `a3d42a57718f921e2f5add9c3eead1e419cc4bc7`; source implementation commit `204f13e3f33edade7613fd9f84b2672569101e95`. |
-| Existing accepted evidence | Base 4: 160/160 training attempts complete, 96,000/96,000 evaluation attempts complete; target-training effect estimated under matched canonical one-step mean/variance control. |
-| Existing claim status | **No RL–SBJTS > RL–Merton claim yet.** Research evidence from the user Colab run must be audited before any promotion. |
-| Primary new comparison | frozen SBJTS-trained policy vs new Merton/GBM-trained policy, both evaluated on the same frozen SBJTS target holdout. |
-| Primary endpoints | `mean_terminal_log_wealth` and `cvar_log_loss`, separately for LONG_ONLY_FULL and LONG_ONLY_CAP50. |
-| Research hardware | **Paid Google Colab NVIDIA T4.** RESEARCH mode fails closed without CUDA T4. The frozen market engine runs CUDA float32 batched. |
-| Learner numerical contract | The frozen Base 3 actor/critic rollout, critic fit and actor-gradient path remains vectorized NumPy float64 on CPU, exactly as in frozen Base 4. Porting this component to CUDA is a separate numerical-equivalence scope change and is **not** part of the authorized comparator run. |
-| Frozen ancestry | Base 2 environment/calibration; Base 3 learner mathematics; Base 4 target law, constraints, `m=0.01`, state, wealth accounting, training budget, holdout namespaces and endpoint definitions. |
-| Permanent current limitation | Base 2 ancestry is smoke-scale; no external-market-validation or universal superiority claim. |
-| Next PMO decision | After the user Colab run publishes research outputs, audit source fingerprint, U1 reproduction, calibration, attempt accounting, estimands and claim status. |
+| Project research status | **THEORY_COUPLING_OPEN** — the direct RL–SBJTS versus RL–Merton/GBM empirical comparator is accepted as scoped research evidence; the current bottleneck is formal theory, not more training. |
+| Sole executable ticket | `tickets/C-RLSBJTS-THEORY-COUPLING-01.md` — `OPEN_FOR_CLAUDE`. |
+| Closed empirical question | Direct learned RL–SBJTS vs empirical RL–Merton/GBM on the same frozen SBJTS target holdout. |
+| Accepted empirical scope | Under the tested frozen SBJTS deployment law, SBJTS-trained policies have higher terminal log wealth and lower CVaR log loss than otherwise matched empirical-GBM-trained policies in both LONG_ONLY_FULL and LONG_ONLY_CAP50. |
+| FULL result | `Delta_W = +0.0022063`; `Delta_CVaR = -0.0031810`. |
+| CAP50 result | `Delta_W = +0.0005541`; `Delta_CVaR = -0.0007611`. |
+| Robustness | Frozen crossed-cluster 95% intervals exclude zero for all four co-primary contrasts. Policy-level sensitivity using only the 40 paired training replications also excludes zero for all four; favorable sign is 40/40 in every endpoint/stratum. |
+| Mechanism evidence | Average exposure is nearly unchanged, but saved SBJTS actors show strong negative lag-return and wealth-state feedback while Merton actors are nearly flat. FULL executed-action lag slope ≈ `-0.674` for SBJTS vs `+0.015` for Merton. |
+| Base 4 retained finding | Local one-step mean/variance similarity does not remove path/terminal differences; cross-time covariance/dependence explains the residual terminal-variance gap at decomposition level. |
+| Evidence location | User Colab T4 raw outputs remain on Drive under `merton_comparator_v1/evidence/research/`; GitHub pins Drive IDs, byte sizes and SHA-256 in `evidence/merton_comparator_v1/research/ARTIFACT_MANIFEST.json`. |
+| Research hardware lineage | Paid Colab NVIDIA T4; frozen market engine CUDA float32 batched; frozen Base 3 learner update path NumPy float64 CPU for numerical comparability. |
+| Permanent limitations | No universal superiority, no pure-jump causal attribution, no external-market validity from smoke-scale Base 2 ancestry, no retrospective confirmatory-superiority claim. |
+| Next PMO decision | Audit Claude's formal theory package and theorem-to-code map; then decide whether a small conditional-law/lag-ablation diagnostic is needed before manuscript lock. |
 
-## Authorized user execution
+## Current scientific narrative
 
-Use `rl_sbjts/notebooks/06_RL_SBJTS_VS_MERTON_COMPARATOR_GPU_v1_0.ipynb` from `main`.
+The paper is now organized around
 
-Set:
+\[
+\boxed{
+\text{training market law}
+\rightarrow
+\text{conditional/path structure}
+\rightarrow
+\text{RL state occupancy and continuation values}
+\rightarrow
+\text{learned feedback policy}
+\rightarrow
+\text{wealth and tail-risk outcomes}
+}.
+\]
 
-```python
-RUN_MODE = "RESEARCH"
-ALLOW_NON_T4 = False
-```
+The empirical backbone is already in place:
 
-Use a paid Colab **NVIDIA T4** runtime. Run from the top with the frozen inputs under `MyDrive/sbjts_rst`.
+1. **Path-law evidence:** Base 4 shows that matching local canonical mean/variance does not match terminal/path behavior.
+2. **Direct performance evidence:** RL–SBJTS outperforms matched RL–Merton/GBM on the frozen SBJTS deployment law in both wealth and CVaR loss under both constraints.
+3. **Mechanism evidence:** the performance difference is not explained by average exposure; the saved policies encode materially different feedback to lagged return and current wealth.
 
-The notebook must pass, in order:
+The remaining high-value work is theoretical formalization and lightweight mechanism verification, not another full training campaign.
 
-```text
-U0 source fingerprint
- -> U1 exact/tolerance-adjudicated two-holdout Base 4 reproduction
- -> U2 empirical Merton calibration
- -> U3 bounded learner positive control
- -> U4 80-policy Merton training
- -> U5 24,000 Merton target-holdout evaluations
- -> U6 analytic secondary benchmark
- -> U7 inference
-```
+## Sole open ticket
 
-### Hard stop rules
+`C-RLSBJTS-THEORY-COUPLING-01` asks Claude to provide, with derivations and cheap unit/mutation tests only:
 
-- If U0 fails identity/hash checks: **STOP**.
-- If U1 is not `BASE4_TARGET_REPRODUCTION_PASS_EXACT` or `...PASS_WITHIN_FROZEN_BACKEND_TOLERANCE`: **STOP before U4**.
-- If U1 passes only within tolerance rather than exactly, preserve the evidence and report it to PMO; this is not an automatic defect, but the backend difference must be recorded.
-- If U3 reports a gross learner failure: **STOP before U4**.
-- Do not alter `m`, bounds, state, budgets, seeds, holdout namespace, endpoint definitions or entropy convention during the run.
-- Do not retrain frozen SBJTS policies and do not regenerate the TT arm; reuse the frozen Base 4 ledger.
-- On disconnect, rerun from the top with the same `MERTONCOMP_WORK`; accepted completed units must be skipped.
+- exact wealth-law coupling;
+- a rigorous moment-matching non-equivalence proposition;
+- likelihood-ratio policy gradient for an observation-based policy under history-dependent market dynamics without assuming the four-feature observation is Markov;
+- occupancy and continuation-value decomposition of the SBJTS-vs-Merton gradient difference;
+- structural role of lagged return;
+- entropy-time-scaling discipline;
+- theorem-to-code mapping;
+- fixture-level mutation tests for U0–U3 gates.
 
-## GPU interpretation
+Claude remains **smoke/unit only**. No research-scale training/evaluation is authorized for the theory ticket.
 
-The authorized run deliberately preserves the same learner implementation used by frozen Base 4. T4 accelerates the tensor-heavy SBJTS/market simulation and block generation; the small frozen actor/critic update path remains NumPy float64 on CPU for numerical comparability. Moving that learner path to CUDA would create a new implementation lineage and requires a separate equivalence ticket before it can be used for paper evidence.
+## Evidence references
 
-## Evidence handoff after Colab
-
-Copy/commit the generated `evidence/merton_comparator_v1/research/` outputs to GitHub. Then return here with:
-
-> `audit comparator Colab results`
-
-PMO will audit the research evidence; no claim is promoted automatically.
+- `reports/research/RL_SBJTS_PAPER_SCIENTIFIC_UPDATE_v1.md`
+- `reports/research/RL_SBJTS_MECHANISM_AND_ROBUSTNESS_v1.md`
+- `reports/research/RL_SBJTS_THEORY_COUPLING_BLUEPRINT_v1.md`
+- `evidence/merton_comparator_v1/research/ARTIFACT_MANIFEST.json`
+- `evidence/merton_comparator_v1/research/policy_response_surface.csv`
+- `evidence/merton_comparator_v1/research/policy_response_slopes.csv`
+- `evidence/merton_comparator_v1/research/policy_level_sensitivity.csv`
 
 ## Closed / historical work
 
 - Base 4 remains frozen and is not reopened.
-- Commit `0bdd16b` is retained only as **DEVELOPMENT_EVIDENCE** because it executed research-scale work before the current user-Colab/T4 policy and its result files are not part of the active research tree.
-- Claude's comparator implementation/smoke phase is complete; no further Claude research-scale execution is authorized for this ticket.
+- `C-RLSBJTS-MERTON-COMP-01` has completed its scientific purpose; its user-Colab T4 research evidence is accepted with scope under DEC-RL-004.
+- Commit `0bdd16b` remains **DEVELOPMENT_EVIDENCE** only.
+- The process rule from DEC-RL-002 remains binding: Claude does derivation/design/code/smoke; the user owns any future research-scale Colab execution.
