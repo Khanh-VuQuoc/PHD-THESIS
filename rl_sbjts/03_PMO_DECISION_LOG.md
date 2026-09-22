@@ -172,3 +172,46 @@ The research outputs remain on Google Drive and are now pinned in GitHub by Driv
 Open exactly one new executable ticket: `C-RLSBJTS-THEORY-COUPLING-01`.
 
 The next deliverable is formal theory: wealth-law coupling, moment-matching non-equivalence, likelihood-ratio policy gradient under history dependence/partial observation, occupancy/continuation-value decomposition, theorem-to-code mapping, and cheap gate-mutation tests. No additional research-scale training is authorized at this stage.
+
+---
+
+## DEC-RL-005 — Theory coupling requires a targeted mathematical patch
+
+**Date:** 2026-09-22  
+**Decision:** `TARGETED_PATCH`; retain the first theory submission as a strong candidate but do not merge/adopt it into the manuscript yet.
+
+### Submission audited
+
+- Claude commit: `64cd35b0d885a5306733a5c7ea4ea75a8ba0fd18`.
+- Scope discipline: correct — derivation, theorem-to-code mapping and cheap unit/mutation tests only; no research-scale training/evaluation.
+- Frozen-source identity: strong — Base 3 code concat and training slice match pinned digests; 17/17 native AST components match.
+- Verification package: 18/18 check groups pass; theorem-to-code map covers 16 load-bearing objects; gate-mutation controls include negative tests that fail as intended.
+
+### Findings accepted in substance
+
+1. Exact wealth coupling is correct, and the third-order coefficients are symbolically verified.
+2. Two constructive mechanisms establish the narrow non-equivalence claim: higher moments can matter even with matched mean/variance, and conditional/path laws can matter even when every one-step marginal matches.
+3. The likelihood-ratio policy-gradient derivation correctly uses a full history state and observation-based policy without requiring the four-feature observation to be Markov.
+4. The frozen entropy convention and `m = lambda * dt` scaling are handled explicitly.
+5. The first submission correctly discovers that occupancy/continuation channel magnitudes are reference-convention dependent.
+6. The lagged-return result is appropriately structural rather than a claim of sole causal attribution.
+
+### Required corrections before theory acceptance
+
+- **T1 locality:** the Taylor/moment series must be stated as local/asymptotic around zero, or supplied with explicit convergence/interchange conditions. The exact wealth coupling remains global and is the correct object on jumps.
+- **Market-entry wording:** `g(A_t,r_t)` is the one-step wealth coupling, not the only route by which the market law enters the RL problem; the law also changes future state/history occupancy and continuation values.
+- **T3 regularity:** replace the unsupported bounded-return-support rationale with explicit domination/integrability assumptions sufficient for differentiation under expectation.
+- **T3.4 numerical wording:** a central finite difference at nonzero step size has truncation error and is not literally an unbiased pathwise estimator. Treat it as an independent numerical agreement check, not part of the analytic proof.
+- **T4 decomposition:** use the symmetric midpoint identity as the main manuscript convention,
+  \[
+  d_SA_S-d_MA_M=\tfrac12(d_S-d_M)(A_S+A_M)+\tfrac12(d_S+d_M)(A_S-A_M),
+  \]
+  with a common dominating measure; label the terms symmetric occupancy and continuation-value contributions, state that the split remains an attribution convention rather than causal identification, and keep S/M-reference decompositions as supporting identities. Carry the direct entropy-derivative occupancy term separately if it remains outside the soft advantage.
+
+### Execution decision
+
+No new training, holdout evaluation or Colab research run is authorized. Claude should sync current `main`, patch only the theory report/evidence/map and ticket status, rerun only cheap theory/unit fixtures if needed, return `READY_FOR_PMO_THEORY`, and stop.
+
+### Research direction after patch
+
+If the patch is accepted, the theory backbone will be ready for manuscript integration. PMO will then decide whether a lightweight conditional-law diagnostic is worth running. A lag-ablation **retraining** experiment is not automatically authorized and should be opened only if the manuscript needs causal attribution beyond the current structural mechanism evidence.
