@@ -6,8 +6,10 @@ Updated: 2026-09-22. Owner: GPT / PMO.
 
 | Field | Current value |
 |---|---|
-| Project research status | **SCIENTIFIC_BACKBONE_LOCKED / MANUSCRIPT_INTEGRATION** — direct comparator, T1–T5 theory, robustness, saved-policy mechanism evidence, and the user-Colab conditional-law diagnostic are accepted with stated scope. No further research-scale experiment is open. |
-| Executable research ticket | **NONE. STOP EXPERIMENTS.** `C-RLSBJTS-CONDLAW-DIAG-01` has completed its scientific purpose. |
+| Project research status | **SCIENTIFIC_BACKBONE_LOCKED / MANUSCRIPT_CORE_ASSEMBLED** — direct comparator, T1–T5 theory, robustness, saved-policy mechanism evidence, and the user-Colab conditional-law diagnostic are accepted with stated scope. No further research-scale experiment is open. |
+| Executable research ticket | **NONE. STOP EXPERIMENTS.** All currently authorized scientific work packages have completed their purpose. |
+| Manuscript core | `manuscript/RL_SBJTS_MANUSCRIPT_DRAFT_v1.tex` — comparator + theory + mechanism + discussion/limitations assembled into one paper narrative. |
+| Manuscript integration record | `reports/pmo/PMO_MANUSCRIPT_INTEGRATION_v1.md`. |
 | Accepted empirical scope | Under the tested frozen SBJTS deployment law, SBJTS-trained policies have higher terminal log wealth and lower CVaR log loss than otherwise matched empirical-GBM-trained policies in both LONG_ONLY_FULL and LONG_ONLY_CAP50. |
 | FULL comparator result | `Delta_W = +0.0022063`; `Delta_CVaR = -0.0031810`. |
 | CAP50 comparator result | `Delta_W = +0.0005541`; `Delta_CVaR = -0.0007611`. |
@@ -20,11 +22,11 @@ Updated: 2026-09-22. Owner: GPT / PMO.
 | Conditional-law hardware/provenance | Research evidence is correctly stamped `C-RLSBJTS-CONDLAW-DIAG-01`, executed on Tesla T4 / CUDA 12.8 / `TORCH_CUDA_FLOAT32_BATCHED`; Base-3 code concat, snapshot, training slice and environment fingerprints match the frozen lineage. |
 | Result audit | `reports/pmo/PMO_CONDLAW_RESULT_AUDIT_v1.md` — `RESEARCH_EVIDENCE_ACCEPTED_WITH_SCOPE / STOP_EXPERIMENTS`. |
 | Permanent limitations | No universal superiority, no pure-jump causal attribution, no external-market validity from smoke-scale Base 2 ancestry, no retrospective confirmatory-superiority claim, no claim that lagged return alone causes the observed gain. |
-| Next PMO action | Integrate comparator + theory + mechanism into the manuscript; generate final figures/tables; update the TeX; perform claim/limitation and reference audit. |
+| Next PMO action | Editorial only: broaden and verify the external literature/reference section, adapt to the chosen journal template, polish language/figures, and respond to advisor/reviewer comments. No new scientific experiment unless a new scoped question is explicitly opened. |
 
 ## Locked scientific narrative
 
-The paper is now organized around
+The paper is organized around
 
 \[
 \boxed{
@@ -64,6 +66,8 @@ When plotting conditional means, use within-law deviations or each law's own unc
 - `reports/pmo/PMO_THEORY_COUPLING_ACCEPTANCE_v3.md`
 - `reports/pmo/PMO_CONDLAW_CODE_ACCEPTANCE_v2.md`
 - `reports/pmo/PMO_CONDLAW_RESULT_AUDIT_v1.md`
+- `reports/pmo/PMO_MANUSCRIPT_INTEGRATION_v1.md`
+- `manuscript/RL_SBJTS_MANUSCRIPT_DRAFT_v1.tex`
 - `evidence/theory_coupling_v1/unit_checks.json`
 - `evidence/theory_coupling_v1/theorem_code_map.csv`
 - `evidence/merton_comparator_v1/research/ARTIFACT_MANIFEST.json`
