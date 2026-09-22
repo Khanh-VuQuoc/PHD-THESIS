@@ -1,0 +1,26 @@
+{
+  "project": "RL-SBJTS",
+  "ticket": "C-RLSBJTS-MERTON-COMP-01",
+  "protocol_id": "c9ef65485a49d40356f3bbb02d491c4b73fcc9ebf0a22f02f64ab87e04a590d4",
+  "evidence_class": "USER_COLAB_T4_RESEARCH_EVIDENCE",
+  "drive_research_folder_id": "1fPoz0DcOn1_k4j_gTesptJjQpyCaMxie",
+  "generated_manifest_date": "2026-09-22",
+  "files": [
+    {"file":"primary_estimands.json","size_bytes":23905,"sha256":"93edd7a600222c1e1cadf1f25f185ecf1d0d6c4bd97786a167c88ae2f87e67b1","drive_file_id":"13ryTz4tsSPDNegDn9Q5yw7yCz4ZaUDrH"},
+    {"file":"source_fingerprint.json","size_bytes":3428,"sha256":"9f6752513efb7a692b89f336ec5c4474df3f502c8593b7a504f98a363fe54d63","drive_file_id":"1fuLM80t7wwm_PzDWppMpyVwiQr5mnLNC"},
+    {"file":"reproduction_check.json","size_bytes":26915,"sha256":"1af069a2c003c05f327df60d69160ae82ee352eb7390de5f79df1e9b91d53dac","drive_file_id":"11ZbmFGDkIlZIFR0i0VsM91N6TuccMo18"},
+    {"file":"merton_calibration.json","size_bytes":7021,"sha256":"9066a8873c537c56da2391e90de7df1902a0686f96ee3cedf6fa7c47a54b7b30","drive_file_id":"1bWNSJl_qRMFU6V_ajxoxVaSIQyPa-zIA"},
+    {"file":"learner_positive_control.json","size_bytes":6385,"sha256":"cc6cf00af3f4ae0614f066895e36f9006669c466f20046d3e0ad434e22ca60dc","drive_file_id":"1RhEIG57ORhu9k5u7G2oBedixpeYc5Tek"},
+    {"file":"entropy_time_scaling_tests.json","size_bytes":10136,"sha256":"3d44def82bc95392a6e273e6461dd4d2d2b5fcf995e078f891bb5977b0111e1a","drive_file_id":"1lfUOfjA0qirV0t_qy2PlP5x0Z7SOur-G"},
+    {"file":"hardware_manifest.json","size_bytes":1479,"sha256":"8fc30a50c68b223d52812af246870335ce35153afa4bc2360ab0ed1638992e9d","drive_file_id":"1aWJ1SxkcIn-z1c-_efddoO1G05M5_do9"},
+    {"file":"training_attempts.csv","size_bytes":44801,"sha256":"621322d32c55c49c44b18a7d397f1d6973e2215ae14dfbb1f6a2be4de21dc1b0","drive_file_id":"1eNs0_lrI974KGxBnHk6An8SobkIemR35"},
+    {"file":"evaluation_attempts.csv","size_bytes":10803356,"sha256":"23c2bc1c79f3d7b67764b14f755154853113466e67b3b6acf342e58336e12e90","drive_file_id":"1mqprM4Peuxy_Nv4nZEb_LFxRx1mPZjXv"},
+    {"file":"policies_merton.npz","size_bytes":33942,"sha256":"0c96614c9ac642d45644582b630ad13c82885d7a6b97b2d90b7a28883856141c","drive_file_id":"1k7qod9f1jfU0GezvdhFRHUIuLrHImrCQ"},
+    {"file":"analytic_merton_results.csv","size_bytes":451702,"sha256":"883503c67d55b296fc13a2ed675d5969aa98e9c7d89e1f7cc126c582cee2b575","drive_file_id":"1Zi1vFpoKoAFN6zzAJPrp-NmZz9JNHHz3"},
+    {"file":"resume_manifest.json","size_bytes":604,"sha256":"0948d76f90c3233eb87d38cdde27fbb6632df12d886f9a6265fabac0ec811941","drive_file_id":"1amARaGeS9A3L0aLNPOL2JqrPSAPJ__s4"},
+    {"file":"base4_evaluation_results_frozen.csv","size_bytes":31275147,"sha256":"287d98bb8a913478d62a7932650e5c32dc41c533e38129238d74f7e67d83c577","drive_file_id":"1wBGnVvYk9od0so54EhDaejFuzyJBN-kk"},
+    {"file":"base4_training_attempts.csv","size_bytes":40994,"sha256":"b56505a2d8d0973e821f0a81c60cfaaf96613c1e72bc3c11e44828f9332729c2","drive_file_id":"1HVVuO6LwTXiEStjYD9gb42RLd_9gIOYm"},
+    {"file":"base4_policies.npz","size_bytes":67862,"sha256":"34c39a30feb29391684bab03e4cbb0a3ebedd448af645253265413d8406fa294","drive_file_id":"15BMGKOTO0m1iQA7sSSBhxz4VrCfDwaid"}
+  ],
+  "note":"Large/binary research artifacts remain authoritative on Drive and are pinned here by file ID, byte size, and SHA-256. Compact derived research summaries are stored in GitHub."
+}
