@@ -1,0 +1,137 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs,array}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{microtype}
+\usepackage{setspace}
+\hypersetup{colorlinks=true,linkcolor=black,citecolor=black,urlcolor=blue}
+\setstretch{1.08}
+\newtheorem{proposition}{Proposition}
+\newcommand{\E}{\mathbb E}
+\newcommand{\Cov}{\operatorname{Cov}}
+
+\title{Training-Law Misspecification in Constrained Exploratory Portfolio Reinforcement Learning:\\Evidence from a Frozen SBJTS Market Law}
+\author{Manuscript core assembled from the locked RL--SBJTS research record}
+\date{September 2026}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+We study how the market law used during reinforcement-learning training affects constrained exploratory portfolio policies when deployment returns exhibit jump-rich and temporally dependent structure. The comparison holds the learner, state representation, exploration parameter, optimization budget, portfolio constraints, and deployment environment fixed, while changing only the training law: a frozen SBJTS path generator versus an empirically calibrated iid Merton/GBM diffusion. On the same frozen SBJTS deployment law, SBJTS-trained policies achieve higher mean terminal log wealth and lower CVaR log loss under both a long-only full-allocation constraint and a 50\% risky cap. Under the full constraint, the estimated differences are $\Delta_W=0.0022063$ and $\Delta_{\rm CVaR}=-0.0031810$; under the 50\% cap they are $0.0005541$ and $-0.0007611$. Crossed-cluster intervals and a policy-level sensitivity analysis based only on the 40 paired training replications preserve all four directions. The difference is not explained by average risky exposure. A theory layer shows that local moment matching does not imply RL equivalence and decomposes market-law effects through exact wealth coupling, state occupancy, continuation values, and conditional information. A final user-run diagnostic on 196,608 paths per law shows that the frozen SBJTS return has pronounced negative lag dependence and state-dependent conditional variance and tail risk, while the iid Merton control is recovered as flat. Saved SBJTS policies adjust risky exposure in a direction qualitatively aligned with this conditional structure, whereas Merton-trained policies are nearly insensitive to lagged return. The evidence is domain-scoped and descriptive rather than a universal or single-channel causal claim.
+\end{abstract}
+
+\section{Introduction}
+Continuous-time portfolio models often compress the risky-return law into a small number of diffusion parameters. This compression is analytically valuable, but it raises a different question once the portfolio rule is learned from simulated trajectories rather than solved directly: does a training law that matches local return moments but omits path dependence define the same reinforcement-learning problem?
+
+We keep the learning algorithm fixed and compare two training environments. The first is a frozen SBJTS path generator calibrated from historical multi-asset returns and designed to preserve jump/path/temporal structure. The second is an empirical Merton/GBM comparator calibrated from the same frozen training slice to the mean and variance of the equally weighted risky log increment. Both learners are evaluated on the same frozen SBJTS deployment law.
+
+The paper does not claim that SBJTS is the true financial data-generating process, that a pure jump effect has been causally isolated, that the truncated-Gaussian policy class is globally optimal under SBJTS, or that the observed lagged-return channel uniquely causes the performance gap.
+
+\section{Baseline and frozen objective}
+The learner observes
+\[
+S_t=\left(1,t/N,\log(W_t/W_0),r_{t-1}\right),
+\]
+which is an observation vector, not asserted to be a complete Markov state. The actor is linear in $S_t$ before a bounded transformation maps its outputs to the location and scale of a truncated Gaussian over the admissible risky-weight interval. We study LONG\_ONLY\_FULL, $A_t\in[0,1]$, and LONG\_ONLY\_CAP50, $A_t\in[0,0.5]$.
+
+The discrete objective is
+\[
+J_{\rm disc}(\theta)=\E_\theta[\log(W_T/W_0)] + m\sum_t H(\lambda_\theta(\cdot\mid S_t)),
+\]
+with $m=0.01$ and $\Delta t=1/250$. If continuous-time notation uses $\lambda\int H\,dt$, then $m=\lambda\Delta t$.
+
+\section{Market laws and experimental design}
+The frozen SBJTS target law produces the equally weighted projected risky log increment consumed by the learner. The empirical-Merton comparator is calibrated from the same frozen training slice using
+\[
+\sigma_M^2=v_1/\Delta t,\qquad \mu_M-r_f=m_1/\Delta t+\tfrac12\sigma_M^2,
+\]
+with $m_1=2.7942696\times10^{-4}$, $v_1=1.7267919\times10^{-4}$, $\sigma_M=0.2077734$, and $\mu_M-r_f=0.0914416$. Merton increments are iid Gaussian by construction.
+
+The direct comparison uses the same learner, optimizer, state representation, exploration parameter, constraints, number of updates, paths per update, and deployment law. Forty training replications are used per constraint for each training law. Frozen SBJTS evaluation rows are reused; the Merton arm contributes 80 trained policies and 24,000 target-holdout evaluations.
+
+\section{Theory}
+With gross risk-free return equal to one in the primary discrete convention,
+\[
+W_{t+1}=W_t[1+A_t(e^{r_t}-1)],
+\]
+so for $X_t=\log W_t$,
+\[
+X_{t+1}-X_t=\log\{1+A_t(e^{r_t}-1)\}.
+\]
+Locally around $r=0$,
+\[
+g(a,r)=ar+\tfrac12a(1-a)r^2+\tfrac16a(1-a)(1-2a)r^3+O(r^4),
+\]
+used only as a local diagnostic.
+
+\begin{proposition}
+There exist return laws with identical unconditional one-step mean and variance at every time for which the expected-growth functional, the optimal observation-based policy, or the policy gradient differ. The statement also holds when the full one-step marginal is identical and only the conditional law differs.
+\end{proposition}
+
+Let $H_t$ denote the full simulator history and $S_t$ the learner observation. If the market kernel and initial law are independent of $\theta$,
+\[
+\nabla_\theta\log p_{\theta,L}(\tau)=\sum_t \nabla_\theta\log\lambda_\theta(A_t\mid S_t),
+\]
+so the trajectory gradient does not require $S_t$ itself to be Markov. The theorem is conditional on a domination assumption; a sufficient local condition is
+\[
+\sup_{\theta\in U}\E[(1+\max_t\|S_t\|)(1+|R_\theta^{\rm soft}|)]<\infty.
+\]
+
+Writing the score-gradient integrand as $d_LA_L$, the law gap admits the symmetric identity
+\[
+d_SA_S-d_MA_M=\tfrac12(d_S-d_M)(A_S+A_M)+\tfrac12(d_S+d_M)(A_S-A_M),
+\]
+which is descriptive rather than causal.
+
+Finally, with $\bar\pi_\theta(S_t)=\E[A_t\mid S_t]$ and $\mu_L(H_t)=\E_L[r_t\mid H_t]$,
+\[
+\E[A_tr_t]=\E[\bar\pi_\theta(S_t)]\E[\mu_L(H_t)]+\Cov(\bar\pi_\theta(S_t),\mu_L(H_t)).
+\]
+Under iid Merton, $\mu_M(H_t)$ is constant and the covariance channel vanishes.
+
+\section{Main results}
+\begin{table}[htbp]
+\centering
+\caption{Direct comparison on the frozen SBJTS deployment law.}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Quantity & FULL & CAP50\\
+\midrule
+SBJTS mean terminal log wealth & 0.0148430 & 0.00752284\\
+Merton mean terminal log wealth & 0.0126367 & 0.00696874\\
+$\Delta_W$ & +0.00220632 & +0.000554092\\
+95\% CI for $\Delta_W$ & [0.00217262, 0.00224227] & [0.000545001, 0.000563736]\\
+SBJTS CVaR log loss & 0.0838585 & 0.0415466\\
+Merton CVaR log loss & 0.0870395 & 0.0423077\\
+$\Delta_{\rm CVaR}$ & -0.00318095 & -0.000761064\\
+95\% CI for $\Delta_{\rm CVaR}$ & [-0.00336362, -0.00299560] & [-0.000810332, -0.000712501]\\
+Mean executed exposure, SBJTS & 0.500677 & 0.249915\\
+Mean executed exposure, Merton & 0.499760 & 0.249670\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+All four crossed-cluster intervals exclude zero in the direction favoring SBJTS training. A policy-level sensitivity based only on the 40 paired training replications also excludes zero for all four contrasts, with the favorable sign in 40/40 replications for every endpoint/constraint pair.
+
+\section{Mechanism evidence}
+The final diagnostic simulates 64 seed blocks of 3,072 paths per law, giving 196,608 paths and 11,599,872 lagged-return pairs per law, with 4,000 block-bootstrap replications. The iid Merton control has lag slope $+0.0001347$ with 95\% CI $[-0.0004298,+0.0007155]$. SBJTS has lag slope $-0.125006$ with interval $[-0.125843,-0.124150]$ and lag-1 autocorrelation $-0.124750$.
+
+SBJTS conditional variance is state-dependent: unconditional variance is about $0.0002623$, while the most negative lag bin reaches $0.0009073$ and the most positive bin $0.0004576$. With the frozen Merton 5\% threshold, SBJTS left-tail probability rises to 7.85\% in the most positive lag bin, while Merton remains near 5\% across bins.
+
+Saved policies align qualitatively with this structure. Under LONG\_ONLY\_FULL, the SBJTS-trained mean risky allocation moves from about 0.543 at lag $-0.06$ to 0.462 at lag $+0.06$, while the Merton-trained policy remains near 0.495--0.496. CAP50 shows the same qualitative separation.
+
+\section{Discussion and limitations}
+The evidence supports a training-law misspecification interpretation: changing the trajectory law while holding the learner and deployment environment fixed changes the learned feedback rule and deployment outcomes. The evidence does not identify a pure-jump effect or a causal share attributable to one state coordinate. The deployment environment is simulated, one exploration level is primary, the observation is partial, and the policy-gradient theorem remains conditional on its stated integrability assumption.
+
+\section{Conclusion}
+Relative to an empirically calibrated iid Merton/GBM training law, the frozen SBJTS training law produces higher terminal log wealth and lower CVaR log loss on the tested SBJTS deployment environment under both portfolio constraints. The average risky exposure is nearly unchanged, but the learned feedback rule differs. Together with the theory and the conditional-law diagnostic, the results provide domain-scoped evidence that training-law misspecification can matter to constrained exploratory portfolio reinforcement learning even when local low-order return moments are matched.
+
+\begin{thebibliography}{9}
+\bibitem{Merton1969} R. C. Merton, ``Lifetime Portfolio Selection under Uncertainty: The Continuous-Time Case,'' \emph{Review of Economics and Statistics}, 51(3), 247--257, 1969.
+\bibitem{Merton1971} R. C. Merton, ``Optimum Consumption and Portfolio Rules in a Continuous-Time Model,'' \emph{Journal of Economic Theory}, 3(4), 373--413, 1971.
+\bibitem{Chau2026} H. Chau, D. Nguyen, and T. Nguyen, ``Continuous-time optimal investment with portfolio constraints: A reinforcement learning approach,'' \emph{European Journal of Operational Research}, 328, 1068--1092, 2026. DOI: 10.1016/j.ejor.2025.08.032.
+\end{thebibliography}
+\end{document}
