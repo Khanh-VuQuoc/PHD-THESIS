@@ -1,15 +1,28 @@
 {
-  "ticket": "C-RLSBJTS-MERTON-COMP-01",
+  "ticket": "C-RLSBJTS-CONDLAW-DIAG-01",
+  "producing_ticket": "C-RLSBJTS-CONDLAW-DIAG-01",
+  "diagnostic_id": "C-RLSBJTS-CONDLAW-DIAG-01",
+  "claim_status": "EXPLORATORY_MECHANISM_ONLY",
   "stage": "overlay",
   "run_mode": "SMOKE",
   "evidence_class": "SMOKE_EVIDENCE",
   "is_scientific_evidence": false,
-  "generated_at_utc": "2026-09-22T06:10:33.094397+00:00",
-  "claim_status": "SMOKE_EVIDENCE \u2014 execution proof only. This artifact is not a scientific result and must never be reported as comparator evidence.",
+  "is_research_scale_execution": false,
+  "no_policy_training_or_evaluation": true,
+  "generated_at_utc": "2026-09-22T06:33:47.883080+00:00",
+  "smoke_note": "execution proof only: this artifact is not a scientific result and must not be quoted as a mechanism finding",
   "law_used_for_curve": "SBJTS_TARGET",
-  "source_tables": {
-    "policy_response_surface": "/home/user/PHD-THESIS/rl_sbjts/evidence/merton_comparator_v1/research/policy_response_surface.csv",
-    "policy_response_slopes": "/home/user/PHD-THESIS/rl_sbjts/evidence/merton_comparator_v1/research/policy_response_slopes.csv"
+  "input_provenance": {
+    "note": "these two tables are INPUTS produced by the comparator ticket and accepted as research evidence; they are not produced here and the producing ticket of this artifact is the diagnostic ticket",
+    "source_ticket_of_inputs": "C-RLSBJTS-MERTON-COMP-01",
+    "policy_response_surface": {
+      "path": "/home/user/PHD-THESIS/rl_sbjts/evidence/merton_comparator_v1/research/policy_response_surface.csv",
+      "sha256": "12c6f35414858552d0c116d26a651d6e2397a466421d6de2312a794b7a392d86"
+    },
+    "policy_response_slopes": {
+      "path": "/home/user/PHD-THESIS/rl_sbjts/evidence/merton_comparator_v1/research/policy_response_slopes.csv",
+      "sha256": "c0ebf2b9deeda7e9ad564d4c142d27e82dc4ea46fbb0d424d4d814028aed6afc"
+    }
   },
   "join": "policy lagged-return grid mapped to diagnostic z bins via the frozen empirical Merton one-step calibration",
   "rows": [

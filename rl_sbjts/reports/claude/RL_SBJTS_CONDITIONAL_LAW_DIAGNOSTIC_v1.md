@@ -2,11 +2,35 @@
 
 **Ticket:** `C-RLSBJTS-CONDLAW-DIAG-01`  
 **Status:** `READY_FOR_PMO_CODE` — design, implementation and smoke only.  
+**Revision:** second submission, patching commit `e60a351` per `reports/pmo/PMO_CONDLAW_CODE_AUDIT_v1.md` (P1 provenance, P2 dependencies). The estimand, bins, block-bootstrap design, controls, research budget and claim discipline are unchanged.  
 **Claim status:** `EXPLORATORY_MECHANISM_ONLY`.  
 **Policy training or evaluation:** none. Market simulation only, enforced by a static AST gate.  
-**Generated:** 2026-09-22T06:10:36.303910+00:00 · smoke package runs in 6.2 s on CPU.
+**Generated:** 2026-09-22T06:33:51.025239+00:00 · smoke package runs in 8.9 s on CPU.
 
 RESEARCH mode has **not** been run and cannot be run here: it hard-requires a CUDA NVIDIA T4, and this sandbox has no GPU. The proposed budget is in §6.
+
+## 0. Patch response (PMO code audit v1)
+
+Both findings were correct, and both came from reusing comparator scaffolding wholesale rather than from the diagnostic's own design. Nothing scientific changed.
+
+| patch | finding | fix |
+|---|---|---|
+| **P1** | diagnostic artifacts were stamped with the comparator ticket and carried comparator-specific claim wording | The package no longer writes through `comparator_config`. A new `condlaw_config` owns the stamp: every artifact carries `ticket`, `producing_ticket` and `diagnostic_id` all equal to `C-RLSBJTS-CONDLAW-DIAG-01`, plus `claim_status = EXPLORATORY_MECHANISM_ONLY`, and a caller payload cannot overwrite those fields. The comparator's "never report as comparator evidence" wording is gone, replaced by a diagnostic-specific smoke note. The notebook's hardware cell was also writing through the comparator stamper and now does not. |
+| **P2** | the notebook staged `policies.npz`, `training_attempts.csv` and the 31 MB evaluation ledger, the last resolved by largest-file-if-ambiguous | Step 00 is rewritten. It stages exactly two inputs, each content-pinned and each labelled with the function that executes it. There is no largest-file fallback anywhere: `resolve` accepts a candidate only on a digest match. The two accepted compact policy tables are carried inline in the notebook (about 3.8 kB) with their source digests verified on write, so the overlay needs no Drive lookup at all. Step 00 raises if a not-required artifact is staged anyway. |
+
+Two new gates enforce the fixes, and both are shown to bite:
+
+- **`S12`** scans every generated artifact (21 of them) for the producer keys and for any stray comparator ticket string. A comparator ticket is permitted **only** under an explicitly labelled input-provenance key, because the policy-response tables genuinely were produced by that ticket and saying so is correct attribution. Its negative control stamps an artifact through `comparator_config.stamp`, the actual pre-patch code path, and confirms the scan flags it: `True`, 1 offence and 3 missing stamps detected.
+- **`S13`** checks the dependency claim two ways: statically, that no module on the diagnostic path names a not-required artifact outside the declaration itself (`0` hits); and behaviourally, that the overlay — the only consumer of comparator evidence — builds correctly with **only** the two pinned compact tables present in its search path (`True`, 20 rows from 2 files).
+
+**Executed inputs, and what is deliberately absent.** Simulating two market laws and binning their lagged pairs needs neither saved policies nor any ledger:
+
+| input | executed by | why |
+|---|---|---|
+| `03_RL_SBJTS_RESEARCH_GPU_HYBRID_v1_8.ipynb` | `frozen_loader.load_base3_namespace / verify_native_ast_hashes` | supplies the frozen market engine and calibration code that Base4Engine.make_base4_market_pair executes |
+| `frozen_market_snapshot_U1_BASELINE_4.npz` | `frozen_loader.build_frozen_environment` | supplies the frozen calibration inputs and the training slice the empirical Merton one-step calibration is fitted to |
+
+Not staged, by design: `policies.npz`, `training_attempts.csv`, `evaluation_results_partial.csv`, `evaluation_results.csv`, `BASE4_05A_FINAL_BUNDLE.zip`.
 
 ## 1. What the diagnostic asks
 
@@ -74,7 +98,7 @@ Alongside the sup test, the Merton control also satisfies the two global checks:
 
 ## 5. Smoke results
 
-**11/11 checks pass**, 4 of them controls that must fail or block and do.
+**13/13 checks pass**, 4 of them controls that must fail or block and do.
 
 | check | what it establishes | pass |
 |---|---|---|
@@ -89,6 +113,8 @@ Alongside the sup test, the Merton control also satisfies the two global checks:
 | `S9_SEED_ISOLATION` | diagnostic seeds disjoint from all Base 4 seeds | True |
 | `S10_NAMESPACE_ISOLATION` | SMOKE cannot write into research/ and vice versa (negative control) | True |
 | `S11_RESEARCH_REQUIRES_NVIDIA_T4` | RESEARCH refuses to run without a T4 (negative control) | True |
+| `S12_PRODUCER_TICKET_PROVENANCE` | every artifact names this ticket as producer; a comparator ticket appears only as labelled input provenance (carries its own negative control) | True |
+| `S13_NO_RAW_LEDGER_DEPENDENCY` | no policy, training or evaluation ledger is required; the overlay builds from the two pinned compact tables alone | True |
 
 `S5` deserves a note because it is the control that protects the headline quantity. Permuting each step's column independently preserves every one-step marginal exactly (verified: `True`) while removing the time linkage. On the SBJTS fixture the slope moves from -0.1335 to -0.0093. A slope that survived this would have been an artefact of the marginals rather than evidence of conditional structure.
 
@@ -134,10 +160,10 @@ Blocks are favoured over paths-per-block deliberately: uncertainty is quantified
 
 | probe | paths | elapsed |
 |---|---|---|
-| 1 | 128 | 0.58 s |
-| 2 | 512 | 1.75 s |
+| 1 | 128 | 0.56 s |
+| 2 | 512 | 1.62 s |
 
-That fits a marginal cost of about 3.05 ms per path, so the proposed budget is roughly **11 minutes** of SBJTS simulation, seconds for the Merton control, and a few minutes for the bootstrap, which works on sufficient statistics rather than raw pairs. **Request a 45-minute end-to-end allowance** on one T4 session. Peak resident memory extrapolates to about **0.9 GB**.
+That fits a marginal cost of about 2.76 ms per path, so the proposed budget is roughly **11 minutes** of SBJTS simulation, seconds for the Merton control, and a few minutes for the bootstrap, which works on sufficient statistics rather than raw pairs. **Request a 45-minute end-to-end allowance** on one T4 session. Peak resident memory extrapolates to about **0.9 GB**.
 
 **Honest limitation on these figures.** They are CPU measurements. Claude has no GPU here and has not timed the CUDA path, so the T4 run may be faster or slower; the allowance is loose for that reason. A first measurement of the engine in this session came out 40× more expensive per path and was pure one-time torch warmup — which is why the reported figures come from a two-point fit after warm-up rather than a single timing.
 
@@ -155,6 +181,8 @@ The overlay is read-only: it joins the conditional-mean curve to the already-acc
 | LONG_ONLY_CAP50 | MERTON | +0.0061 | -0.1140 | `False` |
 
 DIRECTION ONLY. This overlay shows whether the sign of the learned action response to the lagged return is qualitatively consistent with the sign of the conditional structure present in the frozen target law. It does not attribute any share of the performance gap to the lagged-return channel, and it is not a test.
+
+**Input provenance.** The two tables are inputs, not outputs of this package. They were produced by `C-RLSBJTS-MERTON-COMP-01` and are accepted research evidence; this artifact's producing ticket is the diagnostic ticket. Each is verified against its pinned digest before a row is read — `policy_response_surface.csv` `12c6f35414858552…`, `policy_response_slopes.csv` `c0ebf2b9deeda7e9…` — because a filename match is not evidence that the accepted table is the one that was read.
 
 The direction column answers one question only: does the learned action move the way the law's own conditional mean would reward at first order, given T1's result that expected growth rises with the action when the conditional mean is positive. It is a sign comparison. It carries no magnitude, no share of the performance gap, and no test.
 

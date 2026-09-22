@@ -1,20 +1,22 @@
 {
-  "ticket": "C-RLSBJTS-MERTON-COMP-01",
+  "ticket": "C-RLSBJTS-CONDLAW-DIAG-01",
+  "producing_ticket": "C-RLSBJTS-CONDLAW-DIAG-01",
+  "diagnostic_id": "C-RLSBJTS-CONDLAW-DIAG-01",
+  "claim_status": "EXPLORATORY_MECHANISM_ONLY",
   "stage": "law_summary",
   "run_mode": "SMOKE",
   "evidence_class": "SMOKE_EVIDENCE",
   "is_scientific_evidence": false,
-  "generated_at_utc": "2026-09-22T06:10:31.542319+00:00",
-  "claim_status": "EXPLORATORY_MECHANISM_ONLY",
-  "diagnostic_id": "C-RLSBJTS-CONDLAW-DIAG-01",
+  "is_research_scale_execution": false,
+  "no_policy_training_or_evaluation": true,
+  "generated_at_utc": "2026-09-22T06:33:47.851223+00:00",
+  "smoke_note": "execution proof only: this artifact is not a scientific result and must not be quoted as a mechanism finding",
   "profile": {
     "n_blocks": 6,
     "n_paths": 64,
     "n_boot": 2000,
     "note": "tiny frozen-engine fixture, CPU, exercises every bin and the whole output schema"
   },
-  "is_research_scale_execution": false,
-  "no_policy_training_or_evaluation": true,
   "binning": {
     "z_edges": [
       "-inf",

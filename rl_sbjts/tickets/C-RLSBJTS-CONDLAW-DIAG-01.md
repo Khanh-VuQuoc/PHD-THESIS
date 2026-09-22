@@ -264,3 +264,67 @@ no external-validity claim, no confirmatory test, no universal superiority. The 
 overlay is read-only and direction-only: it compares the SIGN of the already-accepted
 learned action response with the sign of the law's own conditional structure, and carries
 no magnitude and no share of the performance gap.
+
+### 2026-09-22 — Claude — P1/P2 patch submission — `READY_FOR_PMO_CODE`
+
+Patch of the existing `e60a351` submission only, per
+`reports/pmo/PMO_CONDLAW_CODE_AUDIT_v1.md`. **Both findings were correct**, and both came
+from reusing comparator scaffolding wholesale rather than from the diagnostic's own
+design. The estimand, bins, block-bootstrap design, controls, research budget and claim
+discipline are unchanged. No training, no RESEARCH mode: 13/13 cheap checks pass in 8.9 s
+on CPU (11 carried forward, 2 new). `main` synced first; PMO state, decision log, claim
+ledger and comparator evidence untouched.
+
+**P1 — artifact provenance.** The package no longer writes through `comparator_config`,
+whose `stamp` hard-codes the comparator ticket and comparator-specific claim wording. A
+new `condlaw_config` module owns the stamp. Every artifact now carries `ticket`,
+`producing_ticket` and `diagnostic_id` all equal to `C-RLSBJTS-CONDLAW-DIAG-01`, plus
+`claim_status = EXPLORATORY_MECHANISM_ONLY`, the correct run mode and evidence class, and
+a caller-supplied payload cannot overwrite those fields. The comparator's "must never be
+reported as comparator evidence" wording is replaced by a diagnostic-specific smoke note.
+The notebook's hardware cell was also writing `hardware_manifest.json` through the
+comparator stamper and now does not. Verified on the regenerated artifacts:
+`law_summary.json`, `source_fingerprint.json`, `hardware_manifest.json` and
+`policy_overlay.json` all stamp correctly.
+
+New gate **`S12`** scans every generated JSON and CSV (21 artifacts) for the producer
+keys and for any stray comparator ticket string, and fails on either a foreign producer
+ticket or a missing required stamp. A comparator ticket is permitted only under an
+explicitly labelled input-provenance key, because the policy-response tables genuinely
+were produced by that ticket and attributing them is correct. The gate carries its own
+negative control: it stamps an artifact through `comparator_config.stamp` — the actual
+pre-patch code path — and confirms the scan flags it (1 offence, 3 missing stamps). A
+provenance gate that could not be made to fail would not have caught the defect it exists
+to prevent.
+
+**P2 — raw comparator dependencies.** Step 00 of the notebook is rewritten. It stages
+exactly two inputs, each content-pinned and each documented with the function that
+executes it: the Base 3 research notebook (`344956031d9e8976…`, consumed by
+`load_base3_namespace` / `verify_native_ast_hashes`) and the frozen market snapshot
+(`7e817762849118fc…`, consumed by `build_frozen_environment`). Removed entirely:
+`policies.npz`, `training_attempts.csv`, `evaluation_results_partial.csv` and the Base 4
+bundle. The `largest_if_ambiguous` resolution path is gone — `resolve` accepts a
+candidate only on a digest match — and Step 00 raises if a not-required artifact is
+staged anyway.
+
+The overlay's inputs are now the two accepted compact tables, `policy_response_surface.csv`
+(`12c6f35414858552…`) and `policy_response_slopes.csv` (`c0ebf2b9deeda7e9…`), carried
+inline in the notebook as read-only copies (about 3.8 kB together) and verified against
+those digests on write, so the Colab run needs no Drive lookup for them at all. The
+overlay verifies the pinned digest before reading a single row, because a filename match
+is not evidence that the accepted table is the one that was read.
+
+New gate **`S13`** checks the dependency claim two ways: statically, that no module on the
+diagnostic path names a not-required artifact outside the declaration itself (0 hits);
+and behaviourally, that the overlay — the only consumer of comparator evidence — builds
+correctly (20 rows) with **only** the two pinned compact tables present in its search
+path.
+
+**Unchanged and re-verified:** the estimand and pair construction, the Merton-standardised
+right-closed common bins, block sufficient statistics with bit-exact resume, the
+block-level cluster bootstrap, the simultaneous studentized sup-statistic flatness test
+(Merton sup 1.057 vs critical 2.696; AR(1) rho=0.15 sup 42.563 vs 2.710), the
+pairing-destruction control, seed isolation, namespace isolation, the T4 fail-closed gate,
+the AST no-actor-training gate, the proposed budget of 64 blocks x 3,072 paths per law
+with 4,000 bootstrap replicates, and `EXPLORATORY_MECHANISM_ONLY` throughout. The smoke
+numbers remain execution proof, not evidence.

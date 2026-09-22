@@ -1,14 +1,17 @@
 {
   "ticket": "C-RLSBJTS-CONDLAW-DIAG-01",
+  "producing_ticket": "C-RLSBJTS-CONDLAW-DIAG-01",
+  "diagnostic_id": "C-RLSBJTS-CONDLAW-DIAG-01",
+  "claim_status": "EXPLORATORY_MECHANISM_ONLY",
   "stage": "smoke_checks",
   "run_mode": "SMOKE",
   "evidence_class": "SMOKE_EVIDENCE",
   "is_scientific_evidence": false,
-  "generated_at_utc": "2026-09-22T06:10:36.303910+00:00",
-  "claim_status": "EXPLORATORY_MECHANISM_ONLY",
-  "check_id": "C-RLSBJTS-CONDLAW-DIAG-01/SMOKE",
   "is_research_scale_execution": false,
   "no_policy_training_or_evaluation": true,
+  "generated_at_utc": "2026-09-22T06:33:51.025239+00:00",
+  "smoke_note": "execution proof only: this artifact is not a scientific result and must not be quoted as a mechanism finding",
+  "check_id": "C-RLSBJTS-CONDLAW-DIAG-01/SMOKE",
   "profile": {
     "n_blocks": 6,
     "n_paths": 64,
@@ -270,7 +273,7 @@
         },
         {
           "module": "overlay",
-          "n_identifiers": 62,
+          "n_identifiers": 74,
           "forbidden_found": []
         }
       ],
@@ -314,10 +317,81 @@
       "check": "S11_RESEARCH_REQUIRES_NVIDIA_T4",
       "observed": "RESEARCH_MODE_REQUIRES_CUDA",
       "pass": true
+    },
+    {
+      "check": "S12_PRODUCER_TICKET_PROVENANCE",
+      "negative_control": {
+        "mis_stamped_artifact_flagged": true,
+        "n_offences_detected": 1,
+        "n_missing_stamps_detected": 3,
+        "example": {
+          "file": "/tmp/tmpdcyaug0v/law_summary.json",
+          "key": "ticket",
+          "value": "C-RLSBJTS-MERTON-COMP-01",
+          "reason": "foreign ticket as producer"
+        },
+        "stamped_via": "comparator_config.stamp (the pre-patch code path)"
+      },
+      "producer_ticket": "C-RLSBJTS-CONDLAW-DIAG-01",
+      "claim_status": "EXPLORATORY_MECHANISM_ONLY",
+      "foreign_producer_tickets": [
+        "C-RLSBJTS-MERTON-COMP-01"
+      ],
+      "producer_keys_checked": [
+        "ticket",
+        "producing_ticket",
+        "diagnostic_id",
+        "check_id"
+      ],
+      "allowed_input_provenance_keys": [
+        "calibration_id_source",
+        "input_provenance",
+        "source_ticket_of_inputs"
+      ],
+      "n_artifacts_scanned": 21,
+      "offences": [],
+      "artifacts_missing_required_stamp": [],
+      "pass": true
+    },
+    {
+      "check": "S13_NO_RAW_LEDGER_DEPENDENCY",
+      "not_required_artifacts": [
+        "policies.npz",
+        "training_attempts.csv",
+        "evaluation_results_partial.csv",
+        "evaluation_results.csv",
+        "BASE4_05A_FINAL_BUNDLE.zip"
+      ],
+      "required_inputs": {
+        "03_RL_SBJTS_RESEARCH_GPU_HYBRID_v1_8.ipynb": {
+          "sha256": "344956031d9e89763370a020d92ec54a669a7cc400e3d2b674de613897c02129",
+          "executed_by": "frozen_loader.load_base3_namespace / verify_native_ast_hashes",
+          "why": "supplies the frozen market engine and calibration code that Base4Engine.make_base4_market_pair executes"
+        },
+        "frozen_market_snapshot_U1_BASELINE_4.npz": {
+          "sha256": "7e817762849118fc3abf8d4cf98ad8d65d921fa49cb0d1b3bb34d884b73c5b4a",
+          "executed_by": "frozen_loader.build_frozen_environment",
+          "why": "supplies the frozen calibration inputs and the training slice the empirical Merton one-step calibration is fitted to"
+        }
+      },
+      "static_hits": {},
+      "overlay_built_without_any_ledger": true,
+      "overlay_detail": {
+        "n_overlay_rows": 20,
+        "files_available_to_the_overlay": [
+          "policy_response_slopes.csv",
+          "policy_response_surface.csv"
+        ]
+      },
+      "pinned_compact_tables": {
+        "policy_response_surface.csv": "12c6f35414858552d0c116d26a651d6e2397a466421d6de2312a794b7a392d86",
+        "policy_response_slopes.csv": "c0ebf2b9deeda7e9ad564d4c142d27e82dc4ea46fbb0d424d4d814028aed6afc"
+      },
+      "pass": true
     }
   ],
-  "n_checks": 11,
-  "n_pass": 11,
+  "n_checks": 13,
+  "n_pass": 13,
   "all_pass": true,
   "negative_controls": [
     "S4_AR1_NEGATIVE_CONTROL",
@@ -329,7 +403,7 @@
     "observations": [
       {
         "n_paths": 128,
-        "elapsed_s": 0.58,
+        "elapsed_s": 0.56,
         "shape": [
           128,
           60
@@ -337,17 +411,17 @@
       },
       {
         "n_paths": 512,
-        "elapsed_s": 1.75,
+        "elapsed_s": 1.62,
         "shape": [
           512,
           60
         ]
       }
     ],
-    "marginal_seconds_per_path_cpu": 0.0030468749999999997,
-    "fixed_seconds_per_block_cpu": 0.19,
+    "marginal_seconds_per_path_cpu": 0.0027604166666666667,
+    "fixed_seconds_per_block_cpu": 0.20666666666666672,
     "model": "elapsed ~= fixed + marginal * n_paths, fitted on the two probes",
     "backend": "TORCH_CPU_FLOAT32_BATCHED (this sandbox has no GPU)"
   },
-  "elapsed_s": 6.2
+  "elapsed_s": 8.9
 }

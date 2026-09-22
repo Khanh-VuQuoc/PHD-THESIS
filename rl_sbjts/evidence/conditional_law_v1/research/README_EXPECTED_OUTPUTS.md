@@ -8,6 +8,40 @@ budget. Claude has not run and must not run RESEARCH mode.
 This directory is **empty until that authorised run happens**. Nothing Claude produced
 belongs here; Claude's artifacts live in `../smoke/` and are not scientific evidence.
 
+## Inputs the RESEARCH run needs
+
+Exactly two files are staged, each resolved **by content digest only** — there is no
+name-only match and no largest-file fallback anywhere in this notebook:
+
+| input | sha256 | executed by |
+|---|---|---|
+| `03_RL_SBJTS_RESEARCH_GPU_HYBRID_v1_8.ipynb` | `344956031d9e89763370a020…` | `frozen_loader.load_base3_namespace / verify_native_ast_hashes` |
+| `frozen_market_snapshot_U1_BASELINE_4.npz` | `7e817762849118fc3abf8d4c…` | `frozen_loader.build_frozen_environment` |
+
+Deliberately **not** staged, because nothing in the diagnostic path opens them:
+`policies.npz`, `training_attempts.csv`, `evaluation_results_partial.csv`,
+`evaluation_results.csv`, `BASE4_05A_FINAL_BUNDLE.zip`. Simulating two market laws and
+binning their lagged pairs requires no saved policy and no training or evaluation
+ledger. Step 00 raises if any of them is staged anyway, and the `S13` gate checks the
+claim both statically and behaviourally.
+
+The policy overlay's two inputs — the accepted compact tables
+`policy_response_surface.csv` (`12c6f35414858552…`) and `policy_response_slopes.csv`
+(`c0ebf2b9deeda7e9…`) — are **carried inline in the notebook** as read-only copies, about
+3.8 kB together, and verified against those digests when written out. The Colab run
+therefore needs no Drive lookup for them at all.
+
+## Provenance of what this run produces
+
+Every artifact written here carries `ticket`, `producing_ticket` and `diagnostic_id` all
+equal to `C-RLSBJTS-CONDLAW-DIAG-01`, plus
+`claim_status = EXPLORATORY_MECHANISM_ONLY`, stamped by the diagnostic's own config
+rather than the comparator's. The comparator ticket may appear **only** under the
+labelled `input_provenance` key of `policy_overlay.json`, where it correctly attributes
+the two input tables. The `S12` gate scans every generated JSON and CSV for this and
+fails on any other occurrence; it carries its own negative control proving it catches a
+mis-stamped artifact.
+
 ## Proposed bounded budget
 
 | Field | Value |
