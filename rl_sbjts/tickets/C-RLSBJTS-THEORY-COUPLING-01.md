@@ -1,6 +1,6 @@
 # C-RLSBJTS-THEORY-COUPLING-01 — Formal theory coupling and theorem-to-code verification
 
-**Status:** `OPEN_FOR_CLAUDE`  
+**Status:** `PATCH_REQUESTED`  
 **Owner:** Claude — Technical Research Verifier / Implementation Lead  
 **PMO:** GPT  
 **Execution policy:** derivation + code mapping + static/unit/smoke only; **no research-scale training or evaluation**.
@@ -177,3 +177,54 @@ COMMIT:
 ```
 
 Then mark the ticket `READY_FOR_PMO_THEORY` and stop. No full training/evaluation is authorized.
+
+## 9. PMO audit of first theory submission
+
+**Submission audited:** commit `64cd35b0d885a5306733a5c7ea4ea75a8ba0fd18`  
+**PMO verdict:** `TARGETED_PATCH`.
+
+The first submission is accepted in substance: T1–T5 core structure, the theorem-to-code map, frozen-source identity, entropy scaling, and unit/mutation evidence are strong. No research-scale rerun is requested. The patch is limited to mathematical precision and manuscript-safe decomposition.
+
+### Required patch P1 — localize the T1 moment series
+
+Keep the exact identity
+
+\[
+g(a,r)=\log\{1+a(e^r-1)\}
+\]
+
+global. But the Taylor expansion and any representation as an infinite sum of conditional moments must be labelled **local/asymptotic around `r=0`**, unless explicit convergence and expectation/series interchange conditions are stated. Do not write an unconditional exact equality `E[g]=sum_k ...` for jump steps without those conditions. Preserve the existing caveat that the exact coupling, not the truncated series, governs jumps.
+
+### Required patch P2 — correct the market-entry wording
+
+Replace any wording equivalent to “the market enters the learning problem only through this scalar map.” The scalar map is the exact **one-step wealth coupling**, but the market law also changes the distribution of future history/observations, occupancy measures and continuation values. The paper's central mechanism requires both roles.
+
+### Required patch P3 — strengthen T3 regularity assumptions
+
+Do not justify differentiation-under-expectation by claiming that SBJTS returns have bounded support. State an explicit sufficient domination/integrability assumption, for example finite integrability of the score-weighted soft return and entropy derivative in a neighbourhood of `theta`, together with the smooth bounded policy transform/action interval. If a stronger moment condition is used, state it as an assumption rather than as a verified property of the stochastic law unless source evidence proves it.
+
+### Required patch P4 — correct T3.4 finite-difference language
+
+A central finite difference at nonzero step size is a numerical approximation with truncation error (typically `O(h^2)` under the required smoothness); it is not literally an unbiased pathwise estimator. Rephrase T3.4 as an independent numerical agreement check between the likelihood-ratio gradient and a common-random-number pathwise/finite-difference approximation, with both Monte Carlo uncertainty and finite-difference error acknowledged. Do not use the finite-difference check as the proof of T3; the proof is analytic.
+
+### Required patch P5 — make T4 manuscript decomposition symmetric/reference-explicit
+
+The first submission correctly discovered that the two-channel split is reference dependent. For the main manuscript, use the symmetric midpoint identity
+
+\[
+d_SA_S-d_MA_M
+=\tfrac12(d_S-d_M)(A_S+A_M)
++\tfrac12(d_S+d_M)(A_S-A_M),
+\]
+
+under a common dominating measure, and label the two terms as a **symmetric occupancy contribution** and a **symmetric continuation-value contribution**. State clearly that even this is an attribution convention, not a causal identification. Keep the S-reference and M-reference decompositions as supporting/appendix identities demonstrating non-uniqueness. If the direct entropy derivative remains outside the soft advantage, carry its occupancy-difference term separately. Add the symmetric split to the exactly enumerable fixture and verify that it sums to the same total gap.
+
+### Patch acceptance
+
+- No new training or research-scale evaluation.
+- Re-run only the cheap theory/unit fixture if needed.
+- Update the report and machine-readable evidence/map where the corrected statements affect them.
+- Preserve all existing caveats on partial observation, critic finite-sample bias, non-pure-jump interpretation and entropy scaling.
+- Sync current `main` before patching; do not overwrite PMO state/decision files.
+
+After these five items are addressed, return `READY_FOR_PMO_THEORY` again and stop.
