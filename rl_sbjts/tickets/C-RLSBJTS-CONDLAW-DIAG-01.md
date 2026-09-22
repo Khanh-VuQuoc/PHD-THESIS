@@ -1,6 +1,6 @@
 # C-RLSBJTS-CONDLAW-DIAG-01 — Frozen conditional-law mechanism diagnostic
 
-**Status:** `OPEN_FOR_CLAUDE`  
+**Status:** `READY_FOR_PMO_CODE`  
 **Owner:** Claude — Technical Research Verifier / Implementation Lead  
 **Research execution owner:** User / Google Colab if RESEARCH mode is needed  
 **PMO:** GPT  
@@ -185,3 +185,82 @@ COMMIT:
 ```
 
 Then mark `READY_FOR_PMO_CODE` and stop. Do not run RESEARCH mode.
+
+## 12. Progress
+
+### 2026-09-22 — Claude — `READY_FOR_PMO_CODE`
+
+Design, implementation and smoke only. **No policy was trained or evaluated, and
+RESEARCH mode was not run** — it hard-requires a CUDA NVIDIA T4 and this sandbox has no
+GPU. 11/11 smoke checks pass in 6.2 s on CPU, four of them controls that must fail or
+block and do. PMO state, decision log, claim ledger and all frozen/comparator evidence
+untouched; `main` synced before work.
+
+Delivered against the section 8 allowlist:
+
+- `notebooks/07_RL_SBJTS_CONDITIONAL_LAW_DIAGNOSTIC_v1_0.ipynb` (26 cells; the eight
+  modules plus the namespace loader are carried as base64 and round-trip verified
+  byte-for-byte against what was smoke-executed)
+- `reports/claude/RL_SBJTS_CONDITIONAL_LAW_DIAGNOSTIC_v1.md`
+- `evidence/conditional_law_v1/smoke/*` (schema, checks, 12 block checkpoints)
+- `evidence/conditional_law_v1/research/README_EXPECTED_OUTPUTS.md`
+
+**Design.** Pairs `(r_{t-1}, r_t)` for every decision time after the first lag,
+never across a path boundary; lagged returns standardised with the frozen Merton
+one-step calibration and the same fixed right-closed bins applied to both laws. Every
+reported quantity is a function of per-(law, block, bin) sufficient statistics, which is
+what makes the run resumable at block granularity, makes a resumed run bit-exact against
+an uninterrupted one, and makes the cluster bootstrap cheap. The resampling unit is the
+simulation seed block, as section 10 requires.
+
+**A method correction worth PMO's attention.** My first flatness control read eight
+per-bin 95% intervals and required all to cover `m1`. That is a multiplicity error and it
+duly failed on honest iid data: with eight bins at least one miss has probability about
+1 - 0.95^8 = 34% under a perfectly flat law. Bonferroni fixes the level but needs a 0.3%
+bootstrap percentile, which a few dozen blocks cannot resolve. The package now uses a
+simultaneous studentized sup-statistic over bins, which asks the simultaneous question
+directly and needs only a central percentile. Merton returns sup 1.057 against a critical
+value of 2.696 (flat); a mild injected AR(1) at rho=0.15 returns 42.563 against 2.710 and
+a slope interval [0.1456, 0.1524] excluding zero. The gate that passes on iid data fails
+decisively on dependence.
+
+**Controls.** Merton flatness (positive control, and the notebook raises in BOTH modes if
+it fails); AR(1) injection (negative); pairing destruction — permuting each step's column
+preserves every one-step marginal exactly while removing the time linkage, moving the
+SBJTS fixture slope from -0.1335 to -0.0093, so a surviving slope could not have been a
+marginal artefact; resume exactness; cluster unit (block interval 1.35x the row-iid
+width, single-block case refused); AST gate proving no actor, critic or learner-update
+symbol is referenced anywhere on the diagnostic path; numeric seed isolation (128
+diagnostic seeds against 720 Base 4 training/holdout seeds, empty intersection);
+namespace isolation both directions; and the T4 requirement refusing to run here.
+
+**Smoke numbers are not evidence.** The fixture is 6 blocks x 64 paths per law. It exists
+to exercise every bin and the whole schema, and all eight bins populate for both laws. I
+have deliberately drawn no inference from its SBJTS slope, and any quotation of it as a
+finding should be treated as an error.
+
+**Proposed bounded RESEARCH budget:** 64 blocks x 3,072 paths per law = 196,608 paths and
+11,599,872 lagged pairs per law, 4,000 bootstrap replicates, on the paid Colab T4 under
+`TORCH_CUDA_FLOAT32_BATCHED`. Blocks are favoured over paths-per-block because
+uncertainty is quantified at the block level. Sizing: the tail bins hold about 2% of
+pairs, giving a row-level standard error near 3.4e-05 and about 4.6e-05 after the measured
+1.35x block inflation — fine enough for conditional-mean deviations of order 1e-4.
+Estimated 11 minutes of SBJTS simulation from a two-point fit of the frozen engine
+(marginal about 3.4 ms per path), seconds for Merton, a few minutes for the bootstrap;
+**requesting a 45-minute allowance**, peak memory about 0.9 GB.
+
+Honest limitation on that estimate: it is a CPU measurement, since Claude has no GPU
+here, so the CUDA path is untimed and the allowance is deliberately loose. A first
+timing in this session came out 40x more expensive per path and was pure torch warm-up,
+which is why the reported figures come from a two-point fit after warm-up rather than a
+single measurement. The T4 requirement itself is scientific rather than performance
+driven: the accepted comparator lineage ran the frozen engine under
+`TORCH_CUDA_FLOAT32_BATCHED`, and characterising the same law under a different numerical
+backend would not be the same measurement.
+
+**Claim discipline preserved.** `EXPLORATORY_MECHANISM_ONLY` throughout. No causal
+attribution of the performance gain to the lagged-return channel, no pure-jump isolation,
+no external-validity claim, no confirmatory test, no universal superiority. The policy
+overlay is read-only and direction-only: it compares the SIGN of the already-accepted
+learned action response with the sign of the law's own conditional structure, and carries
+no magnitude and no share of the performance gap.

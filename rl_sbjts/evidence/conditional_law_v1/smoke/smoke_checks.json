@@ -1,0 +1,353 @@
+{
+  "ticket": "C-RLSBJTS-CONDLAW-DIAG-01",
+  "stage": "smoke_checks",
+  "run_mode": "SMOKE",
+  "evidence_class": "SMOKE_EVIDENCE",
+  "is_scientific_evidence": false,
+  "generated_at_utc": "2026-09-22T06:10:36.303910+00:00",
+  "claim_status": "EXPLORATORY_MECHANISM_ONLY",
+  "check_id": "C-RLSBJTS-CONDLAW-DIAG-01/SMOKE",
+  "is_research_scale_execution": false,
+  "no_policy_training_or_evaluation": true,
+  "profile": {
+    "n_blocks": 6,
+    "n_paths": 64,
+    "n_boot": 2000,
+    "note": "tiny frozen-engine fixture, CPU, exercises every bin and the whole output schema"
+  },
+  "source_fingerprint": {
+    "base3_notebook_sha256": "344956031d9e89763370a020d92ec54a669a7cc400e3d2b674de613897c02129",
+    "base3_code_concat_sha256": "db500333b57ae9029bde99018877580978f3c0344567fa8f86b9c74ac788b26e",
+    "base3_code_concat_match": true,
+    "snapshot_sha256": "7e817762849118fc3abf8d4cf98ad8d65d921fa49cb0d1b3bb34d884b73c5b4a",
+    "training_slice_sha256": "09811db465da1443b092f6b5e18a78b2fe1dda1fbf1709061395b0ed0e72bf01",
+    "training_slice_match": true,
+    "environment_fingerprint": "63ba37cc4a26b48b497e424cdeef4981684c1aef1176f2db571efa6e8e48a060",
+    "n_steps": 60,
+    "n_pi": 5,
+    "dt": 0.004,
+    "merton_calibration": {
+      "m1": 0.00027942696048003366,
+      "v1": 0.0001726791906838439,
+      "sigma_M": 0.2077734286932787,
+      "mu_minus_rf": 0.0914416389554889
+    },
+    "market_object": "project_ew(inc): equally weighted log increment over the four snapshot assets, the same object the learner consumes and the same object the Merton arm was calibrated to"
+  },
+  "checks": [
+    {
+      "check": "S1_BIN_SCHEME",
+      "edges": [
+        "-inf",
+        "-2.0",
+        "-1.0",
+        "-0.5",
+        "0.0",
+        "0.5",
+        "1.0",
+        "2.0",
+        "inf"
+      ],
+      "labels": [
+        "(-inf,-2]",
+        "(-2,-1]",
+        "(-1,-0.5]",
+        "(-0.5,0]",
+        "(0,0.5]",
+        "(0.5,1]",
+        "(1,2]",
+        "(2,inf)"
+      ],
+      "probe_z": [
+        -5.0,
+        -2.0,
+        -1.999,
+        -1.0,
+        -0.5,
+        -1e-18,
+        0.0,
+        1e-18,
+        0.5,
+        1.0,
+        2.0,
+        5.0
+      ],
+      "probe_bin": [
+        0,
+        0,
+        1,
+        1,
+        2,
+        3,
+        3,
+        4,
+        4,
+        5,
+        6,
+        7
+      ],
+      "right_closed_minus_two_in_lowest_bin": true,
+      "zero_falls_in_minus_half_to_zero": true,
+      "all_in_range": true,
+      "pass": true
+    },
+    {
+      "check": "S2_SUFFICIENT_STATISTICS_ADDITIVE",
+      "max_abs_count_gap_must_be_exact": 0.0,
+      "max_rel_bin_gap": 4.353815782843751e-18,
+      "max_rel_global_gap": 1.423362852083534e-19,
+      "relative_tolerance": 1e-12,
+      "pairs_counted": 715.0,
+      "pairs_expected": 715.0,
+      "no_pair_crosses_a_path_boundary": true,
+      "note": "counts are exact; the real-valued sums agree to floating-point summation order, which is all that re-pooling can disturb",
+      "pass": true
+    },
+    {
+      "check": "S3_MERTON_FLAT_CONTROL",
+      "m1": 0.00027942696048003366,
+      "n_blocks": 24,
+      "n_paths": 250,
+      "method": "simultaneous studentized sup-statistic over bins; per-bin intervals are reported for description only and are NOT read simultaneously",
+      "sup_test": {
+        "status": "OK",
+        "null_value": 0.00027942696048003366,
+        "n_blocks": 24,
+        "n_boot": 2000,
+        "level": 0.95,
+        "bins_used": 8,
+        "sup_statistic": 1.0565422545049568,
+        "critical_value": 2.6959327113261007,
+        "per_bin": [
+          {
+            "bin": "(-inf,-2]",
+            "n": 8153,
+            "conditional_mean": 0.00025034688078709173,
+            "standard_error": 0.00011520921794415563,
+            "studentized_deviation": 0.25241105019077265
+          },
+          {
+            "bin": "(-2,-1]",
+            "n": 47854,
+            "conditional_mean": 0.0002749002940770898,
+            "standard_error": 5.776957748139657e-05,
+            "studentized_deviation": 0.07835727038858101
+          },
+          {
+            "bin": "(-1,-0.5]",
+            "n": 53008,
+            "conditional_mean": 0.0002868600379063545,
+            "standard_error": 5.487126520486488e-05,
+            "studentized_deviation": 0.1354639336011121
+          },
+          {
+            "bin": "(-0.5,0]",
+            "n": 67637,
+            "conditional_mean": 0.0003351059753052637,
+            "standard_error": 5.269927879156948e-05,
+            "studentized_deviation": 1.0565422545049568
+          },
+          {
+            "bin": "(0,0.5]",
+            "n": 68098,
+            "conditional_mean": 0.0003207519174439218,
+            "standard_error": 6.693418104360549e-05,
+            "studentized_deviation": 0.6173969161879527
+          },
+          {
+            "bin": "(0.5,1]",
+            "n": 52922,
+            "conditional_mean": 0.0002578227207756524,
+            "standard_error": 5.0036109807889595e-05,
+            "studentized_deviation": 0.4317729693081529
+          },
+          {
+            "bin": "(1,2]",
+            "n": 48176,
+            "conditional_mean": 0.00030739395778895756,
+            "standard_error": 4.883647503463846e-05,
+            "studentized_deviation": 0.5726661739834341
+          },
+          {
+            "bin": "(2,inf)",
+            "n": 8152,
+            "conditional_mean": 0.00019569259222264592,
+            "standard_error": 0.00012504527111334166,
+            "studentized_deviation": 0.6696324260154587
+          }
+        ],
+        "simultaneous_flat": true,
+        "pass": true
+      },
+      "lag_slope": -0.0001004234020724271,
+      "lag_slope_lo": -0.002795845861932152,
+      "lag_slope_hi": 0.002589908872822799,
+      "slope_interval_covers_zero": true,
+      "lag1_autocorrelation": -0.00010044698103247765,
+      "autocorrelation_interval_covers_zero": true,
+      "pooled_tail_probability": 0.04985593220338983,
+      "tail_probability_near_5pct": true,
+      "pass": true
+    },
+    {
+      "check": "S4_AR1_NEGATIVE_CONTROL",
+      "injected_rho": 0.15,
+      "sup_statistic": 42.563255507846286,
+      "critical_value": 2.710317613873567,
+      "simultaneous_flat": false,
+      "lag_slope": 0.1491220811817385,
+      "lag_slope_lo": 0.1456396829817568,
+      "lag_slope_hi": 0.15237656705871624,
+      "slope_interval_covers_zero": false,
+      "expected": "FAIL the sup flatness test and exclude zero slope",
+      "pass": true
+    },
+    {
+      "check": "S5_PAIRING_NEGATIVE_CONTROL",
+      "slope_with_true_pairing": -0.133498467600717,
+      "slope_after_shuffling_the_pairing": -0.009269652980337382,
+      "per_step_marginals_unchanged": true,
+      "shuffled_slope_is_much_smaller": true,
+      "pass": true
+    },
+    {
+      "check": "S6_RESUME_EXACT",
+      "laws": [
+        {
+          "law": "SBJTS_TARGET",
+          "n_blocks": 6,
+          "interrupt_after_block": 3,
+          "max_abs_scalar_gap": 0.0,
+          "max_abs_bin_gap": 0.0,
+          "resume_is_exact": true,
+          "regrouped_partial_sum_gap": 0.0,
+          "regrouped_gap_relative": 0.0,
+          "regrouped_within_tolerance": true
+        },
+        {
+          "law": "MERTON_EMPIRICAL_GBM",
+          "n_blocks": 6,
+          "interrupt_after_block": 3,
+          "max_abs_scalar_gap": 0.0,
+          "max_abs_bin_gap": 0.0,
+          "resume_is_exact": true,
+          "regrouped_partial_sum_gap": 2.6020852139652106e-18,
+          "regrouped_gap_relative": 5.876044856311675e-15,
+          "regrouped_within_tolerance": true
+        }
+      ],
+      "note": "resume pools in block-index order and is bit-exact; the regrouped figure is floating-point non-associativity, not a resume defect",
+      "pass": true
+    },
+    {
+      "check": "S7_CLUSTER_UNIT_IS_THE_BLOCK",
+      "resampling_unit": "simulation seed block",
+      "n_blocks": 6,
+      "block_bootstrap_slope_ci_width": 0.0349514397904636,
+      "row_iid_slope_ci_width": 0.025872283963936312,
+      "ratio_block_over_row": 1.3509220847754622,
+      "single_block_guard": "CLUSTER_BOOTSTRAP_REQUIRES_AT_LEAST_TWO_BLOCKS",
+      "pass": true
+    },
+    {
+      "check": "S8_NO_ACTOR_TRAINING",
+      "method": "AST identifier / attribute / subscript-key scan",
+      "modules_scanned": [
+        {
+          "module": "binning",
+          "n_identifiers": 137,
+          "forbidden_found": []
+        },
+        {
+          "module": "laws",
+          "n_identifiers": 59,
+          "forbidden_found": []
+        },
+        {
+          "module": "runner",
+          "n_identifiers": 133,
+          "forbidden_found": []
+        },
+        {
+          "module": "overlay",
+          "n_identifiers": 62,
+          "forbidden_found": []
+        }
+      ],
+      "forbidden_symbols": [
+        "LinearActor",
+        "actor_gradient",
+        "fit_linear_critic",
+        "adam_update",
+        "soft_return_to_go",
+        "entropy_gradient_batch",
+        "rollout_states_actions",
+        "critic_values",
+        "score_phi",
+        "policy_from_raw_batch",
+        "state_features"
+      ],
+      "hits": {},
+      "pass": true
+    },
+    {
+      "check": "S9_SEED_ISOLATION",
+      "n_diagnostic_seeds": 128,
+      "n_frozen_seeds": 720,
+      "intersection": [],
+      "isolated": true,
+      "namespaces": [
+        "CONDLAW_DIAGNOSTIC_SBJTS_BLOCK",
+        "CONDLAW_DIAGNOSTIC_MERTON_BLOCK"
+      ],
+      "pass": true
+    },
+    {
+      "check": "S10_NAMESPACE_ISOLATION",
+      "attempts": {
+        "SMOKE": "SMOKE_WRITE_INTO_RESEARCH_NAMESPACE_FORBIDDEN",
+        "RESEARCH": "RESEARCH_WRITE_INTO_SMOKE_NAMESPACE_FORBIDDEN"
+      },
+      "pass": true
+    },
+    {
+      "check": "S11_RESEARCH_REQUIRES_NVIDIA_T4",
+      "observed": "RESEARCH_MODE_REQUIRES_CUDA",
+      "pass": true
+    }
+  ],
+  "n_checks": 11,
+  "n_pass": 11,
+  "all_pass": true,
+  "negative_controls": [
+    "S4_AR1_NEGATIVE_CONTROL",
+    "S5_PAIRING_NEGATIVE_CONTROL",
+    "S10_NAMESPACE_ISOLATION",
+    "S11_RESEARCH_REQUIRES_NVIDIA_T4"
+  ],
+  "cpu_budget_probe": {
+    "observations": [
+      {
+        "n_paths": 128,
+        "elapsed_s": 0.58,
+        "shape": [
+          128,
+          60
+        ]
+      },
+      {
+        "n_paths": 512,
+        "elapsed_s": 1.75,
+        "shape": [
+          512,
+          60
+        ]
+      }
+    ],
+    "marginal_seconds_per_path_cpu": 0.0030468749999999997,
+    "fixed_seconds_per_block_cpu": 0.19,
+    "model": "elapsed ~= fixed + marginal * n_paths, fitted on the two probes",
+    "backend": "TORCH_CPU_FLOAT32_BATCHED (this sandbox has no GPU)"
+  },
+  "elapsed_s": 6.2
+}

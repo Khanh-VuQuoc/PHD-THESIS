@@ -1,0 +1,26 @@
+{
+  "ticket": "C-RLSBJTS-MERTON-COMP-01",
+  "stage": "fingerprint",
+  "run_mode": "SMOKE",
+  "evidence_class": "SMOKE_EVIDENCE",
+  "is_scientific_evidence": false,
+  "generated_at_utc": "2026-09-22T06:10:33.092763+00:00",
+  "claim_status": "SMOKE_EVIDENCE \u2014 execution proof only. This artifact is not a scientific result and must never be reported as comparator evidence.",
+  "base3_notebook_sha256": "344956031d9e89763370a020d92ec54a669a7cc400e3d2b674de613897c02129",
+  "base3_code_concat_sha256": "db500333b57ae9029bde99018877580978f3c0344567fa8f86b9c74ac788b26e",
+  "base3_code_concat_match": true,
+  "snapshot_sha256": "7e817762849118fc3abf8d4cf98ad8d65d921fa49cb0d1b3bb34d884b73c5b4a",
+  "training_slice_sha256": "09811db465da1443b092f6b5e18a78b2fe1dda1fbf1709061395b0ed0e72bf01",
+  "training_slice_match": true,
+  "environment_fingerprint": "63ba37cc4a26b48b497e424cdeef4981684c1aef1176f2db571efa6e8e48a060",
+  "n_steps": 60,
+  "n_pi": 5,
+  "dt": 0.004,
+  "merton_calibration": {
+    "m1": 0.00027942696048003366,
+    "v1": 0.0001726791906838439,
+    "sigma_M": 0.2077734286932787,
+    "mu_minus_rf": 0.0914416389554889
+  },
+  "market_object": "project_ew(inc): equally weighted log increment over the four snapshot assets, the same object the learner consumes and the same object the Merton arm was calibrated to"
+}
