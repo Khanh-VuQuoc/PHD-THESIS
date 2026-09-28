@@ -1,28 +1,30 @@
 # 00_CURRENT_STATE — RL–SBJTS
 
-Updated: 2026-09-22. Owner: GPT / PMO.
+Updated: 2026-09-28. Owner: GPT / PMO.
 
 ## Current work
 
 | Field | Current value |
 |---|---|
-| Project research status | **SCIENTIFIC_BACKBONE_LOCKED / MANUSCRIPT_CORE_ASSEMBLED** — direct comparator, T1–T5 theory, robustness, saved-policy mechanism evidence, and the user-Colab conditional-law diagnostic are accepted with stated scope. No further research-scale experiment is open. |
+| Project research status | **SCIENTIFIC_BACKBONE_LOCKED / MANUSCRIPT_THEORY_PATCH_ACCEPTED** — direct comparator, T1–T5 theory, robustness, saved-policy mechanism evidence, conditional-law diagnostic, and the manuscript theory-consistency patch are accepted with stated scope. No further research-scale experiment is open. |
 | Executable research ticket | **NONE. STOP EXPERIMENTS.** All currently authorized scientific work packages have completed their purpose. |
-| Manuscript core | `manuscript/RL_SBJTS_MANUSCRIPT_DRAFT_v1.tex` — comparator + theory + mechanism + discussion/limitations assembled into one paper narrative. |
+| Manuscript core | `manuscript/RL_SBJTS_MANUSCRIPT_DRAFT_v1.tex` — comparator + theory + mechanism + discussion/limitations assembled into one paper narrative. T3/T4/T5 consistency patch `ea86d118...` is accepted and merged to main. |
 | Manuscript integration record | `reports/pmo/PMO_MANUSCRIPT_INTEGRATION_v1.md`. |
+| Manuscript theory-patch audit | `reports/pmo/PMO_MANUSCRIPT_THEORY_PATCH_AUDIT_v1.md` — `ACCEPTED / MERGED_TO_MAIN`. |
+| Theory supersession note | `reports/pmo/RL_SBJTS_THEORY_SUPERSESSION_NOTE_v1.md` — historical P3 first-moment reduction and pre-diagnostic unresolved wording are superseded; accepted theory report itself remains unchanged. |
 | Accepted empirical scope | Under the tested frozen SBJTS deployment law, SBJTS-trained policies have higher terminal log wealth and lower CVaR log loss than otherwise matched empirical-GBM-trained policies in both LONG_ONLY_FULL and LONG_ONLY_CAP50. |
 | FULL comparator result | `Delta_W = +0.0022063`; `Delta_CVaR = -0.0031810`. |
 | CAP50 comparator result | `Delta_W = +0.0005541`; `Delta_CVaR = -0.0007611`. |
 | Comparator robustness | Frozen crossed-cluster 95% intervals exclude zero for all four co-primary contrasts. Policy-level sensitivity using only the 40 paired training replications also excludes zero for all four; favorable sign is 40/40 in every endpoint/stratum. |
-| Theory status | **ACCEPTED_WITH_STATED_ASSUMPTIONS.** T1 exact wealth coupling; T2 moment/path-law non-equivalence; T3 history-state likelihood-ratio gradient without assuming the four-feature observation is Markov; T4 symmetric occupancy/continuation-value decomposition; T5 structural lagged-return mechanism; entropy scaling `m=lambda*dt`. |
-| T3 regularity | The theorem is conditional on A4, or the sufficient mixed condition `sup_theta E[(1+max_t||S_t||)(1+|R_soft|)] < infinity`; this is assumed, not claimed verified for the frozen SBJTS law. |
-| Saved-policy mechanism evidence | Average executed exposure is nearly unchanged, while saved SBJTS actors show strong negative lag-return and wealth-state feedback and Merton actors are nearly flat. FULL lag-response slope is about `-0.674` for SBJTS vs `+0.015` for Merton. |
+| Theory status | **ACCEPTED_WITH_STATED_ASSUMPTIONS.** T1 exact wealth coupling; T2 moment/path-law non-equivalence; T3 history-state likelihood-ratio gradient with separate direct entropy derivative and without assuming the four-feature observation is Markov; T4 symmetric occupancy/continuation-value decomposition under a common dominating measure plus the separate entropy-derivative law-gap term; T5 structural lagged-return conditional-mean channel; entropy scaling `m=lambda*dt`. |
+| T3 regularity | The theorem is conditional on A4, or the sufficient mixed condition `sup_theta E[(1+max_t||S_t||)(1+|R_soft|)] < infinity`; this is assumed, not claimed verified for the frozen SBJTS law. The withdrawn reduction to terminal-log-wealth first-moment integrability must not be used. |
+| Saved-policy mechanism evidence | Average executed exposure is nearly unchanged, while saved SBJTS actors show strong negative lag-return and wealth-state feedback and Merton actors are nearly flat. FULL executed-policy lag-response slope is about `-0.674` for SBJTS vs `+0.015` for Merton; these are not the same quantity as the raw actor-weight lag coefficients. |
 | Conditional-law result | **ACCEPTED_EXPLORATORY_MECHANISM_EVIDENCE.** User T4 run completed `64 × 3,072` paths per law and `4,000` block-bootstrap replicates. SBJTS lag slope `-0.125006` with 95% CI `[-0.125843,-0.124150]`; lag-1 autocorrelation `-0.124750` with CI `[-0.125587,-0.123909]`. Merton research slope `+0.000135` with CI `[-0.000430,+0.000716]`. |
 | Conditional-risk result | SBJTS also shows state-dependent variance and left-tail probability. Variance rises to `0.0009073` after the most negative lag bin and `0.0004576` after the most positive lag bin versus unconditional `0.0002623`; the fixed-Merton 5% tail probability ranges from about `2.8–3.2%` after negative lags to `7.85%` after the most positive lag. Merton remains approximately flat. |
 | Conditional-law hardware/provenance | Research evidence is correctly stamped `C-RLSBJTS-CONDLAW-DIAG-01`, executed on Tesla T4 / CUDA 12.8 / `TORCH_CUDA_FLOAT32_BATCHED`; Base-3 code concat, snapshot, training slice and environment fingerprints match the frozen lineage. |
 | Result audit | `reports/pmo/PMO_CONDLAW_RESULT_AUDIT_v1.md` — `RESEARCH_EVIDENCE_ACCEPTED_WITH_SCOPE / STOP_EXPERIMENTS`. |
-| Permanent limitations | No universal superiority, no pure-jump causal attribution, no external-market validity from smoke-scale Base 2 ancestry, no retrospective confirmatory-superiority claim, no claim that lagged return alone causes the observed gain. |
-| Next PMO action | Editorial only: broaden and verify the external literature/reference section, adapt to the chosen journal template, polish language/figures, and respond to advisor/reviewer comments. No new scientific experiment unless a new scoped question is explicitly opened. |
+| Permanent limitations | No universal superiority, no pure-jump causal attribution, no external-market validity from smoke-scale Base 2 ancestry, no retrospective confirmatory-superiority claim, no claim that lagged return alone causes the observed gain. The T5 covariance result is an availability statement for a conditional-mean information channel, not a statement that every lag-related policy effect disappears under iid Merton. |
+| Next PMO action | **Final manuscript claim/reference audit only.** Verify every Abstract/Introduction/Results/Discussion/Conclusion claim against evidence, expand and verify external literature/reference positioning, then adapt to the chosen journal template and polish language/figures. No new scientific experiment unless a genuinely new scoped question is explicitly opened. |
 
 ## Locked scientific narrative
 
@@ -46,7 +48,7 @@ The evidence chain is complete for the intended domain-scoped paper claim:
 
 1. **Path-law evidence.** Base 4 shows that matching local canonical mean/variance does not match terminal/path behavior; cross-time dependence matters.
 2. **Direct performance evidence.** On the same frozen SBJTS deployment law, the SBJTS-trained learner has higher terminal log wealth and lower CVaR log loss than the matched empirical-Merton/GBM-trained learner under both frozen constraints.
-3. **Theory.** T1–T5 establish how a market law can enter wealth dynamics, policy gradients, occupancy and continuation values without assuming the learner's four-feature observation is a complete Markov state.
+3. **Theory.** T1–T5 establish how a market law can enter wealth dynamics, policy gradients, occupancy and continuation values without assuming the learner's four-feature observation is a complete Markov state. The manuscript now carries the two-term T3 gradient, the common-dominating-measure T4 split, and the separate entropy-derivative law-gap contribution explicitly.
 4. **Saved-policy mechanism evidence.** Merton-trained policies are almost flat in lagged return while SBJTS-trained policies learn strong negative lag feedback.
 5. **Direct conditional-law evidence.** The frozen SBJTS market object has pronounced negative lag dependence and state-dependent variance/tail risk, while the iid Merton control is recovered as flat. The SBJTS policy response is qualitatively aligned with that target-law structure.
 
@@ -64,9 +66,11 @@ When plotting conditional means, use within-law deviations or each law's own unc
 - `reports/research/RL_SBJTS_MECHANISM_AND_ROBUSTNESS_v1.md`
 - `reports/claude/RL_SBJTS_THEORY_COUPLING_v1.md`
 - `reports/pmo/PMO_THEORY_COUPLING_ACCEPTANCE_v3.md`
+- `reports/pmo/RL_SBJTS_THEORY_SUPERSESSION_NOTE_v1.md`
 - `reports/pmo/PMO_CONDLAW_CODE_ACCEPTANCE_v2.md`
 - `reports/pmo/PMO_CONDLAW_RESULT_AUDIT_v1.md`
 - `reports/pmo/PMO_MANUSCRIPT_INTEGRATION_v1.md`
+- `reports/pmo/PMO_MANUSCRIPT_THEORY_PATCH_AUDIT_v1.md`
 - `manuscript/RL_SBJTS_MANUSCRIPT_DRAFT_v1.tex`
 - `evidence/theory_coupling_v1/unit_checks.json`
 - `evidence/theory_coupling_v1/theorem_code_map.csv`
@@ -81,7 +85,9 @@ When plotting conditional means, use within-law deviations or each law's own unc
 - `C-RLSBJTS-MERTON-COMP-01` completed its scientific purpose under DEC-RL-004.
 - `C-RLSBJTS-THEORY-COUPLING-01` completed its scientific purpose under `PMO_THEORY_COUPLING_ACCEPTANCE_v3.md`.
 - `C-RLSBJTS-CONDLAW-DIAG-01` completed its scientific purpose under `PMO_CONDLAW_RESULT_AUDIT_v1.md`.
+- Manuscript theory-consistency submission `ea86d118...` is accepted under `PMO_MANUSCRIPT_THEORY_PATCH_AUDIT_v1.md` and merged to main.
 - Conditional-law code submission `e60a351...` is superseded by accepted patched code `c47304c...`.
 - Historical theory submissions `64cd35b0...` and `6bc4796...` are superseded by `ed7e9b5...`.
+- Historical P3 wording and pre-execution conditional-law status in the accepted theory report are superseded for manuscript use by `RL_SBJTS_THEORY_SUPERSESSION_NOTE_v1.md`; the accepted theory report itself remains immutable.
 - Commit `0bdd16b` remains **DEVELOPMENT_EVIDENCE** only.
 - Process rule DEC-RL-002 remains binding for any future work: Claude does derivation/design/code/smoke; the user owns research-scale execution. No new research-scale work is currently authorized.
