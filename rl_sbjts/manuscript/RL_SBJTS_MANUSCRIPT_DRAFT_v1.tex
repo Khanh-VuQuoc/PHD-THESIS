@@ -71,26 +71,75 @@ used only as a local diagnostic.
 There exist return laws with identical unconditional one-step mean and variance at every time for which the expected-growth functional, the optimal observation-based policy, or the policy gradient differ. The statement also holds when the full one-step marginal is identical and only the conditional law differs.
 \end{proposition}
 
-Let $H_t$ denote the full simulator history and $S_t$ the learner observation. If the market kernel and initial law are independent of $\theta$,
+\subsection*{Trajectory policy gradient under history dependence}
+Let $H_t$ denote the full simulator history, $S_t=s(H_t)=(1,t/N,\log(W_t/W_0),r_{t-1})$ the learner observation, and $A_t\sim\lambda_\theta(\cdot\mid S_t)$. The observation $S_t$ is \emph{not} assumed to be a complete Markov state: the problem is a history-state process controlled by an observation-based policy. For a trajectory $\tau=(H_0,A_0,\dots,H_N)$,
 \[
-\nabla_\theta\log p_{\theta,L}(\tau)=\sum_t \nabla_\theta\log\lambda_\theta(A_t\mid S_t),
+p_{\theta,L}(\tau)=p_0(H_0)\prod_{t=0}^{N-1}\lambda_\theta(A_t\mid S_t)\,Q_L(dH_{t+1}\mid H_t,A_t).
 \]
-so the trajectory gradient does not require $S_t$ itself to be Markov. The theorem is conditional on a domination assumption; a sufficient local condition is
+We use the following assumptions.
+\begin{enumerate}[label=(A\arabic*),leftmargin=3em]
+\item The market transition kernel $Q_L$ does not depend on the actor parameter $\theta$.
+\item The initial law $p_0$ does not depend on $\theta$.
+\item The executed policy is a Gaussian truncated to the constraint interval; it has strictly positive density on the open action interval, is smooth in its policy parameters, has scale bounded away from zero, and the raw-to-policy transform is smooth.
+\item (Domination.) For $\theta_0$ and a neighbourhood $U\ni\theta_0$ there is an integrable $\Phi(\tau)$ with $E_{\theta_0}[\Phi]<\infty$ such that, for all $\theta\in U$,
 \[
-\sup_{\theta\in U}\E[(1+\max_t\|S_t\|)(1+|R_\theta^{\rm soft}|)]<\infty.
+\Big|R^{\rm soft}_\theta(\tau)\sum_t\psi_\theta(A_t,S_t)\Big|+\Big|m\sum_t\partial_\theta H(\lambda_\theta(\cdot\mid S_t))\Big|\le\Phi(\tau).
 \]
+\end{enumerate}
+Under (A1)--(A2) the kernel terms of $\log p_{\theta,L}$ are $\theta$-free, so
+\[
+\nabla_\theta\log p_{\theta,L}(\tau)=\sum_t\psi_\theta(A_t,S_t),\qquad \psi_\theta(a,s)=\nabla_\theta\log\lambda_\theta(a\mid s),
+\]
+which uses only that the policy is $S_t$-measurable, not that $S_t$ is Markov.
 
-Writing the score-gradient integrand as $d_LA_L$, the law gap admits the symmetric identity
+Two scores must be distinguished. The \emph{policy-parameter score} $\psi_\phi=\nabla_\phi\log\lambda_\phi(a\mid s)$, with $\phi$ the location/scale parameters, is bounded on the frozen parameter box. The learned parameter, however, is the linear actor weight $\theta$, with ${\rm raw}=\theta S_t$, and the \emph{actor-weight score} is
 \[
-d_SA_S-d_MA_M=\tfrac12(d_S-d_M)(A_S+A_M)+\tfrac12(d_S+d_M)(A_S-A_M),
+\nabla_\theta\log\lambda_\theta(a\mid S_t)=\big[J_{\rm transform}({\rm raw})^{\top}\psi_\phi\big]\otimes S_t .
 \]
-which is descriptive rather than causal.
+It chains through the state features. Because $\log(W_t/W_0)$ is unbounded, the actor-weight score is not uniformly bounded over the state space merely because the policy-parameter image is bounded; (A3) does not dominate it. The zero-mean property $E[\psi_\theta\mid S_t]=0$ does transfer, since $J_{\rm transform}$ and $S_t$ are $S_t$-measurable.
 
-Finally, with $\bar\pi_\theta(S_t)=\E[A_t\mid S_t]$ and $\mu_L(H_t)=\E_L[r_t\mid H_t]$,
+For the frozen objective
+\[
+J_L(\theta)=\E\Big[X_N-X_0+m\sum_t H(\lambda_\theta(\cdot\mid S_t))\Big],\qquad R^{\rm soft}_\theta(\tau)=X_N-X_0+m\sum_t H(\lambda_\theta(\cdot\mid S_t)),
+\]
+the integrand itself depends on $\theta$, so under (A1)--(A4)
+\[
+\nabla_\theta J_L=\underbrace{\E\Big[R^{\rm soft}_\theta(\tau)\sum_t\psi_\theta(A_t,S_t)\Big]}_{\text{trajectory-score term}}+\underbrace{m\,\E\Big[\sum_t\partial_\theta H(\lambda_\theta(\cdot\mid S_t))\Big]}_{\text{direct entropy-derivative term, sampled state held fixed}}.
+\]
+Occupancy effects enter through the first term; the second is a partial derivative at the sampled state and is kept as a separate term.
+
+Assumption (A4) is retained as a general assumption. An assumed sufficient condition for it, for finite horizon $N$, is the mixed state/soft-return moment condition
+\[
+\sup_{\theta\in U}\E\Big[\big(1+\max_{t\le N}\|S_t\|\big)\big(1+|R^{\rm soft}_\theta(\tau)|\big)\Big]<\infty .
+\]
+This condition is assumed; it is not proved for the frozen SBJTS law. In particular, (A4) is not reduced to integrability of terminal log wealth alone: that reduction presumed a uniformly bounded actor score and is withdrawn. The policy-gradient theorem is therefore stated conditionally on (A4).
+
+\subsection*{Occupancy and continuation-value decomposition}
+Let $d^\theta_{L,t}$ be the time-$t$ occupancy measure of the history state under law $L\in\{S,M\}$ and let $\mathcal A_{L,t}(h,a)$ denote the soft advantage (written $\mathcal A$ to distinguish it from the action $A_t$). The two occupancy measures need not share a support---a history-dependent law can place zero mass on histories that the iid law reaches---so they are represented with respect to a common dominating measure $\nu$ (for instance $\nu=d^\theta_{S,t}+d^\theta_{M,t}$), with densities
+\[
+d_{L,t}=\frac{d\,d^\theta_{L,t}}{d\nu}.
+\]
+The trajectory-score term is then
+\[
+G^{\rm score}_L=\sum_t\int\!\!\int d_{L,t}(h)\,\lambda_\theta(a\mid s(h))\,\psi_\theta(a,s(h))\,\mathcal A_{L,t}(h,a)\,da\,\nu(dh),
+\]
+and, pointwise in $(h,a)$ and suppressing $t$, the manuscript convention is the symmetric midpoint identity
+\[
+d_S\mathcal A_S-d_M\mathcal A_M=\underbrace{\tfrac12(d_S-d_M)(\mathcal A_S+\mathcal A_M)}_{\text{symmetric occupancy contribution}}+\underbrace{\tfrac12(d_S+d_M)(\mathcal A_S-\mathcal A_M)}_{\text{symmetric continuation-value contribution}}.
+\]
+Because the direct entropy derivative is not folded into the soft advantage, the full training-law gradient gap has three pieces: (i) the symmetric occupancy contribution, (ii) the symmetric continuation-value contribution, both integrated against $\lambda_\theta\psi_\theta\,da\,\nu(dh)$ and summed over $t$, and (iii) the direct entropy-derivative occupancy-difference contribution
+\[
+m\sum_t\int\big(d_{S,t}(h)-d_{M,t}(h)\big)\,\partial_\theta H\big(\lambda_\theta(\cdot\mid s(h))\big)\,\nu(dh).
+\]
+Term (iii) is carried explicitly. It vanishes in the enumerable verification fixture, where the relevant one-step marginals are matched by construction, but it does not vanish in general and is not dropped. The symmetric split removes the arbitrary choice of reference law and nothing more: it is an attribution convention, not a causal decomposition, and neither contribution should be read as the effect of intervening on occupancy or continuation values separately.
+
+\subsection*{Lagged-return information channel}
+With $\bar\pi_\theta(S_t)=\E[A_t\mid S_t]$ and $\mu_L(H_t)=\E_L[r_t\mid H_t]$,
 \[
 \E[A_tr_t]=\E[\bar\pi_\theta(S_t)]\E[\mu_L(H_t)]+\Cov(\bar\pi_\theta(S_t),\mu_L(H_t)).
 \]
 Under iid Merton, $\mu_M(H_t)$ is constant and the covariance channel vanishes.
+This establishes the \emph{availability} of a lag-dependent information channel under a history-dependent law, and its absence under the iid law. It does not attribute any particular share of the observed wealth or CVaR gap to lagged return alone; occupancy, continuation-value, wealth-state and higher-order channels remain unseparated.
 
 \section{Main results}
 \begin{table}[htbp]
