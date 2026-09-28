@@ -80,13 +80,11 @@ Summary: 12 objections — 3 CRITICAL, 7 MAJOR, 2 MINOR. None requires a new exp
 ### R6 — "A lag-1 autocorrelation of −0.125 in daily index-like returns is far stronger than what is typically observed. The SBJTS policy may be exploiting a simulator artifact."
 
 - **Severity:** MAJOR.
-- **Already answered?** No.
-- **Where:** l.169 reports the number without context.
-- **Minimal clarification:**
-  - Present the lag structure explicitly as a property of the frozen simulator.
-  - Repeat that no claim is made about real-market predictability.
-  - Tie this to R5.
-- **New experiment?** No. The lag-1 autocorrelation of the frozen *historical training slice* would be a cheap descriptive statistic on an existing frozen input. It is not an experiment and needs no training, but it is **not run** and is left as a **PMO decision**. If PMO declines, the limitation wording is sufficient.
+- **Scope ruling (PMO, 2026-09-28):** the conditional-law diagnostic characterizes the frozen target simulator. It is not presented as evidence that the same conditional-dependence magnitude holds in historical or future market returns.
+- **Already answered?** In substance, by this ruling and by l.31 (SBJTS is not claimed to be the true DGP). The manuscript does not yet say it at the point where −0.125 is reported.
+- **Where:** l.169 reports the number without that scope sentence.
+- **Minimal clarification:** Add one sentence at the start of the mechanism section (patch plan P0-12): "These statistics characterize the frozen target simulator; they are not presented as evidence that conditional dependence of this magnitude holds in historical or future market returns." The reviewer's artifact concern then becomes the external-validity limitation in R5.
+- **New experiment?** No. A training-slice autocorrelation statistic is **not needed**, because the ruling makes no claim that would require it. The former P2-7 option is withdrawn.
 
 ### R7 — "The mechanism is correlational. Without a lag-ablation, you cannot claim the policy's lag feedback produces the gain."
 

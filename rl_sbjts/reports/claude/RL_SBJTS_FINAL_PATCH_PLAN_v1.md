@@ -25,6 +25,7 @@ Items marked **[PMO decision]** need a PMO choice before they can be drafted.
 | P0-9 | Discussion l.176 | Add the missing permanent limitations: (a) SBJTS calibration ancestry is limited-scale, so no historical-market validity is claimed; (b) estimation-first, with no prespecified smallest effect size, so not a confirmatory test; (c) the GBM arm is data-calibrated, not moment-matched to the deployment law; (d) one learner class, state and exploration level, with no optimality of the truncated-Gaussian class claimed; (e) the T4 channels are not estimated on the frozen problem; (f) a lag-ablation contrast was not run, so the mechanism is directional alignment only. | [L3], R4, R5, R7, R9, R11. |
 | P0-10 | Design | Define the missing primitives: horizon N **[PMO confirm N=60]**, CVaR level α **[PMO supply; not in repository]**, "CVaR log loss", holdout structure (20 streams × 15 seeds, 600 paths), common-random-number pairing, the crossed-cluster bootstrap (training replication × holdout block), and the policy-level sensitivity. Disclose the single duplicate SBJTS row removed before pairing. | [B6], [D5], [D6], R10, R12. |
 | P0-11 | Results table l.148–163 | Report CIs at 4 significant figures, or have PMO confirm CAP50 Δ_W CI low from Drive `primary_estimands.json`. The repository snapshot has 0.000544995 and the manuscript 0.000545001; both round to 0.0005450. | Audit B.1 conflict. |
+| P0-12 | Mechanism, first sentence of l.169 | Add: "These statistics characterize the frozen target simulator; they are not presented as evidence that conditional dependence of this magnitude holds in historical or future market returns." | PMO scope ruling 2026-09-28; R6. |
 
 ## P1 — literature / citation completeness
 
@@ -47,7 +48,7 @@ Items marked **[PMO decision]** need a PMO choice before they can be drafted.
 | P2-4 | State λ_equiv = m/Δt = 2.5 at l.44 and note that both arms' mean actions sit near the interval centres. | [B5], R4. |
 | P2-5 | Add one sentence on economic scale: horizon-level Δ_W ≈ 22 bp (≈17.5% of the Merton arm's mean terminal log wealth); Δ_CVaR ≈ 3.7% of Merton CVaR; CAP50 effects ≈ 25% of FULL. | [R4], [R5]. |
 | P2-6 | Define the lag bins (units/standardization) **[PMO to confirm from the diagnostic spec]**. Optionally add the exact extreme-negative-bin tail probability of 3.19%. Use "2.8–3.2%" only if marked as rounded. | [M4], [M5]. |
-| P2-7 | **[PMO decision]** Optionally report the lag-1 autocorrelation of the frozen historical training slice as context for the simulator's −0.125. This is a descriptive statistic on an existing input, not an experiment. It is not run in this pass. | R6. |
+| P2-7 | **Withdrawn** (PMO scope ruling 2026-09-28). No training-slice autocorrelation statistic is reported; the diagnostic is scoped to the simulator and P0-12 states this. | R6. |
 
 ## P3 — language / style / formatting
 
@@ -77,4 +78,4 @@ Items marked **[PMO decision]** need a PMO choice before they can be drafted.
 3. P0-11: confirm CAP50 CI digits from Drive, or accept 4-significant-figure reporting.
 4. P2-2: SBJTS acronym, model reference and appendix source.
 5. P2-6: lag-bin units.
-6. P2-7: whether a training-slice autocorrelation statistic may be reported.
+6. ~~P2-7~~ resolved by the 2026-09-28 scope ruling (P0-12); no statistic is reported.
